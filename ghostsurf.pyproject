@@ -1,0 +1,3 @@
+{
+    "files": ["guis/main_win.ui","guis/password_win.ui","resources.qrc","guis/checklist_win.ui","guis/password_win.ui"]
+}

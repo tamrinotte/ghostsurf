@@ -1,0 +1,13 @@
+[Desktop Entry]
+# The type of the thing this desktop file refers to (e.g. can be Link)
+Type=Application
+# The application name.
+Name=Ghostsurf
+# Tooltip comment to show in menus.
+Comment=A destkop application which redirects internet traffic over tor
+# The path (folder) in which the executable is run
+Path=/usr/bin
+# The executable (can include arguments)
+Exec=/usr/bin/ghostsurf
+# The icon for the entry, use the target filesystem path.
+Icon=/usr/share/icons/hicolor/scalable/apps/ghostsurf_rounded.png
