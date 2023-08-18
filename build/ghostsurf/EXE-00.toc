@@ -42,7 +42,7 @@
  [],
  False,
  False,
- 1692202475,
+ 1692338005,
  [('run',
    '/home/max/.virtualenvs/ghostsurf/lib/python3.10/site-packages/PyInstaller/bootloader/Linux-64bit-intel/run',
    'EXECUTABLE')])
