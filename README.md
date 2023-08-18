@@ -51,19 +51,19 @@ __Enable Ghostsurf at Boot Switch:__ Enables ghostsurf boot
 ## INSTALLATION
 1) Install the dependencies: 	
 
-		sudo apt install tor netfilter-persistent iptables-persistent secure-delete bleachbit macchanger net-tools -y
+       sudo apt install tor netfilter-persistent iptables-persistent secure-delete bleachbit macchanger net-tools -y
 
 2) Download the installer
 
-		curl -L https://github.com/dogaegeozden/ghostsurf/releases/download/tor/ghostsurf.deb -o ghostsurf.deb		
+       curl -L https://github.com/dogaegeozden/ghostsurf/releases/download/tor/ghostsurf.deb -o ghostsurf.deb		
 
 3) Start the installer 
 
-		sudo dpkg -i ghostsurf.deb		
+       sudo dpkg -i ghostsurf.deb		
 
-4) Open a new terminal and type: 
+4) Open a new terminal and type:
 	
-		ghostsurf
+       ghostsurf
 
 <br>
 
@@ -133,19 +133,19 @@ __Enable Ghostsurf at Boot Switch:__ Ghostsurf'ü başlangıçta başlamaya ayar
 ## YÜKLEME
 1) Bağımlılıkları yükle: 	
 
-		sudo apt install tor netfilter-persistent iptables-persistent secure-delete bleachbit macchanger net-tools -y
+       sudo apt install tor netfilter-persistent iptables-persistent secure-delete bleachbit macchanger net-tools -y
 
 2) Yükleyiciyi indir
 
-		curl -L https://github.com/dogaegeozden/ghostsurf/releases/download/tor/ghostsurf.deb -o ghostsurf.deb		
+       curl -L https://github.com/dogaegeozden/ghostsurf/releases/download/tor/ghostsurf.deb -o ghostsurf.deb		
 
 3) Yükleyiciyi başlat
 
-		sudo dpkg -i ghostsurf.deb		
+       sudo dpkg -i ghostsurf.deb		
 
 4) Terminali aç ve aşağıdaki metni gir: 
 	
-		ghostsurf
+       ghostsurf
 
 <br>
 
