@@ -42,7 +42,7 @@
  [],
  False,
  False,
- 1692686556,
+ 1692689035,
  [('run',
    '/home/dillan/Desktop/ghostsurf/env/lib/python3.10/site-packages/PyInstaller/bootloader/Linux-64bit-intel/run',
    'EXECUTABLE')])

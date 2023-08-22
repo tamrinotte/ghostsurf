@@ -21,6 +21,6 @@ missing module named nt - imported by os (delayed, conditional, optional), ntpat
 missing module named _frozen_importlib_external - imported by importlib._bootstrap (delayed), importlib (optional), importlib.abc (optional)
 excluded module named _frozen_importlib - imported by importlib (optional), importlib.abc (optional)
 missing module named _winapi - imported by encodings (delayed, conditional, optional), ntpath (optional), subprocess (optional), mimetypes (optional)
-missing module named _scproxy - imported by urllib.request (conditional)
 missing module named org - imported by pickle (optional)
+missing module named _scproxy - imported by urllib.request (conditional)
 missing module named msvcrt - imported by subprocess (optional), getpass (optional)
