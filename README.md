@@ -1,5 +1,5 @@
 # GHOSTSURF 
-![GhostsurfLogo](https://raw.githubusercontent.com/dogaegeozden/ghostsurf/main/logos/ghostsurf_rounded.png)
+![GhostsurfLogo](https://raw.githubusercontent.com/tamrinotte/ghostsurf/main/logos/ghostsurf_rounded.png)
 
 Ghostsurf is a hacking tool which you can use to hide your identity.
 
@@ -55,11 +55,11 @@ __Enable Ghostsurf at Boot Switch:__ Enables ghostsurf boot
 
 2) Download the installer
 
-       curl -L https://github.com/dogaegeozden/ghostsurf/releases/download/tor/ghostsurf.deb -o ghostsurf.deb		
+       curl -L https://github.com/tamrinotte/ghostsurf/releases/download/tor/ghostsurf.deb -o ghostsurf.deb
 
 3) Start the installer 
 
-       sudo dpkg -i ghostsurf.deb		
+       sudo dpkg -i ghostsurf.deb
 
 4) Open a new terminal and type:
 	
@@ -68,7 +68,7 @@ __Enable Ghostsurf at Boot Switch:__ Enables ghostsurf boot
 <br>
 
 
-![AppScreenShot](https://raw.githubusercontent.com/dogaegeozden/ghostsurf/main/app_images/app_sc.png)
+![AppScreenShot](https://raw.githubusercontent.com/tamrinotte/ghostsurf/main/app_images/app_sc.png)
 
 ## HELP
 
@@ -81,7 +81,7 @@ Ghostsurf is identifying your ip address by sending a get request to https://ifc
 <br>
 
 # GHOSTSURF 
-![GhostsurfLogo](https://raw.githubusercontent.com/dogaegeozden/ghostsurf/main/logos/ghostsurf_rounded.png)
+![GhostsurfLogo](https://raw.githubusercontent.com/tamrinotte/ghostsurf/main/logos/ghostsurf_rounded.png)
 
 Ghostsurf kullanıcıların kimliklerini gizlemelerini sağlayan bir hackleme aracıdır.
 
@@ -137,11 +137,11 @@ __Enable Ghostsurf at Boot Switch:__ Ghostsurf'ü başlangıçta başlamaya ayar
 
 2) Yükleyiciyi indir
 
-       curl -L https://github.com/dogaegeozden/ghostsurf/releases/download/tor/ghostsurf.deb -o ghostsurf.deb		
+       curl -L https://github.com/tamrinotte/ghostsurf/releases/download/tor/ghostsurf.deb -o ghostsurf.deb	
 
 3) Yükleyiciyi başlat
 
-       sudo dpkg -i ghostsurf.deb		
+       sudo dpkg -i ghostsurf.deb	
 
 4) Terminali aç ve aşağıdaki metni gir: 
 	
@@ -149,7 +149,7 @@ __Enable Ghostsurf at Boot Switch:__ Ghostsurf'ü başlangıçta başlamaya ayar
 
 <br>
 
-![AppScreenShot](https://raw.githubusercontent.com/dogaegeozden/ghostsurf/main/app_images/app_sc.png)
+![AppScreenShot](https://raw.githubusercontent.com/tamrinotte/ghostsurf/main/app_images/app_sc.png)
 
 ## YARDIM
 
