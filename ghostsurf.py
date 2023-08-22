@@ -12,7 +12,7 @@ from getpass import getuser
 from pathlib import Path
 from socket import gethostname
 from sys import exit as sysexit
-from subprocess import Popen, PIPE, run
+from subprocess import run
 
 # PySide2
 from PySide2.QtWidgets import QApplication, QWidget, QMainWindow, QMessageBox, QLineEdit, QListView, QVBoxLayout
@@ -339,7 +339,6 @@ def kill_log_files():
 
     # Sending a notification to inform the user that the operation is done
     system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "Log shredding is done"')
-
 
 def change_the_mac_address():
     """A function which changes the mac address"""
