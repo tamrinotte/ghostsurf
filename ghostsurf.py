@@ -413,7 +413,7 @@ def change_the_mac_address():
     question_dialog.setWindowTitle("Important")
 
     # Setting the question dialog's text
-    question_dialog.setText("Do you want connect back to internet?")
+    question_dialog.setText("Do you want to connect back to the internet?")
 
     # Setting standard buttons
     question_dialog.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
