@@ -64,6 +64,7 @@ icons_dir_path = Path(base_dir, "icons")
 
 ghostsurf_logo_file_path = Path(icons_dir_path, "ghostsurf.png")
 
+
 # BASH SCRIPT FILE PATHS
 
 bash_scripts_dir_path = Path(base_dir, "bash_scripts")
@@ -91,6 +92,7 @@ log_shredder_file_path = Path(bash_scripts_dir_path, "log_shredder.sh")
 # BACKUP FILE PATH
 timezone_backup_file_path = Path("/opt/ghostsurf/backup_files/timezone.backup")
 
+# ICONS
 
 tick = QImage(str(Path(icons_dir_path, "tick.png")))
 

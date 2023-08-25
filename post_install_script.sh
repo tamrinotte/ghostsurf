@@ -11,7 +11,7 @@ main() {
 
     # Calling the set_up_file_ownerships function
     set_up_file_ownerships
-    
+
 }
 
 declare_variables() {
@@ -22,6 +22,12 @@ declare_variables() {
 
     # Creating path which lead to the preferences script of firefox
     pref_path=$(find /home/$username -name prefs.js)
+
+    font_dir="/usr/local/share/fonts"
+
+    blackops_font="/opt/ghostsurf/fonts/BlackOpsOne-Regular.ttf"
+
+    satisfy_font="/opt/ghostsurf/fonts/Satisfy-Regular.ttf"
 
 }
 

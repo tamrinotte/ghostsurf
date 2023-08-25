@@ -143,6 +143,50 @@ set_iptables_rules() {
 
 }
 
+append_rules_for_essential_security_measures() {
+    # A function which appends firewall rules for essential security
+
+    # Logging
+    iptables -A INPUT -j LOG --log-prefix "IPTABLES-DROP: " --log-level 4
+    iptables -A OUTPUT -j LOG --log-prefix "IPTABLES-DROP: " --log-level 4
+
+    # Drop invalid packets
+    iptables -A INPUT -m conntrack --ctstate INVALID -j DROP
+
+    # Drop packets with too many fragments
+    iptables -A INPUT -f -j DROP
+
+    # Drop incoming NULL packets
+    iptables -A INPUT -p tcp --tcp-flags ALL NONE -j DROP
+
+    # Drop XMAS packets
+    iptables -A INPUT -p tcp --tcp-flags ALL ALL -j DROP
+
+    # Drop SYN-FIN packets
+    iptables -A INPUT -p tcp --tcp-flags SYN,FIN SYN,FIN -j DROP
+
+    # Drop malformed packets
+    iptables -A INPUT -m conntrack --ctstate INVALID -j DROP
+
+    # Prevent DoS attacks (Adjust threshold as needed)
+    iptables -A INPUT -p tcp --dport 80 -m limit --limit 25/minute --limit-burst 100 -j ACCEPT
+
+    # Drop all other incoming traffic
+    iptables -A INPUT -j DROP
+
+    # Reject outgoing traffic for unkown destinations
+    iptables -A OUTPUT -d 0.0.0.0/8 -j REJECT
+
+    iptables -A OUTPUT -d 127.0.0.0/8 -j REJECT
+
+    iptables -A OUTPUT -d 224.0.0.0/4 -j REJECT
+
+    iptables -A OUTPUT -d 240.0.0.0/5 -j REJECT
+
+    iptables -A OUTPUT -d 255.255.255.255 -j REJECT
+
+}
+
 save_the_rules() {
     # A function which saves the rules to make them persistent
 

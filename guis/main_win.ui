@@ -90,15 +90,18 @@
     <property name="geometry">
      <rect>
       <x>99</x>
-      <y>10</y>
+      <y>9</y>
       <width>221</width>
       <height>71</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <family>Dyuthi</family>
-      <pointsize>35</pointsize>
+      <family>URW Bookman</family>
+      <pointsize>30</pointsize>
+      <weight>75</weight>
+      <italic>true</italic>
+      <bold>true</bold>
       <strikeout>false</strikeout>
      </font>
     </property>
