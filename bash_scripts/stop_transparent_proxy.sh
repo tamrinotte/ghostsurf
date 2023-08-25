@@ -24,6 +24,9 @@ main() {
     # Calling the set_iptables_rules function.
     set_iptables_rules
 
+    # Calling the append_rules_for_essential_security_measures function.
+    append_rules_for_essential_security_measures
+    
     # Calling the save_the_rules function.
     save_the_rules
 
