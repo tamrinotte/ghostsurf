@@ -12,7 +12,7 @@ from getpass import getuser
 from pathlib import Path
 from socket import gethostname
 from sys import exit as sysexit
-from subprocess import run, PIPE
+from subprocess import run
 
 # PySide2
 from PySide2.QtWidgets import QApplication, QWidget, QMainWindow, QMessageBox, QLineEdit, QListView, QVBoxLayout
@@ -116,17 +116,32 @@ checklist_items_dict = {
 def main():
     """The function which runs the entire application"""
 
-    # Creating an app object from QApplication
-    app = QApplication([])
+    # Getting the username of the user who started this application
+    current_username = getuser()
+    
+    # Checking if the current_username is equal to root
+    if current_username == "root":
+        
+        # Sending notification to let the user know that the application is trying to connect to the server
+        system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "You can\'t run this app as the root user"')
 
-    # Creating a password_window object from PasswordWindow class
-    password_window = PasswordWindow()
+        # Exiting the system
+        sysexit()
 
-    # Showing the password window
-    password_window.show()
+    # Checking if the current_username is not equal to root
+    else:
 
-    # Executing the app
-    sysexit(app.exec_())
+        # Creating an app object from QApplication
+        app = QApplication([])
+
+        # Creating a password_window object from PasswordWindow class
+        password_window = PasswordWindow()
+
+        # Showing the password window
+        password_window.show()
+
+        # Executing the app
+        sysexit(app.exec_())
 
 
 def check_fake_hostname_usage():
@@ -151,11 +166,13 @@ def check_fake_mac_address_usage():
     # Getting the active network adaptor's name
     active_network_adaptor_name = popen("iw dev | awk '$1==\"Interface\"{print $2}'").read()
 
+    # Checking if active_network_adaptor_name is equal to empty string
     if active_network_adaptor_name == "":
 
         # Setting the 'Using fake mac address' key's value pair to False
         checklist_items_dict['Using fake mac address'] = False
 
+    # Checking if the active_network_adaptor_name is not equal to empty string
     else:
 
         # Getting mac address information
@@ -359,7 +376,7 @@ def kill_log_files():
     sleep(0.3)
 
     # Executing the mac_changer script.
-    run(["sudo", "-S", "bash", "-c", "{}".format(log_shredder_file_path)], input=user_pwd, text=True, capture_output=True)
+    system(f'bash {log_shredder_file_path}')
 
     # Sending a notification to inform the user that the operation is done
     system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "Log shredding has been done"')
@@ -504,14 +521,14 @@ def reset_ghostsurf_settings():
     """A function which resets the ghostsurf settings"""
 
     # Sending a notification to inform the user that the operation is starting
-    system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "Executing the reset.sh script"')
+    system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "Resetting ghostsurf configurations"')
 
     # Waiting for 0.3 seconds
     sleep(0.3)
 
     # Executing the reset.sh script.
     run(["sudo", "-S", "bash", "-c", "{}".format(reset_script_file_path)], input=user_pwd, text=True, capture_output=True)
-
+    
     # Sending a notification to inform the user that the operation is done
     system(f'notify-send -i "{ghostsurf_logo_file_path} "-t 300 "Reseting is done"')
 

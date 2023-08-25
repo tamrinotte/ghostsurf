@@ -79,7 +79,7 @@ reset_mac_address() {
             # Stopping the NetworkManager service
             systemctl stop NetworkManager.service
 
-            # Changing the mac address with random and permanent options
+            # Changing the mac address with permanent option
             macchanger -p $interface
 
             # Starting the NetworkManager service
