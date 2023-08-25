@@ -35,6 +35,10 @@ disable(CRITICAL)
 
 # GLOBAL VARIABLES
 
+# Getting the username of the user who started this application
+current_username = getuser()
+    
+# Creating a string which is equal to this application's help page url
 help_page_url = "https://www.github.com/tamrinotte/ghostsurf#readme"
 
 # Creating a variable called base_dir which leads to the current working directory.
@@ -116,9 +120,6 @@ checklist_items_dict = {
 def main():
     """The function which runs the entire application"""
 
-    # Getting the username of the user who started this application
-    current_username = getuser()
-    
     # Checking if the current_username is equal to root
     if current_username == "root":
         
@@ -236,9 +237,6 @@ def check_appropriate_nameserver_usage():
 
 def check_browser_anonymization_preferences_usage():
     """A function which checks if browser anonymization preferences are in use"""
-
-    # Getting the username of the user who is currently logged in
-    current_username = getuser()
 
     # Opening firefox_prefs.js.custom file in reading mode as custom_firefox_prefs_file
     with open(custom_firefox_preferences_file_path, "r") as custom_firefox_prefs_file:
@@ -376,7 +374,7 @@ def kill_log_files():
     sleep(0.3)
 
     # Executing the mac_changer script.
-    system(f'bash {log_shredder_file_path}')
+    system(f'bash {log_shredder_file_path} {current_username}')
 
     # Sending a notification to inform the user that the operation is done
     system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "Log shredding has been done"')
@@ -890,9 +888,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # Waiting for 0.3 seconds
         sleep(0.3)
-
-        # Getting the username
-        current_username = getuser()
         
         # Finding the prefs.js file of firefox using a system command
         prefs_file_path = Path(run(["sudo", "-S", "bash", "-c", "find /home/{} -name prefs.js".format(current_username)], input=user_pwd, text=True, capture_output=True).stdout.strip())

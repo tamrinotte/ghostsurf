@@ -42,7 +42,7 @@
  [],
  False,
  False,
- 1692952264,
+ 1692991368,
  [('run',
    '/home/phamtom/Desktop/ghostsurf/env/lib/python3.10/site-packages/PyInstaller/bootloader/Linux-64bit-intel/run',
    'EXECUTABLE')])
