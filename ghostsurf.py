@@ -151,23 +151,30 @@ def check_fake_mac_address_usage():
     # Getting the active network adaptor's name
     active_network_adaptor_name = popen("iw dev | awk '$1==\"Interface\"{print $2}'").read()
 
-    # Getting mac address information
-    mac_address_info = popen(f'macchanger -s {active_network_adaptor_name}').read().split("\n")[:-1]
+    if active_network_adaptor_name == "":
 
-    # Getting the permanent mac address
-    permanent_mac_address = mac_address_info[1].split(" ")[2]
+        # Setting the 'Using fake mac address' key's value pair to False
+        checklist_items_dict['Using fake mac address'] = False
 
-    # Getting the current mac address
-    current_mac_address = mac_address_info[0].split(" ")[4]
+    else:
 
-    # Printing the permanent mac address and the current mac address in debug mode.
-    debug(f'Permanent Mac Address = {permanent_mac_address}\nCurrent Mac Address = {current_mac_address}')
+        # Getting mac address information
+        mac_address_info = popen(f'macchanger -s {active_network_adaptor_name}').read().split("\n")[:-1]
 
-    # Checking if the current mac address is not equal to the permanent mac address
-    if current_mac_address != permanent_mac_address:
+        # Getting the permanent mac address
+        permanent_mac_address = mac_address_info[1].split(" ")[2]
 
-        # Setting the 'Using fake mac address' key's value pair to True
-        checklist_items_dict['Using fake mac address'] = True
+        # Getting the current mac address
+        current_mac_address = mac_address_info[0].split(" ")[4]
+
+        # Printing the permanent mac address and the current mac address in debug mode.
+        debug(f'Permanent Mac Address = {permanent_mac_address}\nCurrent Mac Address = {current_mac_address}')
+
+        # Checking if the current mac address is not equal to the permanent mac address
+        if current_mac_address != permanent_mac_address:
+
+            # Setting the 'Using fake mac address' key's value pair to True
+            checklist_items_dict['Using fake mac address'] = True
 
 
 def check_appropriate_nameserver_usage():
