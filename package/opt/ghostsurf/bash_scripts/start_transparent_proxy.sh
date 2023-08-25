@@ -52,9 +52,6 @@ declare_variables() {
     # Creating a variable called username which is equal to the logged in user's username
     username=${SUDO_USER:-${USER}}
 
-    # Creating path which lead to the preferences script of firefox
-    pref_path="$(find /home/$username -name prefs.js)"
-
 }
 
 set_timezone_change() {
@@ -78,7 +75,7 @@ setup_configuration_files() {
     # A function which backs up the resolv.conf file
 
     # Changing the resolv.cfile
-    cp /opt/ghostsurf/configuration_files/resolv.conf.custom /etc/resolv.conf
+    cp /opt/ghostsurf/configuration_files/tor_nameservers_resolv.conf /etc/resolv.conf
 
     # Changing the torrc file
     cp /opt/ghostsurf/configuration_files/torrc.custom /etc/tor/torrc

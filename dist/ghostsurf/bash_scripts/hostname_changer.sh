@@ -46,7 +46,7 @@ set_random_hostname(){
     new_hostname="${array[$index]}"
     
     # Find the current hostname in the /ets/hosts file and replace it with the new name
-    sed -i "s/$current_hostname/$new_hostname/g" /etc/hosts
+    sed -i "s/$current_hostname/$new_hostname/g" "/etc/hosts"
 
     # Updating the hostname of the system
     hostnamectl set-hostname $new_hostname

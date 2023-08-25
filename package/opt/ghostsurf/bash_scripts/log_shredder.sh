@@ -14,7 +14,7 @@ main () {
 declare_variables() {
     # A function which declares variables
 
-    list_of_log_files=( "/var/log/messages" "/var/log/auth.log" "/var/log/kern.log" "/var/log/cron.log" "/var/log/maillog" "/var/log/boot.log" "/var/log/mysqld.log" "/var/log/secure" "/var/log/utmp" "/var/log/wtmp " "/var/log/yum.log" "/var/log/system.log" "/var/log/DiagnosticMessages" "~/.zsh_history" "~/.bash_history")
+    list_of_log_files=("/var/log/messages" "/var/log/auth.log" "/var/log/kern.log" "/var/log/cron.log" "/var/log/maillog" "/var/log/boot.log" "/var/log/mysqld.log" "/var/log/secure" "/var/log/utmp" "/var/log/wtmp " "/var/log/yum.log" "/var/log/system.log" "/var/log/DiagnosticMessages" "~/.zsh_history" "~/.bash_history" "~/.python_history")
 
 }
 

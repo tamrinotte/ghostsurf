@@ -12,7 +12,7 @@ from getpass import getuser
 from pathlib import Path
 from socket import gethostname
 from sys import exit as sysexit
-from subprocess import run
+from subprocess import run, PIPE
 
 # PySide2
 from PySide2.QtWidgets import QApplication, QWidget, QMainWindow, QMessageBox, QLineEdit, QListView, QVBoxLayout
@@ -35,6 +35,8 @@ disable(CRITICAL)
 
 # GLOBAL VARIABLES
 
+help_page_url = "https://www.github.com/tamrinotte/ghostsurf#readme"
+
 # Creating a variable called base_dir which leads to the current working directory.
 base_dir = path.dirname(__file__)
 
@@ -44,9 +46,9 @@ configuration_files_dir_path = Path(base_dir, "configuration_files")
 
 ghostsurf_configuration_file_path = Path(configuration_files_dir_path, "ghostsurf.conf")
 
-dns_changer_resolv_conf_file_path = Path(configuration_files_dir_path, "dns_changer.resolv.conf")
+privacy_focused_nameservers_file_path = Path(configuration_files_dir_path, "privacy_focused_nameservers_resolv.conf")
 
-custom_resolv_configuration_file_path = Path(configuration_files_dir_path, "resolv.conf.custom")
+tor_nameservers_file_path = Path(configuration_files_dir_path, "tor_nameservers_resolv.conf")
 
 custom_firefox_preferences_file_path = Path(configuration_files_dir_path, "firefox_prefs.js.custom")
 
@@ -131,8 +133,8 @@ def check_fake_hostname_usage():
     """A function which checks the hostname"""
 
     # Creating a list of fake hostnames
-    list_of_fake_hostnames = ["Windows10-Enterprise ", "Windows10-Pro", "Windows10-Enterprise-LTSC ", "Windows8.1O-EM", "Windows8-Enterprise", "Windows8.1-Pro", "Windows7-Professional", "Windows7-Enterprise", "Windows7-Ultimate", "Windows-Vista-Business", "WindowsXP-Professional", "macOS11", "OSX10.11", "MacBook-Air", "MacBook", "MacBook-Pro"]
-    
+    list_of_fake_hostnames = ["Windows10-Enterprise", "Windows10-Pro", "Windows10-Enterprise-LTSC", "Windows8.1O-EM", "Windows8-Enterprise", "Windows8.1-Pro", "Windows7-Professional", "Windows7-Enterprise", "Windows7-Ultimate", "Windows-Vista-Business", "WindowsXP-Professional", "macOS11", "OSX10.11", "MacBook-Air", "MacBook", "MacBook-Pro"]
+
     # Getting the current hostname
     current_hostname = gethostname()
 
@@ -147,7 +149,7 @@ def check_fake_mac_address_usage():
     """A function which checks wheather or not you are using fake mac address"""
 
     # Getting the active network adaptor's name
-    active_network_adaptor_name = popen("ip route show default | awk '/default/ {print $5}'").read()
+    active_network_adaptor_name = popen("iw dev | awk '$1==\"Interface\"{print $2}'").read()
 
     # Getting mac address information
     mac_address_info = popen(f'macchanger -s {active_network_adaptor_name}').read().split("\n")[:-1]
@@ -171,11 +173,11 @@ def check_fake_mac_address_usage():
 def check_appropriate_nameserver_usage():
     """A function which checks if you are using privacy focused name servers"""
 
-    # Opening the dns_changer.resolv.conf file in reading mode as privacy_focused_nameserver_file
-    with open(dns_changer_resolv_conf_file_path, "r") as privacy_focused_nameserver_file:
+    # Opening the privacy_focused_nameservers_resolv.conf file in reading mode as privacy_focused_nameservers_file
+    with open(privacy_focused_nameservers_file_path, "r") as privacy_focused_nameservers_file:
 
-        # Reading privacy_focused_nameserver_file's lines
-        privacy_focused_nameservers = privacy_focused_nameserver_file.read()
+        # Reading privacy_focused_nameservers_file's lines
+        privacy_focused_nameservers = privacy_focused_nameservers_file.read()
 
     # Creating a variable that holds the tor nameserver specification 
     tor_nameserver = "nameserver 127.0.0.1\n"
@@ -201,6 +203,7 @@ def check_appropriate_nameserver_usage():
 
     # Checking if start_stop_button's text in the main window is not equal to Start string.
     else:
+
         if resolv_conf_file_contents == tor_nameserver:
 
             # Setting the 'Using appropriate nameservers' key's value pair to True
@@ -371,13 +374,14 @@ def change_the_mac_address():
             internet_adaptor_name = popen("ip route show default | awk '/default/ {print $5}'").read().strip()
 
             # Executing the mac_changer script.
-            run(["sudo", "-S", "bash", "-c", "{}".format(mac_changer_script_file_path)], input=user_pwd, text=True, capture_output=True)
+            run(["sudo", "-S", "bash", "-c", "{}".format(str(mac_changer_script_file_path))], input=user_pwd, text=True, capture_output=True)
 
             # Waiting for 4 seconds
             sleep(4)
 
             # Connecting to internet
-            run(f'echo "user_pwd" | sudo -S nmcli d connect {internet_adaptor_name}', shell=True, input=user_pwd, text=True, capture_output=True, executable="/bin/bash")
+            run(f'sudo nmcli d connect {internet_adaptor_name}', shell=True, input=user_pwd, text=True, capture_output=True, executable="/bin/bash")
+            # run(["sudo", "-S", "bash", "-c", "nmcli d connect {internet_adaptor_name}"], input=user_pwd, text=True, capture_output=True)
 
             # Sending a notification to inform the user that the operation is done
             system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "Mac address has been changed"')
@@ -386,7 +390,7 @@ def change_the_mac_address():
         elif user_answer == "&No":
             
             # Executing the mac_changer script.
-            run(["sudo", "-S", "bash", "-c", "{}".format(mac_changer_script_file_path)], input=user_pwd, text=True, capture_output=True)
+            run(["sudo", "-S", "bash", "-c", "{}".format(str(mac_changer_script_file_path))], input=user_pwd, text=True, capture_output=True)
 
             # Sending a notification to inform the user that the operation is done
             system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "Mac address has been changed"')
@@ -1039,13 +1043,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if working_status == "Stop":
             
             # Copying and pasting custom nameservers for tor on resolv.conf file
-            run(["sudo", "-S", "bash", "-c", f'cp {custom_resolv_configuration_file_path} {original_resolv_configuration_file_path}'], input=user_pwd, text=True, capture_output=True)
+            run(["sudo", "-S", "bash", "-c", f'cp {tor_nameservers_file_path} {original_resolv_configuration_file_path}'], input=user_pwd, text=True, capture_output=True)
 
         # Checking if transparent proxy is off
         else:
 
             # Copying and pasting dns_changer nameservers to on resolv.conf file
-            run(["sudo", "-S", "bash", "-c", f'cp {dns_changer_resolv_conf_file_path} {original_resolv_configuration_file_path}'], input=user_pwd, text=True, capture_output=True)
+            run(["sudo", "-S", "bash", "-c", f'cp {privacy_focused_nameservers_file_path} {original_resolv_configuration_file_path}'], input=user_pwd, text=True, capture_output=True)
 
 
         # Sending a notification to inform the user that the operation is done
@@ -1190,7 +1194,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """A function which opens the info page in the default browser"""
 
         # Opening the info page of this application in the default browser
-        wbopen("https://www.github.com/dogaegeozden/ghostsurf#readme")
+        wbopen(help_page_url)
 
     def start_stop(self):
         """A function which redirects all internet traffic over tor"""
@@ -1433,7 +1437,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """A function which changes your ip address by restarting the transparent proxy"""
 
         # Restarting the tor service to change the ip address.
-        run(["sudo", "-S", "bash", "-c", "systemctl start tor"], input=user_pwd, text=True, capture_output=True)
+        run(["sudo", "-S", "bash", "-c", "systemctl restart tor"], input=user_pwd, text=True, capture_output=True)
 
 
 # Evaluate if the source is being run on its own or being imported somewhere else. With this conditional in place, your code can not be imported somewhere else.

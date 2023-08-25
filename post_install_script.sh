@@ -21,7 +21,7 @@ declare_variables() {
     username=${SUDO_USER:-${USER}}
 
     # Creating path which lead to the preferences script of firefox
-    pref_path=`find /home/$username -name prefs.js`
+    pref_path=$(find /home/$username -name prefs.js)
 
 }
 
@@ -29,10 +29,10 @@ backup_configuration_files() {
     # A function which backs up the configuration files that will be replaced by this application
 
     # Backing up the tor configuration file
-    sudo cp /etc/tor/torrc /opt/ghostsurf/backup_files/torrc.backup
+    sudo cp "/etc/tor/torrc" "/opt/ghostsurf/backup_files/torrc.backup"
 
     # Backing up the original resolv.conf file
-    sudo cp /etc/resolv.conf /opt/ghostsurf/backup_files/resolv.conf.backup
+    sudo cp "/etc/resolv.conf" "/opt/ghostsurf/backup_files/resolv.conf.backup"
 
     # Backing up the original timezone
     sudo timedatectl show | sudo grep Timezone | sudo sed 's/Timezone=//g' > /opt/ghostsurf/backup_files/timezone.backup
@@ -48,10 +48,10 @@ set_up_file_ownerships() {
     # A function which sets the file ownerships and permissions
 
     # Changing the file ownerships recursively
-    chown -R $username:$username /opt/ghostsurf/
+    chown -R $username:$username "/opt/ghostsurf/"
 
     # Changing the launchers file ownership 
-    chown $username:$username /usr/bin/ghostsurf
+    chown $username:$username "/usr/bin/ghostsurf"
 
 }
 
