@@ -30,8 +30,8 @@ main() {
     # Calling the save_the_rules function.
     save_the_rules
 
-    # Calling stop_tor_service function.
-    stop_tor_service    
+    # Stopping the tor service
+    systemctl stop tor
 
     # Calling restore_default_configuration_files function.
     restore_default_configuration_files
@@ -46,6 +46,24 @@ declare_variables() {
 
     # Creating path which lead to the preferences script of firefox
     pref_path="$(find /home -name prefs.js)"
+
+    # Creating a path which leads to the torrc file
+    torrc_file_path="/etc/tor/torrc"
+
+    # Creating a path which leads to the torrc file's backup
+    torrc_backup_file_path="/opt/ghostsurf/backup_files/torrc.backup"
+
+    # Creating a path which leads to resolconf service's nameserver configuration file
+    resolvconf_file_path="/etc/resolv.conf"
+
+    # Creating a path which leads to the file that contains the list of privacy focused nameservers
+    privacy_focused_nameservers_file_path="/opt/ghostsurf/configuration_files/privacy_focused_nameservers_resolv.conf"
+
+    # Creating a path which leads to the ipv4 rules
+    rules_v4_file_path="/etc/iptables/rules.v4"
+
+    # Creating a path which leads to the ipv6 rules
+    rules_v6_file_path="/etc/iptables/rules.v6"
 
 }
 
@@ -194,17 +212,9 @@ save_the_rules() {
     # A function which saves the rules to make them persistent
 
     # Saving the iptables rules
-    iptables-save > "/etc/iptables/rules.v4"
+    iptables-save > $rules_v4_file_path
     
-    ip6tables-save > "/etc/iptables/rules.v6"
-
-}
-
-stop_tor_service() {
-    # A function which stops the tor service
-
-    # Stopping the tor service
-    systemctl stop tor
+    ip6tables-save > $rules_v6_file_path
 
 }
 
@@ -212,10 +222,10 @@ restore_default_configuration_files() {
     # A function which restores the default configuration files. Hint: Ghostsurf defaults baby!!. Reset if you don't like them.
 
     # Restoring the torrc file
-    cp "/opt/ghostsurf/backup_files/torrc.backup" "/etc/tor/torrc"
+    cp $torrc_backup_file_path $torrc_file_path
 
     # Changing the dns configurations
-    cp "/opt/ghostsurf/configuration_files/privacy_focused_nameservers_resolv.conf" "/etc/resolv.conf"
+    cp $privacy_focused_nameservers_file_path $resolvconf_file_path
 
     # Reloading systemd daemons
     systemctl --system daemon-reload

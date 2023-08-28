@@ -58,6 +58,8 @@ custom_firefox_preferences_file_path = Path(configuration_files_dir_path, "firef
 
 original_resolv_configuration_file_path = Path("/etc/resolv.conf")
 
+fake_hostnames_list_file_path = Path(configuration_files_dir_path, "list_of_fake_hostnames.list")
+
 # ICON FILE PATH
 
 icons_dir_path = Path(base_dir, "icons")
@@ -150,14 +152,17 @@ def main():
 def check_fake_hostname_usage():
     """A function which checks the hostname"""
 
-    # Creating a list of fake hostnames
-    list_of_fake_hostnames = ["Windows10-Enterprise", "Windows10-Pro", "Windows10-Enterprise-LTSC", "Windows8.1O-EM", "Windows8-Enterprise", "Windows8.1-Pro", "Windows7-Professional", "Windows7-Enterprise", "Windows7-Ultimate", "Windows-Vista-Business", "WindowsXP-Professional", "macOS11", "OSX10.11", "MacBook-Air", "MacBook", "MacBook-Pro"]
+    # Opening the list_of_fake_hostnames file in reading mode 
+    with open(fake_hostnames_list_file_path, "r") as fake_hostnames_file:
+
+        # Creating a list of fake hostnames from the fake_hostnames_file's lines
+        list_of_fake_hostnames = fake_hostnames_file.readlines()
 
     # Getting the current hostname
     current_hostname = gethostname()
 
     # Checking if the current hostname is in the list of fake hostnames
-    if current_hostname in list_of_fake_hostnames:
+    if f'{current_hostname}\n' in list_of_fake_hostnames:
 
         # Updating the 'Using fake hostname' key's value pair to True
         checklist_items_dict['Using fake hostname'] = True
@@ -769,13 +774,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         tor_status = run(["sudo", "-S", "bash", "-c", "systemctl status tor.service"], input=user_pwd, text=True, capture_output=True).stdout.strip()
         
         # Opening the ghostsurf.conf file in reading mode
-        with open(ghostsurf_configuration_file_path, "r") as c:
+        with open(ghostsurf_configuration_file_path, "r") as ghostsurf_configuraion_file:
             
             # Reading the lines of ghostsurf.conf file
-            c_contents = c.readlines()
+            ghostsurf_configuraion_file_contents = ghostsurf_configuraion_file.readlines()
 
             # Checking if "enabled_at_boot=yes" is in the line
-            if "enabled_at_boot=yes\n" in c_contents:
+            if "enabled_at_boot=yes\n" in ghostsurf_configuraion_file_contents:
 
                 # Creating a variable to keep track if ghostsurf is enabled at boot
                 is_ghostsurf_enabled_at_boot = True
@@ -803,24 +808,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             # Setting the style sheet of the ultra_ghost_button 
             self.ultra_ghost_button.setStyleSheet(u"#ultra_ghost_button {background: #00ff00; border-radius: 4px; border: 1px solid black}")
-
-        # Checking if is_ghostsurf_enabled_at_boot is not equal to True
-        else:
-
-            # Changing the start_stop_button's text value to "Start".
-            self.start_stop_button.setText("Start")
-
-            # Setting the status_label widget's stylesheet
-            self.status_label.setStyleSheet(u"#status_label {color: red;}")
-
-            # Setting the status_label's text to "Inactive"
-            self.status_label.setText('Inactive')
-            
-            # Changing the ultra_ghost_button's text to "disabled"
-            self.ultra_ghost_button.setText("disabled")
-
-            # Setting the style sheet of the ultra_ghost_button 
-            self.ultra_ghost_button.setStyleSheet(u"#ultra_ghost_button {background: red; border-radius: 4px; border: 1px solid black}")
 
         # Checking if the tor service is inactive
         if "inactive" in tor_status:
@@ -1072,7 +1059,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # Copying and pasting dns_changer nameservers to on resolv.conf file
             run(["sudo", "-S", "bash", "-c", f'cp {privacy_focused_nameservers_file_path} {original_resolv_configuration_file_path}'], input=user_pwd, text=True, capture_output=True)
 
-
         # Sending a notification to inform the user that the operation is done
         system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "Nameservers has been changed"')
 
@@ -1136,11 +1122,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     # Updating the a_contents list
                     a_contents[line_index]="enabled_at_boot=yes\n"
 
+                    # Printing list of ghostsurf configuration file lines in debug mode 
+                    debug(a_contents)
+
             # Opening the ghostsurf.conf file in write mode
             with open(ghostsurf_configuration_file_path, "w") as b:
 
                 # Writing the new contents to file
-                b.write('\n'.join(a_contents))
+                b.write(''.join(a_contents))
 
             # Changing the start_stop_button's text value to "Stop".
             self.start_stop_button.setText("Stop")
@@ -1185,7 +1174,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             with open(ghostsurf_configuration_file_path, "w") as b:
                 
                 # Writing the new contents in to file
-                b.write('\n'.join(a_contents))
+                b.write(''.join(a_contents))
 
             # Changing the start_stop_button's text value to "Start".
             self.start_stop_button.setText("Start")

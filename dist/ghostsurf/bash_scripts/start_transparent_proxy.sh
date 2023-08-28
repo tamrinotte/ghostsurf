@@ -6,8 +6,8 @@ main() {
     # Calling the declare_variables function.
     declare_variables
 
-    # Calling configure_tor function.s
-    configure_tor
+    # Starting the tor service
+    systemctl start tor
 
     # Calling the disable_ipv6 function.
     disable_ipv6
@@ -21,14 +21,9 @@ main() {
     # Calling set_up_iptables_rules function.
     set_up_iptables_rules
 
-}
+    # Restarting the tor service
+    systemctl restart tor
 
-configure_tor() {
-    # A function which configures tor
-
-    # Starting the tor service
-    systemctl start tor
-    
 }
 
 declare_variables() {
@@ -49,8 +44,17 @@ declare_variables() {
     # Tor VirtualAddrNetworkIPv4
     virtual_address="10.192.0.0/10"
 
-    # Creating a variable called username which is equal to the logged in user's username
-    username=${SUDO_USER:-${USER}}
+    # Creating a path which leads to the torrc file 
+    torrc_file_path="/etc/tor/torrc"
+
+    # Creating a path which leads to resolconf service's nameserver configuration file
+    resolvconf_file_path="/etc/resolv.conf"
+
+    # Creating a path which leads to the custom torrc file
+    custom_torrc_file="/opt/ghostsurf/configuration_files/torrc.custom"
+
+    # Creating a path which leads to the custom resolv.conf file 
+    custom_resolv_conf_file="/opt/ghostsurf/configuration_files/tor_nameservers_resolv.conf"
 
 }
 
@@ -75,10 +79,10 @@ setup_configuration_files() {
     # A function which backs up the resolv.conf file
 
     # Changing the resolv.cfile
-    cp /opt/ghostsurf/configuration_files/tor_nameservers_resolv.conf /etc/resolv.conf
+    cp $custom_resolv_conf_file $resolvconf_file_path
 
     # Changing the torrc file
-    cp /opt/ghostsurf/configuration_files/torrc.custom /etc/tor/torrc
+    cp $custom_torrc_file $torrc_file_path
 
     # Reloading system daemons
     systemctl --system daemon-reload
