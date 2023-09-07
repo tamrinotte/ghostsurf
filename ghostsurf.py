@@ -721,7 +721,7 @@ class PasswordWindow(QWidget, Ui_PasswordWindow):
         user_pwd = self.password_line_edit.text()
 
         # Getting the username and the root privileges
-        user_name = run(["sudo", "-S", "whoami"], input=user_pwd, text=True, capture_output=True).stdout.strip()
+        user_name = run(["sudo", "bash", "-c", "whoami"], input=user_pwd, text=True, capture_output=True).stdout.strip()
 
         # Checking if the username is equal to root
         if user_name == "root":
