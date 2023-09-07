@@ -51,7 +51,7 @@ __Enable Ghostsurf at Boot Switch:__ Enables ghostsurf boot
 ## INSTALLATION
 1) Install the dependencies: 	
 
-       sudo apt install tor libnotify-bin netfilter-persistent iptables-persistent secure-delete bleachbit macchanger net-tools -y
+       sudo apt install tor iw libnotify-bin netfilter-persistent iptables-persistent secure-delete bleachbit macchanger net-tools -y
 
 2) Download the installer
 
@@ -133,7 +133,7 @@ __Enable Ghostsurf at Boot Switch:__ Ghostsurf'ü başlangıçta başlamaya ayar
 ## YÜKLEME
 1) Bağımlılıkları yükle: 	
 
-       sudo apt install tor libnotify-bin netfilter-persistent iptables-persistent secure-delete bleachbit macchanger net-tools -y
+       sudo apt install tor iw libnotify-bin netfilter-persistent iptables-persistent secure-delete bleachbit macchanger net-tools -y
 
 2) Yükleyiciyi indir
 

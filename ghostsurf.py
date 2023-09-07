@@ -31,7 +31,7 @@ import resources_rc
 basicConfig(level=DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Disabling the debugging feature. Hint: Comment out this line to enable debugging.
-disable(CRITICAL)
+# disable(CRITICAL)
 
 # GLOBAL VARIABLES
 
@@ -172,7 +172,7 @@ def check_fake_mac_address_usage():
     """A function which checks wheather or not you are using fake mac address"""
 
     # Getting the active network adaptor's name
-    active_network_adaptor_name = popen("iw dev | awk '$1==\"Interface\"{print $2}'").read()
+    active_network_adaptor_name = run(["sudo", "bash", "-c", "iw dev | awk '$1==\"Interface\"{print $2}'"], input=user_pwd, text=True, capture_output=True).stdout.strip()
 
     # Checking if active_network_adaptor_name is equal to empty string
     if active_network_adaptor_name == "":
@@ -252,7 +252,7 @@ def check_browser_anonymization_preferences_usage():
         cfpf_lines = custom_firefox_prefs_file.readlines()
 
     # Finding the prefs.js file of firefox using a system command.
-    prefs_file_path = Path(run(["sudo", "-S", "bash", "-c", "find /home/{} -name prefs.js".format(current_username)], input=user_pwd, text=True, capture_output=True).stdout.strip())
+    prefs_file_path = Path(run(["sudo", "bash", "-c", "find /home/{} -name prefs.js".format(current_username)], input=user_pwd, text=True, capture_output=True).stdout.strip())
 
     # Opening the original prefs.js file in reading mode as original_firefox_prefs_file 
     with open(prefs_file_path, "r") as original_firefox_prefs_file:
@@ -323,7 +323,7 @@ def get_the_public_ip_address():
     # Trying to execute the code block that is located inside this block
     try:
         # Sending a get request to "https://ifconfig.io" to get the public ip address.
-        public_ip_address = run(["sudo", "-S", "bash", "-c", "curl --connect-timeout 14.15 {}".format("https://ifconfig.io")], input=user_pwd, text=True, capture_output=True).stdout.strip()
+        public_ip_address = run(["sudo", "bash", "-c", "curl --connect-timeout 14.15 {}".format("https://ifconfig.io")], input=user_pwd, text=True, capture_output=True).stdout.strip()
 
         # Creating a pattern for ip address validation
         ip_addr_regex = compile(r'\d{1,3}\.\d{1,3}\.\d{1,3}.\d{1,3}')
@@ -356,19 +356,19 @@ def get_the_public_ip_address():
 def manage_netfilter_service():
     """A function which starts and enables netfilter service if it's not"""
 
-    netfilter_persistent_status = run(["sudo", "-S", "bash", "-c", "systemctl status netfilter-persistent"], input=user_pwd, text=True, capture_output=True).stdout.strip()
+    netfilter_persistent_status = run(["sudo", "bash", "-c", "systemctl status netfilter-persistent"], input=user_pwd, text=True, capture_output=True).stdout.strip()
 
     # Checking if the netfilter-persistent service is inactive
     if 'inactive' in netfilter_persistent_status:
 
         # Starting the netfilter-persistent service
-        run(["sudo", "-S", "bash", "-c", "systemctl start netfilter-persistent"], input=user_pwd, text=True, capture_output=True)
+        run(["sudo", "bash", "-c", "systemctl start netfilter-persistent"], input=user_pwd, text=True, capture_output=True)
 
     # Checking if the netfilter-persistent service is disabled
     if 'disabled' in netfilter_persistent_status:
 
         # Enabling the netfilter service
-        run(["sudo", "-S", "bash", "-c", "systemctl enable netfilter-persistent"], input=user_pwd, text=True, capture_output=True)
+        run(["sudo", "bash", "-c", "systemctl enable netfilter-persistent"], input=user_pwd, text=True, capture_output=True)
 
 
 def kill_log_files():
@@ -403,14 +403,14 @@ def change_the_mac_address():
             internet_adaptor_name = popen("ip route show default | awk '/default/ {print $5}'").read().strip()
 
             # Executing the mac_changer script.
-            run(["sudo", "-S", "bash", "-c", "{}".format(str(mac_changer_script_file_path))], input=user_pwd, text=True, capture_output=True)
+            run(["sudo", "bash", "-c", "{}".format(str(mac_changer_script_file_path))], input=user_pwd, text=True, capture_output=True)
 
             # Waiting for 4 seconds
             sleep(4)
 
             # Connecting to internet
             run(f'sudo nmcli d connect {internet_adaptor_name}', shell=True, input=user_pwd, text=True, capture_output=True, executable="/bin/bash")
-            # run(["sudo", "-S", "bash", "-c", "nmcli d connect {internet_adaptor_name}"], input=user_pwd, text=True, capture_output=True)
+            # run(["sudo", "bash", "-c", "nmcli d connect {internet_adaptor_name}"], input=user_pwd, text=True, capture_output=True)
 
             # Sending a notification to inform the user that the operation is done
             system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "Mac address has been changed"')
@@ -419,7 +419,7 @@ def change_the_mac_address():
         elif user_answer == "&No":
             
             # Executing the mac_changer script.
-            run(["sudo", "-S", "bash", "-c", "{}".format(str(mac_changer_script_file_path))], input=user_pwd, text=True, capture_output=True)
+            run(["sudo", "bash", "-c", "{}".format(str(mac_changer_script_file_path))], input=user_pwd, text=True, capture_output=True)
 
             # Sending a notification to inform the user that the operation is done
             system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "Mac address has been changed"')
@@ -477,7 +477,7 @@ def wipe_the_memory():
             system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "Trying to wipe the memory and drop caches. This might take some time!"')
 
             # Executing the bomb.sh file to wipe the memory securely
-            run(["sudo", "-S", "bash", "-c", "{}".format(fast_bomb_script_file_path)], input=user_pwd, text=True, capture_output=True)
+            run(["sudo", "bash", "-c", "{}".format(fast_bomb_script_file_path)], input=user_pwd, text=True, capture_output=True)
 
             # Sending a notification to let the user know what the application just did
             system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "Caches are dropped and memory is wiped"')
@@ -489,7 +489,7 @@ def wipe_the_memory():
             system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "Trying to wipe the memory and drop caches. This might take some time!"')
 
             # Executing the bomb.sh file to wipe the memory securely
-            run(["sudo", "-S", "bash", "-c", "{}".format(secure_bomb_script_file_path)], input=user_pwd, text=True, capture_output=True)
+            run(["sudo", "bash", "-c", "{}".format(secure_bomb_script_file_path)], input=user_pwd, text=True, capture_output=True)
 
             # Sending a notification to let the user know what the application just did
             system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "Caches are dropped and memory is wiped"')
@@ -532,7 +532,7 @@ def reset_ghostsurf_settings():
     sleep(0.3)
 
     # Executing the reset.sh script.
-    run(["sudo", "-S", "bash", "-c", "{}".format(reset_script_file_path)], input=user_pwd, text=True, capture_output=True)
+    run(["sudo", "bash", "-c", "{}".format(reset_script_file_path)], input=user_pwd, text=True, capture_output=True)
     
     # Sending a notification to inform the user that the operation is done
     system(f'notify-send -i "{ghostsurf_logo_file_path} "-t 300 "Reseting is done"')
@@ -771,7 +771,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         manage_netfilter_service()
 
         # Checking tor services status
-        tor_status = run(["sudo", "-S", "bash", "-c", "systemctl status tor.service"], input=user_pwd, text=True, capture_output=True).stdout.strip()
+        tor_status = run(["sudo", "bash", "-c", "systemctl status tor.service"], input=user_pwd, text=True, capture_output=True).stdout.strip()
         
         # Opening the ghostsurf.conf file in reading mode
         with open(ghostsurf_configuration_file_path, "r") as ghostsurf_configuraion_file:
@@ -879,7 +879,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         sleep(0.3)
         
         # Finding the prefs.js file of firefox using a system command
-        prefs_file_path = Path(run(["sudo", "-S", "bash", "-c", "find /home/{} -name prefs.js".format(current_username)], input=user_pwd, text=True, capture_output=True).stdout.strip())
+        prefs_file_path = Path(run(["sudo", "bash", "-c", "find /home/{} -name prefs.js".format(current_username)], input=user_pwd, text=True, capture_output=True).stdout.strip())
 
         # Custom prefs file path
         custom_prefs_file_path = Path(custom_firefox_preferences_file_path)
@@ -1021,13 +1021,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             debug("Rebooting the system")
 
             # Executing the stop script
-            run(["sudo", "-S", "bash", "-c", "{}".format(stop_transparent_proxy_script_file_path)], input=user_pwd, text=True, capture_output=True)
+            run(["sudo", "bash", "-c", "{}".format(stop_transparent_proxy_script_file_path)], input=user_pwd, text=True, capture_output=True)
 
             # Executing the hostname_changer script
-            run(["sudo", "-S", "bash", "-c", "{}".format(hostname_changer_script_file_path)], input=user_pwd, text=True, capture_output=True)
+            run(["sudo", "bash", "-c", "{}".format(hostname_changer_script_file_path)], input=user_pwd, text=True, capture_output=True)
 
             # Rebooting the system
-            run(["sudo", "-S", "reboot"], input=user_pwd, text=True, capture_output=True)
+            run(["sudo", "reboot"], input=user_pwd, text=True, capture_output=True)
 
         # Checking if user didn't pressed to the yes button
         else:
@@ -1051,13 +1051,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if working_status == "Stop":
             
             # Copying and pasting custom nameservers for tor on resolv.conf file
-            run(["sudo", "-S", "bash", "-c", f'cp {tor_nameservers_file_path} {original_resolv_configuration_file_path}'], input=user_pwd, text=True, capture_output=True)
+            run(["sudo", "bash", "-c", f'cp {tor_nameservers_file_path} {original_resolv_configuration_file_path}'], input=user_pwd, text=True, capture_output=True)
 
         # Checking if transparent proxy is off
         else:
 
             # Copying and pasting dns_changer nameservers to on resolv.conf file
-            run(["sudo", "-S", "bash", "-c", f'cp {privacy_focused_nameservers_file_path} {original_resolv_configuration_file_path}'], input=user_pwd, text=True, capture_output=True)
+            run(["sudo", "bash", "-c", f'cp {privacy_focused_nameservers_file_path} {original_resolv_configuration_file_path}'], input=user_pwd, text=True, capture_output=True)
 
         # Sending a notification to inform the user that the operation is done
         system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "Nameservers has been changed"')
@@ -1102,10 +1102,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             debug("Enabling ghostsurf at boot")
 
             # Executing the start script
-            run(["sudo", "-S", "bash", "-c", "{}".format(start_transparent_proxy_script_file_path)], input=user_pwd, text=True, capture_output=True)
+            run(["sudo", "bash", "-c", "{}".format(start_transparent_proxy_script_file_path)], input=user_pwd, text=True, capture_output=True)
 
             # Executing the save script
-            run(["sudo", "-S", "bash", "-c", "{}".format(save_iptables_script_file_path)], input=user_pwd, text=True, capture_output=True)
+            run(["sudo", "bash", "-c", "{}".format(save_iptables_script_file_path)], input=user_pwd, text=True, capture_output=True)
 
             # Opening the ghostsurf.conf file in read mode
             with open(ghostsurf_configuration_file_path, "r") as a:
@@ -1153,7 +1153,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             debug("Disabling ghostsurf at boot")
 
             # Executing the stop script
-            run(["sudo", "-S", "bash", "-c", "{}".format(stop_transparent_proxy_script_file_path)], input=user_pwd, text=True, capture_output=True)
+            run(["sudo", "bash", "-c", "{}".format(stop_transparent_proxy_script_file_path)], input=user_pwd, text=True, capture_output=True)
 
             # Opening the ghostsurf.conf file in read mode
             with open(ghostsurf_configuration_file_path, "r") as a:
@@ -1222,10 +1222,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 debug("Yes button is clicked")
 
                 # Executing the init script.
-                run(["sudo", "-S", "bash", "-c", "{}".format(init_script_file_path)], input=user_pwd, text=True, capture_output=True)
+                run(["sudo", "bash", "-c", "{}".format(init_script_file_path)], input=user_pwd, text=True, capture_output=True)
 
                 # Executing the start script
-                run(["sudo", "-S", "bash", "-c", "{}".format(start_transparent_proxy_script_file_path)], input=user_pwd, text=True, capture_output=True)
+                run(["sudo", "bash", "-c", "{}".format(start_transparent_proxy_script_file_path)], input=user_pwd, text=True, capture_output=True)
 
                 # Changing the start_stop_button's text value to Stop.
                 self.start_stop_button.setText("Stop")
@@ -1237,7 +1237,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 debug("No button is clicked")
                 
                 # Executing the start script
-                run(["sudo", "-S", "bash", "-c", "{}".format(start_transparent_proxy_script_file_path)], input=user_pwd, text=True, capture_output=True)
+                run(["sudo", "bash", "-c", "{}".format(start_transparent_proxy_script_file_path)], input=user_pwd, text=True, capture_output=True)
 
                 # Changing the start_stop_button's text value to Stop.
                 self.start_stop_button.setText("Stop")
@@ -1258,10 +1258,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if user_answer == "&Yes":
 
                 # Executing the init script.
-                run(["sudo", "-S", "bash", "-c", "{}".format(init_script_file_path)], input=user_pwd, text=True, capture_output=True)
+                run(["sudo", "bash", "-c", "{}".format(init_script_file_path)], input=user_pwd, text=True, capture_output=True)
 
                 # Executing the stop script.
-                run(["sudo", "-S", "bash", "-c", "{}".format(stop_transparent_proxy_script_file_path)], input=user_pwd, text=True, capture_output=True)
+                run(["sudo", "bash", "-c", "{}".format(stop_transparent_proxy_script_file_path)], input=user_pwd, text=True, capture_output=True)
 
                 # Opening the ghostsurf.conf file in read mode
                 with open(ghostsurf_configuration_file_path, "r") as d:
@@ -1297,7 +1297,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             elif user_answer == "&No":
 
                 # Executing the stop script.
-                run(["sudo", "-S", "bash", "-c", "{}".format(stop_transparent_proxy_script_file_path)], input=user_pwd, text=True, capture_output=True)
+                run(["sudo", "bash", "-c", "{}".format(stop_transparent_proxy_script_file_path)], input=user_pwd, text=True, capture_output=True)
 
                 # Opening the ghostsurf.conf file in read mode
                 with open(ghostsurf_configuration_file_path, "r") as d:
@@ -1390,7 +1390,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             question_dialog.exec_() 
 
         # Reading the tor service's status by running a system command.
-        tor_status = run(["sudo", "-S", "bash", "-c", "systemctl status tor.service"], input=user_pwd, text=True, capture_output=True).stdout.strip()
+        tor_status = run(["sudo", "bash", "-c", "systemctl status tor.service"], input=user_pwd, text=True, capture_output=True).stdout.strip()
 
         # Checking if tor service is inactive
         if "inactive" in tor_status:
@@ -1423,7 +1423,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """A function which shows the tor service's status"""
 
         # Reading tor services status from a system command
-        tor_status = run(["sudo", "-S", "bash", "-c", "systemctl status tor.service"], input=user_pwd, text=True, capture_output=True).stdout.strip()
+        tor_status = run(["sudo", "bash", "-c", "systemctl status tor.service"], input=user_pwd, text=True, capture_output=True).stdout.strip()
 
         # Checking if tor service is inactive
         if "inactive" in tor_status:
@@ -1447,7 +1447,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """A function which changes your ip address by restarting the transparent proxy"""
 
         # Restarting the tor service to change the ip address.
-        run(["sudo", "-S", "bash", "-c", "systemctl restart tor"], input=user_pwd, text=True, capture_output=True)
+        run(["sudo", "bash", "-c", "systemctl restart tor"], input=user_pwd, text=True, capture_output=True)
 
 
 # Evaluate if the source is being run on its own or being imported somewhere else. With this conditional in place, your code can not be imported somewhere else.
