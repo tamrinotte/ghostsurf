@@ -60,12 +60,13 @@ original_resolv_configuration_file_path = Path("/etc/resolv.conf")
 
 fake_hostnames_list_file_path = Path(configuration_files_dir_path, "list_of_fake_hostnames.list")
 
+firefox_profiles_conf_file_path = Path(f"/home/{current_username}/.mozilla/firefox/profiles.ini")
+
 # ICON FILE PATH
 
 icons_dir_path = Path(base_dir, "icons")
 
 ghostsurf_logo_file_path = Path(icons_dir_path, "ghostsurf.png")
-
 
 # BASH SCRIPT FILE PATHS
 
@@ -91,7 +92,10 @@ init_script_file_path = Path(bash_scripts_dir_path, "init.sh")
 
 log_shredder_file_path = Path(bash_scripts_dir_path, "log_shredder.sh")
 
+nameserver_changer_file_path = Path(bash_scripts_dir_path, "nameservers_changer.sh")
+
 # BACKUP FILE PATH
+
 timezone_backup_file_path = Path("/opt/ghostsurf/backup_files/timezone.backup")
 
 # ICONS
@@ -128,7 +132,7 @@ def main():
     if current_username == "root":
         
         # Sending notification to let the user know that the application is trying to connect to the server
-        system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "You can\'t run this app as the root user"')
+        system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "You can\'t run this app as the root user"')
 
         # Exiting the system
         sysexit()
@@ -172,7 +176,7 @@ def check_fake_mac_address_usage():
     """A function which checks wheather or not you are using fake mac address"""
 
     # Getting the active network adaptor's name
-    active_network_adaptor_name = run(["sudo", "bash", "-c", "iw dev | awk '$1==\"Interface\"{print $2}'"], input=user_pwd, text=True, capture_output=True).stdout.strip()
+    active_network_adaptor_name = run(["sudo", "-S",  "bash", "-c", "iw dev | awk '$1==\"Interface\"{print $2}'"], input=user_pwd, text=True, capture_output=True).stdout.strip()
 
     # Checking if active_network_adaptor_name is equal to empty string
     if active_network_adaptor_name == "":
@@ -209,16 +213,16 @@ def check_appropriate_nameserver_usage():
     with open(privacy_focused_nameservers_file_path, "r") as privacy_focused_nameservers_file:
 
         # Reading privacy_focused_nameservers_file's lines
-        privacy_focused_nameservers = privacy_focused_nameservers_file.read()
+        privacy_focused_nameservers = privacy_focused_nameservers_file.read().strip('\n\r')
 
     # Creating a variable that holds the tor nameserver specification 
-    tor_nameserver = "nameserver 127.0.0.1\n"
+    tor_nameserver = "nameserver 127.0.0.1"
 
     # Opening the resolv.conf file in reading mode as resolv_conf_file
     with open(original_resolv_configuration_file_path, "r") as resolv_conf_file:
 
         # Reading resolv_conf_file's contents
-        resolv_conf_file_contents = resolv_conf_file.read() 
+        resolv_conf_file_contents = resolv_conf_file.read().strip('\n\r')
 
     debug(f'Start stop button\'s text = {main_window.start_stop_button.text()}')
 
@@ -245,29 +249,22 @@ def check_appropriate_nameserver_usage():
 def check_browser_anonymization_preferences_usage():
     """A function which checks if browser anonymization preferences are in use"""
 
-    # Opening firefox_prefs.js.custom file in reading mode as custom_firefox_prefs_file
-    with open(custom_firefox_preferences_file_path, "r") as custom_firefox_prefs_file:
+    ghostsurf_firefox_profile_file_path = Path(run(["bash", "-c", "find /home/{}/.mozilla/firefox/ -name *.ghostsurf".format(current_username)], text=True, capture_output=True).stdout.strip(), "user.js")
 
-        # Reading the lines of custom_firefox_prefs_file file
-        cfpf_lines = custom_firefox_prefs_file.readlines()
+    if ghostsurf_firefox_profile_file_path.exists() == True and custom_firefox_preferences_file_path.exists() == True:
 
-    # Finding the prefs.js file of firefox using a system command.
-    prefs_file_path = Path(run(["sudo", "bash", "-c", "find /home/{} -name prefs.js".format(current_username)], input=user_pwd, text=True, capture_output=True).stdout.strip())
+        with open(custom_firefox_preferences_file_path, "r") as cfpfp:
 
-    # Opening the original prefs.js file in reading mode as original_firefox_prefs_file 
-    with open(prefs_file_path, "r") as original_firefox_prefs_file:
+            cfpfp_contents = cfpfp.read()
 
-        # Reading the original_firefox_prefs_file lines 
-        ofpf_lines = original_firefox_prefs_file.readlines()
+        with open(ghostsurf_firefox_profile_file_path, "r") as gfpfp:
 
-    # Creating a boolean value which is True is all lines in the custom firefox preferences file is available in the original firefox preferences file lines
-    is_all_prefs_set = all(ele in ofpf_lines for ele in cfpf_lines)
+            gfpfp_contents = gfpfp.read()
 
-    # Printing custom firefox preferences file lines, original firefox preferences file lines and is all preferences set variable's value in debug mode.
-    debug(f'Custom Firefox Preferences File Lines = {cfpf_lines}\n\n\nOriginal Firefox Preferences File Lines = {ofpf_lines}\nIs All Preferences Set = {is_all_prefs_set}')
-
-    # Setting the 'Using browser anonymization preferences' key's value pair to True
-    checklist_items_dict['Using browser anonymization preferences'] = is_all_prefs_set
+        debug(f'Custom Firefox Preferences File Path Content = {cfpfp_contents}\nGhostsurf Firefox Profile File Path Content = {gfpfp_contents}')
+        
+        # Setting the 'Using browser anonymization preferences' key's value pair to True
+        checklist_items_dict['Using browser anonymization preferences'] = bool(cfpfp_contents == gfpfp_contents)
 
 
 def check_different_timezone_usage():
@@ -315,7 +312,7 @@ def get_the_public_ip_address():
     sleep(1.5)
 
     # Sending notification to let the user know that the application is trying to connect to the server
-    system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "Trying to connect to the server"')
+    system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Trying to connect to the server"')
 
     # Waiting for 1.5 seconds
     sleep(1.5)
@@ -323,7 +320,7 @@ def get_the_public_ip_address():
     # Trying to execute the code block that is located inside this block
     try:
         # Sending a get request to "https://ifconfig.io" to get the public ip address.
-        public_ip_address = run(["sudo", "bash", "-c", "curl --connect-timeout 14.15 {}".format("https://ifconfig.io")], input=user_pwd, text=True, capture_output=True).stdout.strip()
+        public_ip_address = run(["sudo", "-S", "bash", "-c", "curl --connect-timeout 7.5 {}".format("https://ifconfig.io")], input=user_pwd, text=True, capture_output=True).stdout.strip()
 
         # Creating a pattern for ip address validation
         ip_addr_regex = compile(r'\d{1,3}\.\d{1,3}\.\d{1,3}.\d{1,3}')
@@ -350,32 +347,32 @@ def get_the_public_ip_address():
         message = "Couldn't connect to the server!"
 
     # Sending notification
-    system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "{message}"')
+    system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "{message}"')
 
 
 def manage_netfilter_service():
     """A function which starts and enables netfilter service if it's not"""
 
-    netfilter_persistent_status = run(["sudo", "bash", "-c", "systemctl status netfilter-persistent"], input=user_pwd, text=True, capture_output=True).stdout.strip()
+    netfilter_persistent_status = run(["sudo", "-S", "bash", "-c", "systemctl status netfilter-persistent"], input=user_pwd, text=True, capture_output=True).stdout.strip()
 
     # Checking if the netfilter-persistent service is inactive
     if 'inactive' in netfilter_persistent_status:
 
         # Starting the netfilter-persistent service
-        run(["sudo", "bash", "-c", "systemctl start netfilter-persistent"], input=user_pwd, text=True, capture_output=True)
+        run(["sudo", "-S", "bash", "-c", "systemctl start netfilter-persistent"], input=user_pwd, text=True, capture_output=True)
 
     # Checking if the netfilter-persistent service is disabled
     if 'disabled' in netfilter_persistent_status:
 
         # Enabling the netfilter service
-        run(["sudo", "bash", "-c", "systemctl enable netfilter-persistent"], input=user_pwd, text=True, capture_output=True)
+        run(["sudo", "-S", "bash", "-c", "systemctl enable netfilter-persistent"], input=user_pwd, text=True, capture_output=True)
 
 
 def kill_log_files():
     """A function which overrides the log files in the system"""
     
     # Sending a notification to inform the user that the operation is starting
-    system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "Shreading the log files"')
+    system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Shreading the log files"')
 
     # Waiting for 0.3 seconds
     sleep(0.3)
@@ -384,7 +381,7 @@ def kill_log_files():
     system(f'bash {log_shredder_file_path} {current_username}')
 
     # Sending a notification to inform the user that the operation is done
-    system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "Log shredding has been done"')
+    system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Log shredding has been done"')
 
 
 def change_the_mac_address():
@@ -403,26 +400,26 @@ def change_the_mac_address():
             internet_adaptor_name = popen("ip route show default | awk '/default/ {print $5}'").read().strip()
 
             # Executing the mac_changer script.
-            run(["sudo", "bash", "-c", "{}".format(str(mac_changer_script_file_path))], input=user_pwd, text=True, capture_output=True)
+            run(["sudo", "-S", "bash", "-c", "{}".format(str(mac_changer_script_file_path))], input=user_pwd, text=True, capture_output=True)
 
             # Waiting for 4 seconds
             sleep(4)
 
             # Connecting to internet
             run(f'sudo nmcli d connect {internet_adaptor_name}', shell=True, input=user_pwd, text=True, capture_output=True, executable="/bin/bash")
-            # run(["sudo", "bash", "-c", "nmcli d connect {internet_adaptor_name}"], input=user_pwd, text=True, capture_output=True)
+            # run(["sudo", "-S", "bash", "-c", "nmcli d connect {internet_adaptor_name}"], input=user_pwd, text=True, capture_output=True)
 
             # Sending a notification to inform the user that the operation is done
-            system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "Mac address has been changed"')
+            system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Mac address has been changed"')
 
         # Checking if the user pressed to the no button
         elif user_answer == "&No":
             
             # Executing the mac_changer script.
-            run(["sudo", "bash", "-c", "{}".format(str(mac_changer_script_file_path))], input=user_pwd, text=True, capture_output=True)
+            run(["sudo", "-S", "bash", "-c", "{}".format(str(mac_changer_script_file_path))], input=user_pwd, text=True, capture_output=True)
 
             # Sending a notification to inform the user that the operation is done
-            system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "Mac address has been changed"')
+            system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Mac address has been changed"')
 
         # Checking if the didn't pressed to bot yes and not buttons 
         else:
@@ -431,7 +428,7 @@ def change_the_mac_address():
             debug("Operation canceled")
 
     # Sending a notification to inform the user that the operation is starting
-    system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "Changing the mac address"')
+    system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Changing the mac address"')
     
     # Waiting for 0.3 seconds
     sleep(0.3)
@@ -474,25 +471,25 @@ def wipe_the_memory():
         if user_answer == "&Yes":
             
             # Sending a notification to inform the user that the process is starting
-            system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "Trying to wipe the memory and drop caches. This might take some time!"')
+            system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Trying to wipe the memory and drop caches. This might take some time!"')
 
             # Executing the bomb.sh file to wipe the memory securely
-            run(["sudo", "bash", "-c", "{}".format(fast_bomb_script_file_path)], input=user_pwd, text=True, capture_output=True)
+            run(["sudo", "-S", "bash", "-c", "{}".format(fast_bomb_script_file_path)], input=user_pwd, text=True, capture_output=True)
 
             # Sending a notification to let the user know what the application just did
-            system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "Caches are dropped and memory is wiped"')
+            system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Caches are dropped and memory is wiped"')
             
         # Checking if the user pressed to the no button
         elif user_answer == "&No":
 
             # Sending a notification to inform the user that the process is starting
-            system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "Trying to wipe the memory and drop caches. This might take some time!"')
+            system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Trying to wipe the memory and drop caches. This might take some time!"')
 
             # Executing the bomb.sh file to wipe the memory securely
-            run(["sudo", "bash", "-c", "{}".format(secure_bomb_script_file_path)], input=user_pwd, text=True, capture_output=True)
+            run(["sudo", "-S", "bash", "-c", "{}".format(secure_bomb_script_file_path)], input=user_pwd, text=True, capture_output=True)
 
             # Sending a notification to let the user know what the application just did
-            system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "Caches are dropped and memory is wiped"')
+            system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Caches are dropped and memory is wiped"')
 
         # Checking if the didn't pressed to bot yes and not buttons 
         else:
@@ -526,16 +523,16 @@ def reset_ghostsurf_settings():
     """A function which resets the ghostsurf settings"""
 
     # Sending a notification to inform the user that the operation is starting
-    system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "Resetting ghostsurf configurations"')
+    system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Resetting ghostsurf configurations"')
 
     # Waiting for 0.3 seconds
     sleep(0.3)
 
     # Executing the reset.sh script.
-    run(["sudo", "bash", "-c", "{}".format(reset_script_file_path)], input=user_pwd, text=True, capture_output=True)
+    run(["sudo", "-S", "bash", "-c", "{}".format(reset_script_file_path)], input=user_pwd, text=True, capture_output=True)
     
     # Sending a notification to inform the user that the operation is done
-    system(f'notify-send -i "{ghostsurf_logo_file_path} "-t 300 "Reseting is done"')
+    system(f'notify-send -i "{ghostsurf_logo_file_path} "-t 150 "Reseting is done"')
 
 
 class WorkerSignals(QObject):
@@ -721,7 +718,7 @@ class PasswordWindow(QWidget, Ui_PasswordWindow):
         user_pwd = self.password_line_edit.text()
 
         # Getting the username and the root privileges
-        user_name = run(["sudo", "bash", "-c", "whoami"], input=user_pwd, text=True, capture_output=True).stdout.strip()
+        user_name = run(["sudo", "-S", "whoami"], input=user_pwd, text=True, capture_output=True).stdout.strip()
 
         # Checking if the username is equal to root
         if user_name == "root":
@@ -771,7 +768,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         manage_netfilter_service()
 
         # Checking tor services status
-        tor_status = run(["sudo", "bash", "-c", "systemctl status tor.service"], input=user_pwd, text=True, capture_output=True).stdout.strip()
+        tor_status = run(["sudo", "-S", "bash", "-c", "systemctl status tor.service"], input=user_pwd, text=True, capture_output=True).stdout.strip()
         
         # Opening the ghostsurf.conf file in reading mode
         with open(ghostsurf_configuration_file_path, "r") as ghostsurf_configuraion_file:
@@ -873,112 +870,72 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """A function which anonymizes firefox by changing it's preferences"""
 
         # Sending a notification to let the user know what happening
-        system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "Setting the Firefox preferences"')
+        system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Setting Firefox preferences"')
 
         # Waiting for 0.3 seconds
         sleep(0.3)
-        
-        # Finding the prefs.js file of firefox using a system command
-        prefs_file_path = Path(run(["sudo", "bash", "-c", "find /home/{} -name prefs.js".format(current_username)], input=user_pwd, text=True, capture_output=True).stdout.strip())
 
-        # Custom prefs file path
-        custom_prefs_file_path = Path(custom_firefox_preferences_file_path)
+        # Create a firefox profile called ghostsurf
+        run(["firefox-esr", "-CreateProfile", "ghostsurf"], text=True, capture_output=True)
 
         # Checking if the path that leads to custom preferences file is exists
-        if custom_prefs_file_path.exists() == True:
-
+        if custom_firefox_preferences_file_path.exists() == True:
+        
             # Opening the custom preferences file in read mode
-            with open(custom_prefs_file_path, "r") as the_custom_prefs_file:
+            with open(custom_firefox_preferences_file_path, "r") as the_custom_prefs_file:
 
                 # Creating a list of lines by reading the file
-                list_of_custom_prefs_file_lines = the_custom_prefs_file.readlines()
+                custom_prefs = the_custom_prefs_file.read()
 
         # Checking if the path is not exists
         else:
 
             # Sending a notification to inform the user that the operation is starting
-            system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "Custom preferences file not found. Try to reinstall ghostsurf!"')
+            system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Custom preferences file not found. Try to reinstall ghostsurf!"')
 
-        # Checking if the path that leads to firefox's preferences file is exists
-        if prefs_file_path.exists() == True:
-            
-            # Opening the prefs_file_path in reading mode
-            with open(prefs_file_path, "r") as firefox_prefs_file:
+        ghostsurf_firefox_profile_file_path = Path(run(["bash", "-c", "find /home/{}/.mozilla/firefox/ -name *.ghostsurf".format(current_username)], text=True, capture_output=True).stdout.strip(), "user.js")
 
-                # Readling each line from the file and creating a list from those lines
-                list_of_firefox_prefs_file_lines = firefox_prefs_file.readlines()
-        
-        # Checking if the path is not exists
-        else:
+        with open(ghostsurf_firefox_profile_file_path, "w") as ghostsurf_firefox_profile_user_pref_file:
 
-            # Sending a notification to inform the user that the operation is starting
-            system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "Firefox\'s preferences file not found!"')
+            ghostsurf_firefox_profile_user_pref_file.write(custom_prefs)
 
-        # Creating an empty list to store original file's key names
-        list_of_original_file_keys = []
+        # Executing the init script.
+        run(["sudo", "-S", "bash", "-c", "{}".format(init_script_file_path)], input=user_pwd, text=True, capture_output=True)
 
-        # Iterating line by line in the list_of_firefox_prefs_file_lines list
-        for original_line in list_of_firefox_prefs_file_lines:
+        with open(firefox_profiles_conf_file_path, "r") as firefox_prof_conf_file:
 
-            # Checking if the original_line is including '"' and "," at the same time. 
-            if '"' in original_line and "," in original_line:
+            firefox_prof_conf_lines = firefox_prof_conf_file.readlines()
+
+        for line in firefox_prof_conf_lines:
+
+            if "Path" in line:
+
+                path = line.split("=")[1][:-1]
                 
-                # Extracting the original key name from the original line
-                original_key_name = original_line.split('"')[1]
-                
-                # Extacting the value from the original line
-                original_value = original_line.split('"')[2][2:-3]
+                if "ghostsurf" in path:
 
-                # Appending the key name to the list_of_original_file_keys list
-                list_of_original_file_keys.append(original_key_name)
+                    ghostsurf_profile_path_spec = path
 
-                # Iterating line by line in the list_of_custom_prefs_file_lines
-                for custom_line in list_of_custom_prefs_file_lines:
+                elif "default" in path:
 
-                    # Extrating the key name from the custom preference line               
-                    custom_key_name = custom_line.split('"')[1]
-                    
-                    # Extracting the value from custom preference line
-                    custom_value = custom_line.split('"')[2][2:-3]
-                    
-                    # Checking if the custom_key_name is equal to original_key_name
-                    if custom_key_name == original_key_name:
-                        
-                        # Creating a preferences string
-                        special_line = f'user_pref("{original_key_name}", {custom_value});\n'
+                    default_profile_path_spec = path
 
-                        # Creating an integer that corresponds to the original_line's location in the list
-                        target_lines_index_num = list_of_firefox_prefs_file_lines.index(original_line)
-                        
-                        # Altering the list_of_firefox_prefs_file_lines list
-                        list_of_firefox_prefs_file_lines[target_lines_index_num] = special_line
+            elif "Default" in line and "." in line:
 
-        # Iterating through each line in the list_of_custom_prefs_file_lines
-        for custom_line in list_of_custom_prefs_file_lines:
+                path = line.split("=")[1][:-1]
 
-            # Creating a custom_key_name 
-            custom_key_name = custom_line.split('"')[1]
+                default_profile_setting_raw = line
 
-            # Creatinga a custom variable
-            custom_value = custom_line.split('"')[2][2:-3]
+        new_default = f"Default={ghostsurf_profile_path_spec}\n"
 
-            # Creating user preferences using the custom_key_name and the custom_value variables that have just been created
-            special_custom_line = f'user_pref("{custom_key_name}", {custom_value});\n'
+        firefox_prof_conf_lines[firefox_prof_conf_lines.index(default_profile_setting_raw)] = new_default
 
-            # Checking if the custom key is not in the list of original file keys
-            if custom_key_name not in list_of_original_file_keys: 
-                
-                # Appending the special custom line to the list_of_firefox_prefs_file
-                list_of_firefox_prefs_file_lines.append(special_custom_line)
+        with open(firefox_profiles_conf_file_path, "w") as f:
 
-        # Opening the prefs_file_path in writing mode with firefox_prefs_file object name
-        with open(prefs_file_path, "w") as firefox_prefs_file:
-            
-            # Writing the list_of_firefox_prefs_file_lines list to firefox_prefs_file line by line
-            firefox_prefs_file.writelines(list_of_firefox_prefs_file_lines)
+            f.write("".join(firefox_prof_conf_lines))
 
         # Sending a notification to inform the user that the firefox preferences has been set
-        system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "Firefox preferences has been set"')
+        system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Ghostsurf profile has been created and, preferences bas been set"')
 
     def run_fast_check(self):
         """A function which runs a fast check and displays the checklist in a window"""
@@ -991,7 +948,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # Executing the object to display the window.
         self.checklist_window.show()
-
 
     def change_hostname(self):
         """A function which changes the hostname"""
@@ -1021,10 +977,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             debug("Rebooting the system")
 
             # Executing the stop script
-            run(["sudo", "bash", "-c", "{}".format(stop_transparent_proxy_script_file_path)], input=user_pwd, text=True, capture_output=True)
+            run(["sudo", "-S", "bash", "-c", "{}".format(stop_transparent_proxy_script_file_path)], input=user_pwd, text=True, capture_output=True)
 
             # Executing the hostname_changer script
-            run(["sudo", "bash", "-c", "{}".format(hostname_changer_script_file_path)], input=user_pwd, text=True, capture_output=True)
+            run(["sudo", "-S", "bash", "-c", "{}".format(hostname_changer_script_file_path)], input=user_pwd, text=True, capture_output=True)
 
             # Rebooting the system
             run(["sudo", "reboot"], input=user_pwd, text=True, capture_output=True)
@@ -1039,7 +995,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """A function which changes the nameservers in the resolv.conf file"""
 
         # Sending a notification to inform the user that the operation is starting
-        system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "Changing the nameservers"')
+        system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Changing the nameservers"')
 
         # Waiting for 0.3 seconds
         sleep(0.3)
@@ -1050,17 +1006,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Checking if transparent proxy is on
         if working_status == "Stop":
             
+            # Executing the nameservers_changer script
+            run(["sudo", "-S", "bash", "-c", f'{nameserver_changer_file_path} {tor_nameservers_file_path}'], input=user_pwd, text=True, capture_output=True)
+
             # Copying and pasting custom nameservers for tor on resolv.conf file
-            run(["sudo", "bash", "-c", f'cp {tor_nameservers_file_path} {original_resolv_configuration_file_path}'], input=user_pwd, text=True, capture_output=True)
+            run(["sudo", "-S", "bash", "-c", f'cp {tor_nameservers_file_path} {original_resolv_configuration_file_path}'], input=user_pwd, text=True, capture_output=True)
 
         # Checking if transparent proxy is off
         else:
 
+            # Executing the nameservers_changer script
+            run(["sudo", "-S", "bash", "-c", f'{nameserver_changer_file_path} {privacy_focused_nameservers_file_path}'], input=user_pwd, text=True, capture_output=True)
+
             # Copying and pasting dns_changer nameservers to on resolv.conf file
-            run(["sudo", "bash", "-c", f'cp {privacy_focused_nameservers_file_path} {original_resolv_configuration_file_path}'], input=user_pwd, text=True, capture_output=True)
+            run(["sudo", "-S", "bash", "-c", f'cp {privacy_focused_nameservers_file_path} {original_resolv_configuration_file_path}'], input=user_pwd, text=True, capture_output=True)            
 
         # Sending a notification to inform the user that the operation is done
-        system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 300 "Nameservers has been changed"')
+        system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Nameservers has been changed"')
 
     def reset_settings(self):
         """A function which resets ghostsurf settings"""
@@ -1102,10 +1064,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             debug("Enabling ghostsurf at boot")
 
             # Executing the start script
-            run(["sudo", "bash", "-c", "{}".format(start_transparent_proxy_script_file_path)], input=user_pwd, text=True, capture_output=True)
+            run(["sudo", "-S", "bash", "-c", "{}".format(start_transparent_proxy_script_file_path)], input=user_pwd, text=True, capture_output=True)
 
             # Executing the save script
-            run(["sudo", "bash", "-c", "{}".format(save_iptables_script_file_path)], input=user_pwd, text=True, capture_output=True)
+            run(["sudo", "-S", "bash", "-c", "{}".format(save_iptables_script_file_path)], input=user_pwd, text=True, capture_output=True)
 
             # Opening the ghostsurf.conf file in read mode
             with open(ghostsurf_configuration_file_path, "r") as a:
@@ -1153,7 +1115,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             debug("Disabling ghostsurf at boot")
 
             # Executing the stop script
-            run(["sudo", "bash", "-c", "{}".format(stop_transparent_proxy_script_file_path)], input=user_pwd, text=True, capture_output=True)
+            run(["sudo", "-S", "bash", "-c", "{}".format(stop_transparent_proxy_script_file_path)], input=user_pwd, text=True, capture_output=True)
 
             # Opening the ghostsurf.conf file in read mode
             with open(ghostsurf_configuration_file_path, "r") as a:
@@ -1222,10 +1184,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 debug("Yes button is clicked")
 
                 # Executing the init script.
-                run(["sudo", "bash", "-c", "{}".format(init_script_file_path)], input=user_pwd, text=True, capture_output=True)
+                run(["sudo", "-S", "bash", "-c", "{}".format(init_script_file_path)], input=user_pwd, text=True, capture_output=True)
 
                 # Executing the start script
-                run(["sudo", "bash", "-c", "{}".format(start_transparent_proxy_script_file_path)], input=user_pwd, text=True, capture_output=True)
+                run(["sudo", "-S", "bash", "-c", "{}".format(start_transparent_proxy_script_file_path)], input=user_pwd, text=True, capture_output=True)
 
                 # Changing the start_stop_button's text value to Stop.
                 self.start_stop_button.setText("Stop")
@@ -1237,7 +1199,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 debug("No button is clicked")
                 
                 # Executing the start script
-                run(["sudo", "bash", "-c", "{}".format(start_transparent_proxy_script_file_path)], input=user_pwd, text=True, capture_output=True)
+                run(["sudo", "-S", "bash", "-c", "{}".format(start_transparent_proxy_script_file_path)], input=user_pwd, text=True, capture_output=True)
 
                 # Changing the start_stop_button's text value to Stop.
                 self.start_stop_button.setText("Stop")
@@ -1258,10 +1220,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if user_answer == "&Yes":
 
                 # Executing the init script.
-                run(["sudo", "bash", "-c", "{}".format(init_script_file_path)], input=user_pwd, text=True, capture_output=True)
+                run(["sudo", "-S", "bash", "-c", "{}".format(init_script_file_path)], input=user_pwd, text=True, capture_output=True)
 
                 # Executing the stop script.
-                run(["sudo", "bash", "-c", "{}".format(stop_transparent_proxy_script_file_path)], input=user_pwd, text=True, capture_output=True)
+                run(["sudo", "-S", "bash", "-c", "{}".format(stop_transparent_proxy_script_file_path)], input=user_pwd, text=True, capture_output=True)
 
                 # Opening the ghostsurf.conf file in read mode
                 with open(ghostsurf_configuration_file_path, "r") as d:
@@ -1297,7 +1259,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             elif user_answer == "&No":
 
                 # Executing the stop script.
-                run(["sudo", "bash", "-c", "{}".format(stop_transparent_proxy_script_file_path)], input=user_pwd, text=True, capture_output=True)
+                run(["sudo", "-S", "bash", "-c", "{}".format(stop_transparent_proxy_script_file_path)], input=user_pwd, text=True, capture_output=True)
 
                 # Opening the ghostsurf.conf file in read mode
                 with open(ghostsurf_configuration_file_path, "r") as d:
@@ -1390,7 +1352,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             question_dialog.exec_() 
 
         # Reading the tor service's status by running a system command.
-        tor_status = run(["sudo", "bash", "-c", "systemctl status tor.service"], input=user_pwd, text=True, capture_output=True).stdout.strip()
+        tor_status = run(["sudo", "-S", "bash", "-c", "systemctl status tor.service"], input=user_pwd, text=True, capture_output=True).stdout.strip()
 
         # Checking if tor service is inactive
         if "inactive" in tor_status:
@@ -1423,7 +1385,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """A function which shows the tor service's status"""
 
         # Reading tor services status from a system command
-        tor_status = run(["sudo", "bash", "-c", "systemctl status tor.service"], input=user_pwd, text=True, capture_output=True).stdout.strip()
+        tor_status = run(["sudo", "-S", "bash", "-c", "systemctl status tor.service"], input=user_pwd, text=True, capture_output=True).stdout.strip()
 
         # Checking if tor service is inactive
         if "inactive" in tor_status:
@@ -1447,7 +1409,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """A function which changes your ip address by restarting the transparent proxy"""
 
         # Restarting the tor service to change the ip address.
-        run(["sudo", "bash", "-c", "systemctl restart tor"], input=user_pwd, text=True, capture_output=True)
+        run(["sudo", "-S", "bash", "-c", "systemctl restart tor"], input=user_pwd, text=True, capture_output=True)
 
 
 # Evaluate if the source is being run on its own or being imported somewhere else. With this conditional in place, your code can not be imported somewhere else.

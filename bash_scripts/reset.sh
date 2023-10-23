@@ -12,6 +12,9 @@ main () {
     # Calling the reset_mac_address function.
     reset_mac_address
 
+    # Delete ghostsurf profile
+    delete_ghostsurf_firefox_profile
+
     # Calling the iptables_accept_all function.
     iptables_accept_all
 
@@ -48,9 +51,6 @@ reset_configuration_files() {
 
     # Replacing the current_hostname in the /etc/hosts file with the original hostname
     sed -i "s/$current_hostname/$original_hostname/g" /etc/hosts
-
-    # Restoring the original prefs.js file
-    cp "/opt/ghostsurf/backup_files/prefs.js.backup" "$pref_path" 
 
 }
 
@@ -91,6 +91,18 @@ reset_mac_address() {
         fi
 
     done
+
+}
+
+delete_ghostsurf_firefox_profile() {
+    # A function which deletes ghostsurf's firefox profile
+
+    # Restore firefox's profiles file.
+    cp "/opt/ghostsurf/backup_files/firefox_profiles.backup" "/home/$username/.mozilla/firefox/profiles.ini"
+
+    # Note: In future do not surround these strings with double quotes.
+    rm -rf /home/$username/.mozilla/firefox/*.ghostsurf
+    rm -rf /home/$username/.cache/mozilla/firefox/*ghostsurf
 
 }
 

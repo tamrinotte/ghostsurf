@@ -20,9 +20,6 @@ declare_variables() {
     # Creating a variable called username which is equal to the logged in user's username
     username=${SUDO_USER:-${USER}}
 
-    # Creating path which lead to the preferences script of firefox
-    pref_path=$(find /home/$username -name prefs.js)
-
 }
 
 backup_configuration_files() {
@@ -41,7 +38,8 @@ backup_configuration_files() {
     sudo cp "/etc/hostname" "/opt/ghostsurf/backup_files/hostname.backup"
 
     # Getting a back up of the original prefs.js file
-    sudo cp "$pref_path" "/opt/ghostsurf/backup_files/prefs.js.backup" 
+    sudo cp "/home/$username/.mozilla/firefox/profiles.ini" "/opt/ghostsurf/backup_files/firefox_profiles.backup"
+
 }
 
 set_up_file_ownerships() {
