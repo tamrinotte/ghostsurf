@@ -33,7 +33,7 @@ __Log Shredder Button:__ Overwrites the log files
 
 __Pandora Bomb Button:__ Wipes the memory
 
-__Browser Anonymization Button:__ Creates a firefox profile and sets preferences to enchance browser anonymization
+__Browser Anonymization Button:__ Creates firefox profiles and sets preferences to enchance browser anonymization
 
 __Status Button:__ Updates the tor status text
 
@@ -115,7 +115,7 @@ __Log Shredder Button:__ Kayıt dosyalarının uzerine yazar
 
 __Pandora Bomb Button:__ Belleği siler
 
-__Browser Anonymization Button:__ Firefox profili yaratıp, tercihleri değiştirerek arama motorunun gizliliğini arttırır
+__Browser Anonymization Button:__ Firefox profilleri yaratıp, tercihleri değiştirerek arama motorunun gizliliğini arttırır
 
 __Status Button:__ Tor durumunu günceller
 
