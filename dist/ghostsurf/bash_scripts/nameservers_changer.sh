@@ -20,8 +20,6 @@ declare_variables() {
     # Creating a function parameter called nameservers_file_path
     local nameservers_file_path="$1"
 
-    echo $nameservers_file_path
-
     # Try to get the SSID for Wi-Fi connections
     active_connection_name=$(iwgetid --raw)
 

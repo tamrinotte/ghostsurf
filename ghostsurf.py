@@ -31,7 +31,7 @@ import resources_rc
 basicConfig(level=DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Disabling the debugging feature. Hint: Comment out this line to enable debugging.
-# disable(CRITICAL)
+disable(CRITICAL)
 
 # GLOBAL VARIABLES
 
@@ -114,7 +114,7 @@ checklist_items_dict = {
 
     'Using appropriate nameservers': False,
 
-    'Using browser anonymization preferences': False,
+    'Ghostsurf\'s Firefox profiles are available. And, preferences are set.': False,
 
     'Using different timezone': False,
 
@@ -246,12 +246,14 @@ def check_appropriate_nameserver_usage():
             checklist_items_dict['Using appropriate nameservers'] = True
 
 
-def check_browser_anonymization_preferences_usage():
+def check_browser_anonymization():
     """A function which checks if browser anonymization preferences are in use"""
 
     ghostsurf_firefox_profile_file_path = Path(run(["bash", "-c", "find /home/{}/.mozilla/firefox/ -name *.ghostsurf".format(current_username)], text=True, capture_output=True).stdout.strip(), "user.js")
+    
+    penetration_testing_firefox_profile_file_path = Path(run(["bash", "-c", "find /home/{}/.mozilla/firefox/ -name *.penetration-testing".format(current_username)], text=True, capture_output=True).stdout.strip())
 
-    if ghostsurf_firefox_profile_file_path.exists() == True and custom_firefox_preferences_file_path.exists() == True:
+    if ghostsurf_firefox_profile_file_path.exists() == True and custom_firefox_preferences_file_path.exists() == True and penetration_testing_firefox_profile_file_path.exists() == True:
 
         with open(custom_firefox_preferences_file_path, "r") as cfpfp:
 
@@ -263,8 +265,12 @@ def check_browser_anonymization_preferences_usage():
 
         debug(f'Custom Firefox Preferences File Path Content = {cfpfp_contents}\nGhostsurf Firefox Profile File Path Content = {gfpfp_contents}')
         
-        # Setting the 'Using browser anonymization preferences' key's value pair to True
-        checklist_items_dict['Using browser anonymization preferences'] = bool(cfpfp_contents == gfpfp_contents)
+        # Setting the 'Ghostsurf\'s Firefox profiles have been created. And, preferences have been set.' key's value pair to True
+        checklist_items_dict['Ghostsurf\'s Firefox profiles are available. And, preferences are set.'] = bool(cfpfp_contents == gfpfp_contents)
+
+    else:
+
+        debug('Couldn\'t find a path')
 
 
 def check_different_timezone_usage():
@@ -561,8 +567,8 @@ class Worker(QRunnable):
         # Calling the check_appropriate_nameserver_usage function.
         check_appropriate_nameserver_usage()
 
-        # Calling the check_browser_anonymization_preferences_usage function.
-        check_browser_anonymization_preferences_usage()
+        # Calling the check_browser_anonymization function.
+        check_browser_anonymization()
 
         # Calling the check_different_timezone_usage function.
         check_different_timezone_usage()
@@ -878,6 +884,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Create a firefox profile called ghostsurf
         run(["firefox-esr", "-CreateProfile", "ghostsurf"], text=True, capture_output=True)
 
+        # Create a firefox profile called penetration testing
+        run(["firefox-esr", "-CreateProfile", "penetration-testing"], text=True, capture_output=True)
+
         # Checking if the path that leads to custom preferences file is exists
         if custom_firefox_preferences_file_path.exists() == True:
         
@@ -950,7 +959,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.checklist_window.show()
 
     def change_hostname(self):
-        """A function which changes the hostname"""
+        """A function which changes the hostname. Note: Modems sees your hostname not your username"""
 
         # Creating a question dialog window
         question_dialog = QMessageBox()

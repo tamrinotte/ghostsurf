@@ -33,7 +33,7 @@ __Log Shredder Button:__ Overwrites the log files
 
 __Pandora Bomb Button:__ Wipes the memory
 
-__Browser Anonymization Button:__ Sets the firefox preferences to enhance browser anonymization
+__Browser Anonymization Button:__ Creates a firefox profile and sets preferences to enchance browser anonymization
 
 __Status Button:__ Updates the tor status text
 
@@ -51,7 +51,7 @@ __Enable Ghostsurf at Boot Switch:__ Enables ghostsurf boot
 ## INSTALLATION
 1) Install the dependencies: 	
 
-       sudo apt install tor iw libnotify-bin netfilter-persistent iptables-persistent secure-delete bleachbit macchanger net-tools -y
+       sudo apt install firefox-esr tor iw libnotify-bin netfilter-persistent iptables-persistent secure-delete bleachbit macchanger net-tools -y
 
 2) Download the installer
 
@@ -115,7 +115,7 @@ __Log Shredder Button:__ Kayıt dosyalarının uzerine yazar
 
 __Pandora Bomb Button:__ Belleği siler
 
-__Browser Anonymization Button:__ Arama motorunun tercihlerini anonimleşmeyi attırıcak şekilde değiştirir
+__Browser Anonymization Button:__ Firefox profili yaratıp, tercihleri değiştirerek arama motorunun gizliliğini arttırır
 
 __Status Button:__ Tor durumunu günceller
 
@@ -133,7 +133,7 @@ __Enable Ghostsurf at Boot Switch:__ Ghostsurf'ü başlangıçta başlamaya ayar
 ## YÜKLEME
 1) Bağımlılıkları yükle: 	
 
-       sudo apt install tor iw libnotify-bin netfilter-persistent iptables-persistent secure-delete bleachbit macchanger net-tools -y
+       sudo apt install firefox-esr tor iw libnotify-bin netfilter-persistent iptables-persistent secure-delete bleachbit macchanger net-tools -y
 
 2) Yükleyiciyi indir
 
