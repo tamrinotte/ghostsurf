@@ -27,7 +27,7 @@ __Hostname Changer Button:__ Changes the hostname with a fake one
 
 __Mac Address Changer Button:__ Changes the mac address with a fake one
 
-__Name Servers Changer Button:__ Changes the nameservers with appropriate ones(localhost or privacy focuseds)
+__Name Servers Changer Button:__ Changes the nameservers with appropriate ones(localhost or privacy focused)
 
 __Log Shredder Button:__ Overwrites the log files
 
@@ -39,7 +39,7 @@ __Status Button:__ Updates the tor status text
 
 __Checklist Button:__ Runs a checklist to display the features that you are using
 
-__Reset Button:__ Reset ghostsurf modifications
+__Reset Button:__ Resets ghostsurf modifications or only resets iptables rules
 
 __White Rabbit Button:__ Opens the help page on the browser
 
@@ -121,7 +121,7 @@ __Status Button:__ Tor durumunu günceller
 
 __Checklist Button:__ Kontrol listesi oluşturur
 
-__Reset Button:__ Ghostsurf değişikliklerini sıfırlar
+__Reset Button:__ Ghostsurf değişikliklerini sıfırlar.Veya sadece iptables kurallarını sıfırlar.
 
 __White Rabbit Button:__ Yardım sayfasını açar
 
