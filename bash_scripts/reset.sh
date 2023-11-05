@@ -113,10 +113,19 @@ iptables_accept_all() {
     iptables -t filter -X
     iptables -t nat -F
     iptables -t nat -X
+    
+    ip6tables -t filter -F
+    ip6tables -t filter -X
+    ip6tables -t nat -F
+    ip6tables -t nat -X
 
     iptables -P INPUT ACCEPT
     iptables -P FORWARD ACCEPT
     iptables -P OUTPUT ACCEPT
+
+    ip6tables -P INPUT DROP
+    ip6tables -P FORWARD DROP
+    ip6tables -P OUTPUT DROP
 
 }
 

@@ -80,6 +80,8 @@ secure_bomb_script_file_path = Path(bash_scripts_dir_path, "secure_bomb.sh")
 
 reset_script_file_path = Path(bash_scripts_dir_path, "reset.sh")
 
+reset_iptables_only_script_file_path = Path(bash_scripts_dir_path, "reset_iptables_only.sh")
+
 start_transparent_proxy_script_file_path = Path(bash_scripts_dir_path, "start_transparent_proxy.sh")
 
 stop_transparent_proxy_script_file_path = Path(bash_scripts_dir_path, "stop_transparent_proxy.sh")
@@ -103,26 +105,6 @@ timezone_backup_file_path = Path("/opt/ghostsurf/backup_files/timezone.backup")
 tick = QImage(str(Path(icons_dir_path, "tick.png")))
 
 cross = QImage(str(Path(icons_dir_path, "cross.png")))
-
-
-# Creating a dictionary to store the checklist's keys and values
-checklist_items_dict = {
-
-    'Using fake hostname': False,
-
-    'Using fake mac address': False,
-
-    'Using appropriate nameservers': False,
-
-    'Ghostsurf\'s Firefox profiles are available. And, preferences are set.': False,
-
-    'Using different timezone': False,
-
-    'Using a tor connection': False,
-
-    'Using man in the middle protection': False
-
-}
 
 
 def main():
@@ -176,34 +158,51 @@ def check_fake_mac_address_usage():
     """A function which checks wheather or not you are using fake mac address"""
 
     # Getting the active network adaptor's name
-    active_network_adaptor_name = run(["sudo", "-S",  "bash", "-c", "iw dev | awk '$1==\"Interface\"{print $2}'"], input=user_pwd, text=True, capture_output=True).stdout.strip()
+    list_of_network_interfaces = run(["sudo", "-S",  "bash", "-c", "ip -o link show | awk -F': ' '{print $2}'"], input=user_pwd, text=True, capture_output=True).stdout.strip("\n\r").split("\n")
 
-    # Checking if active_network_adaptor_name is equal to empty string
-    if active_network_adaptor_name == "":
+    verification_list = []
 
-        # Setting the 'Using fake mac address' key's value pair to False
-        checklist_items_dict['Using fake mac address'] = False
+    for interface in list_of_network_interfaces:
 
-    # Checking if the active_network_adaptor_name is not equal to empty string
-    else:
+        interface = interface.strip("\n\r")
 
-        # Getting mac address information
-        mac_address_info = popen(f'macchanger -s {active_network_adaptor_name}').read().split("\n")[:-1]
+        if interface != "lo":
 
-        # Getting the permanent mac address
-        permanent_mac_address = mac_address_info[1].split(" ")[2]
+            debug(f"Network Interface Name = {interface}")
 
-        # Getting the current mac address
-        current_mac_address = mac_address_info[0].split(" ")[4]
+            # Getting mac address information
+            mac_address_info = popen(f'macchanger -s {interface}').read().split("\n")[:-1]
 
-        # Printing the permanent mac address and the current mac address in debug mode.
-        debug(f'Permanent Mac Address = {permanent_mac_address}\nCurrent Mac Address = {current_mac_address}')
+            # Getting the permanent mac address
+            permanent_mac_address = mac_address_info[1].split(" ")[2].strip()
 
-        # Checking if the current mac address is not equal to the permanent mac address
-        if current_mac_address != permanent_mac_address:
+            # Getting the current mac address
+            current_mac_address = mac_address_info[0].split(" ")[4].strip()
 
-            # Setting the 'Using fake mac address' key's value pair to True
-            checklist_items_dict['Using fake mac address'] = True
+            # Printing the permanent mac address and the current mac address in debug mode.
+            debug(f'Permanent Mac Address = {permanent_mac_address}\nCurrent Mac Address = {current_mac_address}')
+
+            # Checking if the current mac address is not equal to the permanent mac address
+            if current_mac_address != permanent_mac_address:
+
+                verification_list.append(True)
+
+                if verification_list.count(True) == len(list_of_network_interfaces) -1:
+
+                    # Setting the 'Using fake mac address' key's value pair to True
+                    checklist_items_dict['Using fake mac address'] = True
+
+                else:
+
+                    # Setting the 'Using fake mac address' key's value pair to False
+                    checklist_items_dict['Using fake mac address'] = False
+
+            else:
+
+                verification_list.append(False)
+
+                # Setting the 'Using fake mac address' key's value pair to False
+                checklist_items_dict['Using fake mac address'] = False
 
 
 def check_appropriate_nameserver_usage():
@@ -265,8 +264,8 @@ def check_browser_anonymization():
 
         debug(f'Custom Firefox Preferences File Path Content = {cfpfp_contents}\nGhostsurf Firefox Profile File Path Content = {gfpfp_contents}')
         
-        # Setting the 'Ghostsurf\'s Firefox profiles have been created. And, preferences have been set.' key's value pair to True
-        checklist_items_dict['Ghostsurf\'s Firefox profiles are available. And, preferences are set.'] = bool(cfpfp_contents == gfpfp_contents)
+        # Setting the 'Ghostsurf\'s Firefox profiles are available. And, preferences are set' key's value pair to True
+        checklist_items_dict['Ghostsurf\'s Firefox profiles are available. And, preferences are set'] = bool(cfpfp_contents == gfpfp_contents)
 
     else:
 
@@ -528,17 +527,71 @@ def wipe_the_memory():
 def reset_ghostsurf_settings():
     """A function which resets the ghostsurf settings"""
 
-    # Sending a notification to inform the user that the operation is starting
-    system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Resetting ghostsurf configurations"')
+    def reset_button_question_dialog_processor(i):
+        """A function which process the input coming from the dialog box that is opened after the reset button is pressed to identify what app should do"""
+        
+        # Getting the user's answer from the i's text value to identify if the user pressed to yes or no
+        user_answer = i.text()
 
-    # Waiting for 0.3 seconds
-    sleep(0.3)
+        # Waiting for 0.3 seconds
+        sleep(0.3)
 
-    # Executing the reset.sh script.
-    run(["sudo", "-S", "bash", "-c", "{}".format(reset_script_file_path)], input=user_pwd, text=True, capture_output=True)
-    
-    # Sending a notification to inform the user that the operation is done
-    system(f'notify-send -i "{ghostsurf_logo_file_path} "-t 150 "Reseting is done"')
+        # Checking if the user pressed to the yes button.
+        if user_answer == "&Yes":
+            
+            # Sending a notification to inform the user that the operation is starting
+            system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Resetting iptables rules only"')
+
+            # Waiting for 0.3 seconds
+            sleep(0.3)
+
+            # Executing the reset.sh script.
+            run(["sudo", "-S", "bash", "-c", "{}".format(reset_iptables_only_script_file_path)], input=user_pwd, text=True, capture_output=True)
+            
+            # Sending a notification to inform the user that the operation is done
+            system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Iptables rules are reset"')
+            
+        # Checking if the user pressed to the no button
+        elif user_answer == "&No":
+
+            # Sending a notification to inform the user that the operation is starting
+            system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Resetting ghostsurf configurations"')
+
+            # Waiting for 0.3 seconds
+            sleep(0.3)
+
+            # Executing the reset.sh script.
+            run(["sudo", "-S", "bash", "-c", "{}".format(reset_script_file_path)], input=user_pwd, text=True, capture_output=True)
+            
+            # Sending a notification to inform the user that the operation is done
+            system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Reseting is done"')
+
+        # Checking if the didn't pressed to bot yes and not buttons 
+        else:
+
+            # Printing "Operation canceled in debug mode"
+            debug("Operation canceled")
+
+    # Creating a question dialog window
+    question_dialog = QMessageBox()
+
+    # Setting the question dialog window's icon
+    question_dialog.setIcon(QMessageBox.Question)
+
+    # Setting the dialog's window title
+    question_dialog.setWindowTitle("Important")
+
+    # Setting the question dialog's text
+    question_dialog.setText("Do you want to reset iptables rules only?")
+
+    # Setting standard buttons
+    question_dialog.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
+
+    # Adding functionality to Yes and No buttons
+    question_dialog.buttonClicked.connect(reset_button_question_dialog_processor)
+
+    # Showing the question dialog
+    question_dialog.exec_()
 
 
 class WorkerSignals(QObject):
@@ -554,6 +607,27 @@ class Worker(QRunnable):
         super().__init__()
 
         self.signals = WorkerSignals()
+
+    # Creating a dictionary to store the checklist's keys and values
+    global checklist_items_dict
+    
+    checklist_items_dict = {
+
+        'Using fake hostname': False,
+
+        'Using fake mac address': False,
+
+        'Using appropriate nameservers': False,
+
+        'Ghostsurf\'s Firefox profiles are available. And, preferences are set': False,
+
+        'Using different timezone': False,
+
+        'Using a tor connection': False,
+
+        'Using man in the middle protection': False
+
+    }
 
     @Slot()
     def run(self):
@@ -876,7 +950,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """A function which anonymizes firefox by changing it's preferences"""
 
         # Sending a notification to let the user know what happening
-        system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Setting Firefox preferences"')
+        system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Creating Ghostsurf\'s Firefox profiles"')
 
         # Waiting for 0.3 seconds
         sleep(0.3)
@@ -944,7 +1018,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             f.write("".join(firefox_prof_conf_lines))
 
         # Sending a notification to inform the user that the firefox preferences has been set
-        system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Ghostsurf profile has been created and, preferences bas been set"')
+        system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Ghostsurf\'s Firefox profiles are created. And, preferences are set."')
 
     def run_fast_check(self):
         """A function which runs a fast check and displays the checklist in a window"""

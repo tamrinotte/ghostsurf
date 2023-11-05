@@ -38,11 +38,11 @@ change_mac_address() {
             # Changing the mac address with random and permanent options
             macchanger -rp $interface
 
-            # Starting the NetworkManager service
-            systemctl start NetworkManager.service
-
             # Turning the interface up
             ifconfig $interface up
+
+            # Starting the NetworkManager service
+            systemctl start NetworkManager.service
 
         fi
 
