@@ -1,21 +1,19 @@
 # This Python file uses the following encoding: utf-8
 
 # MODULES AND/OR LIBRARIES
-from os import system, popen, path
+from os import system, path
 from pathlib import Path
 from logging import basicConfig, DEBUG, debug, disable, CRITICAL
 from webbrowser import open as wbopen
-from threading import Thread
-from re import compile
 from time import sleep
 from getpass import getuser
 from pathlib import Path
-from socket import gethostname
 from sys import exit as sysexit
 from subprocess import run
+from threading import Thread
 
 # PySide2
-from PySide2.QtWidgets import QApplication, QWidget, QMainWindow, QMessageBox, QLineEdit, QListView, QVBoxLayout
+from PySide2.QtWidgets import QApplication, QWidget, QMainWindow, QMessageBox, QLineEdit
 from PySide2.QtGui import QPixmap, QIcon, QImage
 from PySide2.QtCore import QAbstractListModel, Qt, QRunnable, QThreadPool, QThread, QObject, Signal, Slot
 
@@ -27,13 +25,43 @@ from guis.checklist_win_ui import Ui_ChecklistWindow
 # Resources
 import resources_rc
 
+# Ghostsurf Functions
+from gs_functions.check_list_functions import (
+    check_fake_hostname_usage, 
+    check_fake_mac_address_usage, 
+    check_appropriate_nameserver_usage, 
+    check_browser_anonymization,
+    check_different_timezone_usage,
+    check_tor_connection_usage,
+)
+
+from gs_functions.control_deck_functions import (
+    get_the_public_ip_address,
+    kill_log_files,
+    reset_ghostsurf_settings,
+    change_the_mac_address,
+    wipe_the_memory,
+)
+
+from gs_functions.standard_functions import (
+    manage_netfilter_service,
+)
+
+
+
 # Configuring debugging feature code
 basicConfig(level=DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Disabling the debugging feature. Hint: Comment out this line to enable debugging.
 disable(CRITICAL)
 
+
+
+##############################
+
 # GLOBAL VARIABLES
+
+##############################
 
 # Getting the username of the user who started this application
 current_username = getuser()
@@ -107,6 +135,13 @@ tick = QImage(str(Path(icons_dir_path, "tick.png")))
 cross = QImage(str(Path(icons_dir_path, "cross.png")))
 
 
+
+##############################
+
+# THE MAIN FUNCTION
+
+##############################
+
 def main():
     """The function which runs the entire application"""
 
@@ -135,478 +170,26 @@ def main():
         sysexit(app.exec_())
 
 
-def check_fake_hostname_usage():
-    """A function which checks the hostname"""
 
-    # Opening the list_of_fake_hostnames file in reading mode 
-    with open(fake_hostnames_list_file_path, "r") as fake_hostnames_file:
+##############################
 
-        # Creating a list of fake hostnames from the fake_hostnames_file's lines
-        list_of_fake_hostnames = fake_hostnames_file.readlines()
+# WORKERS
 
-    # Getting the current hostname
-    current_hostname = gethostname()
+##############################
 
-    # Checking if the current hostname is in the list of fake hostnames
-    if f'{current_hostname}\n' in list_of_fake_hostnames:
-
-        # Updating the 'Using fake hostname' key's value pair to True
-        checklist_items_dict['Using fake hostname'] = True
-
-
-def check_fake_mac_address_usage():
-    """A function which checks wheather or not you are using fake mac address"""
-
-    # Getting the active network adaptor's name
-    list_of_network_interfaces = run(["sudo", "-S",  "bash", "-c", "ip -o link show | awk -F': ' '{print $2}'"], input=user_pwd, text=True, capture_output=True).stdout.strip("\n\r").split("\n")
-
-    verification_list = []
-
-    for interface in list_of_network_interfaces:
-
-        interface = interface.strip("\n\r")
-
-        if interface != "lo":
-
-            debug(f"Network Interface Name = {interface}")
-
-            # Getting mac address information
-            mac_address_info = popen(f'macchanger -s {interface}').read().split("\n")[:-1]
-
-            # Getting the permanent mac address
-            permanent_mac_address = mac_address_info[1].split(" ")[2].strip()
-
-            # Getting the current mac address
-            current_mac_address = mac_address_info[0].split(" ")[4].strip()
-
-            # Printing the permanent mac address and the current mac address in debug mode.
-            debug(f'Permanent Mac Address = {permanent_mac_address}\nCurrent Mac Address = {current_mac_address}')
-
-            # Checking if the current mac address is not equal to the permanent mac address
-            if current_mac_address != permanent_mac_address:
-
-                verification_list.append(True)
-
-                if verification_list.count(True) == len(list_of_network_interfaces) -1:
-
-                    # Setting the 'Using fake mac address' key's value pair to True
-                    checklist_items_dict['Using fake mac address'] = True
-
-                else:
-
-                    # Setting the 'Using fake mac address' key's value pair to False
-                    checklist_items_dict['Using fake mac address'] = False
-
-            else:
-
-                verification_list.append(False)
-
-                # Setting the 'Using fake mac address' key's value pair to False
-                checklist_items_dict['Using fake mac address'] = False
-
-
-def check_appropriate_nameserver_usage():
-    """A function which checks if you are using privacy focused name servers"""
-
-    # Opening the privacy_focused_nameservers_resolv.conf file in reading mode as privacy_focused_nameservers_file
-    with open(privacy_focused_nameservers_file_path, "r") as privacy_focused_nameservers_file:
-
-        # Reading privacy_focused_nameservers_file's lines
-        privacy_focused_nameservers = privacy_focused_nameservers_file.read().strip('\n\r')
-
-    # Creating a variable that holds the tor nameserver specification 
-    tor_nameserver = "nameserver 127.0.0.1"
-
-    # Opening the resolv.conf file in reading mode as resolv_conf_file
-    with open(original_resolv_configuration_file_path, "r") as resolv_conf_file:
-
-        # Reading resolv_conf_file's contents
-        resolv_conf_file_contents = resolv_conf_file.read().strip('\n\r')
-
-    debug(f'Start stop button\'s text = {main_window.start_stop_button.text()}')
-
-    debug(f'Privacy Focused Nameservers = {privacy_focused_nameservers}\nResolv.conf File = {resolv_conf_file_contents}\nTor Nameserver = {tor_nameserver}')
-
-    # Checking if start_stop_button's text in the main window is equal to Start string.
-    if main_window.start_stop_button.text() == "Start":
-
-        # Checking if resolv_conf_file_contents is equal to privacy_focused_nameservers
-        if resolv_conf_file_contents == privacy_focused_nameservers:
-
-            # Setting the 'Using appropriate nameservers' key's value pair to True
-            checklist_items_dict['Using appropriate nameservers'] = True
-
-    # Checking if start_stop_button's text in the main window is not equal to Start string.
-    else:
-
-        if resolv_conf_file_contents == tor_nameserver:
-
-            # Setting the 'Using appropriate nameservers' key's value pair to True
-            checklist_items_dict['Using appropriate nameservers'] = True
-
-
-def check_browser_anonymization():
-    """A function which checks if browser anonymization preferences are in use"""
-
-    ghostsurf_firefox_profile_file_path = Path(run(["bash", "-c", "find /home/{}/.mozilla/firefox/ -name *.ghostsurf".format(current_username)], text=True, capture_output=True).stdout.strip(), "user.js")
-    
-    penetration_testing_firefox_profile_file_path = Path(run(["bash", "-c", "find /home/{}/.mozilla/firefox/ -name *.penetration-testing".format(current_username)], text=True, capture_output=True).stdout.strip())
-
-    if ghostsurf_firefox_profile_file_path.exists() == True and custom_firefox_preferences_file_path.exists() == True and penetration_testing_firefox_profile_file_path.exists() == True:
-
-        with open(custom_firefox_preferences_file_path, "r") as cfpfp:
-
-            cfpfp_contents = cfpfp.read()
-
-        with open(ghostsurf_firefox_profile_file_path, "r") as gfpfp:
-
-            gfpfp_contents = gfpfp.read()
-
-        debug(f'Custom Firefox Preferences File Path Content = {cfpfp_contents}\nGhostsurf Firefox Profile File Path Content = {gfpfp_contents}')
-        
-        # Setting the 'Ghostsurf\'s Firefox profiles are available. And, preferences are set' key's value pair to True
-        checklist_items_dict['Ghostsurf\'s Firefox profiles are available. And, preferences are set'] = bool(cfpfp_contents == gfpfp_contents)
-
-    else:
-
-        debug('Couldn\'t find a path')
-
-
-def check_different_timezone_usage():
-    """A function which checks if a different timezone is set in the system"""
-
-    # Opening the file in timezone_backup_file_path in reading mode with original_timezone_file name
-    with open(timezone_backup_file_path, "r") as original_timezone_file:
-
-        # Reading the file's contents
-        otf_content = original_timezone_file.read().strip()
-
-    # Getting the current timezone using system commands
-    current_timezone = popen("timedatectl show | grep Timezone | sed 's/Timezone=//g'").read().strip()
-
-    # Creating a boolean by checking if otf_content is not equal to current_timezone
-    is_timezone_different = bool(otf_content!=current_timezone)
-    
-    # Printing the original timezone, current time zone and the is_timezone_different variable's value in debug mode
-    debug(f'Original Timezone = {otf_content}\nCurrent Timezone = {current_timezone}\nIs Timezone Different = {is_timezone_different}')
-
-    # Setting the 'Using different timezone' key's value pair to True
-    checklist_items_dict['Using different timezone'] = is_timezone_different
-
-
-def check_tor_connection_usage():
-    """A function which checks if a transparent proxy is working."""
-
-    # Sending a get request to https://check.torproject.org to learn if transparent proxy set correctly
-    tor_connection_status = str(popen(f'curl -s https://check.torproject.org/ | grep -q Congratulations && echo "Connected through Tor" || echo "Not connected through Tor"').read()).strip()
-
-    # Creaing a boolean
-    is_transparent_proxy_set_correctly = bool(tor_connection_status=="Connected through Tor")
-
-    # Printing if transparent proxy set correctly in debug mode
-    debug(f'Check Tor Project Result = {tor_connection_status}\nIs Transparent Proxy Set Correctly = {is_transparent_proxy_set_correctly}')
-
-    # Setting the 'Using different timezone' key's value pair to True
-    checklist_items_dict['Using a tor connection'] = is_transparent_proxy_set_correctly
-    
-
-def get_the_public_ip_address():
-    """A function which tries to displays the user's public ip address with notifications"""
-
-    # Waiting for 1.5 seconds
-    sleep(1.5)
-
-    # Sending notification to let the user know that the application is trying to connect to the server
-    system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Trying to connect to the server"')
-
-    # Waiting for 1.5 seconds
-    sleep(1.5)
-
-    # Trying to execute the code block that is located inside this block
-    try:
-        # Sending a get request to "https://ifconfig.io" to get the public ip address.
-        public_ip_address = run(["sudo", "-S", "bash", "-c", "curl --connect-timeout 7.5 {}".format("https://ifconfig.io")], input=user_pwd, text=True, capture_output=True).stdout.strip()
-
-        # Creating a pattern for ip address validation
-        ip_addr_regex = compile(r'\d{1,3}\.\d{1,3}\.\d{1,3}.\d{1,3}')
-        
-        # Checking if the get request's response is an ip address
-        result = ip_addr_regex.search(public_ip_address).group()
-
-        # Checking if pattern validation's result is equal to the get request's response
-        if result == public_ip_address:
-
-            # Creating a message that contain's the public ip address
-            message = f'Your public ip address is {public_ip_address}'
-
-        # Checking if the pattern validation's result is not equal to the get request's response
-        else:
-            
-            # Creating a message that says "Couldn't connect to the server!"
-            message = "Couldn't connect to the server!"
-
-    # Instructing the computer about what to do if the application fails to send execute the code which is inside the try block
-    except:
-
-        # Creating a message that informs the user that it can't connect to the internet
-        message = "Couldn't connect to the server!"
-
-    # Sending notification
-    system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "{message}"')
-
-
-def manage_netfilter_service():
-    """A function which starts and enables netfilter service if it's not"""
-
-    netfilter_persistent_status = run(["sudo", "-S", "bash", "-c", "systemctl status netfilter-persistent"], input=user_pwd, text=True, capture_output=True).stdout.strip()
-
-    # Checking if the netfilter-persistent service is inactive
-    if 'inactive' in netfilter_persistent_status:
-
-        # Starting the netfilter-persistent service
-        run(["sudo", "-S", "bash", "-c", "systemctl start netfilter-persistent"], input=user_pwd, text=True, capture_output=True)
-
-    # Checking if the netfilter-persistent service is disabled
-    if 'disabled' in netfilter_persistent_status:
-
-        # Enabling the netfilter service
-        run(["sudo", "-S", "bash", "-c", "systemctl enable netfilter-persistent"], input=user_pwd, text=True, capture_output=True)
-
-
-def kill_log_files():
-    """A function which overrides the log files in the system"""
-    
-    # Sending a notification to inform the user that the operation is starting
-    system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Shreading the log files"')
-
-    # Waiting for 0.3 seconds
-    sleep(0.3)
-
-    # Executing the mac_changer script.
-    system(f'bash {log_shredder_file_path} {current_username}')
-
-    # Sending a notification to inform the user that the operation is done
-    system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Log shredding has been done"')
-
-
-def change_the_mac_address():
-    """A function which changes the mac address"""
-
-    def mac_changer_button_question_dialog_processor(i):
-        """A function which checks the user's answer for the mac changer question and instructs the computer about what to do based on that answer"""
-
-        # Getting the user's answer from the i's text value to identify if the user pressed to yes or no
-        user_answer = i.text()
-
-        # Checking if the user pressed to the yes button.
-        if user_answer == "&Yes":
-            
-            # Getting the active internet adaptors name 
-            internet_adaptor_name = popen("ip route show default | awk '/default/ {print $5}'").read().strip()
-
-            # Executing the mac_changer script.
-            run(["sudo", "-S", "bash", "-c", "{}".format(str(mac_changer_script_file_path))], input=user_pwd, text=True, capture_output=True)
-
-            # Waiting for 4 seconds
-            sleep(4)
-
-            # Connecting to internet
-            run(f'sudo nmcli d connect {internet_adaptor_name}', shell=True, input=user_pwd, text=True, capture_output=True, executable="/bin/bash")
-            # run(["sudo", "-S", "bash", "-c", "nmcli d connect {internet_adaptor_name}"], input=user_pwd, text=True, capture_output=True)
-
-            # Sending a notification to inform the user that the operation is done
-            system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Mac address has been changed"')
-
-        # Checking if the user pressed to the no button
-        elif user_answer == "&No":
-            
-            # Executing the mac_changer script.
-            run(["sudo", "-S", "bash", "-c", "{}".format(str(mac_changer_script_file_path))], input=user_pwd, text=True, capture_output=True)
-
-            # Sending a notification to inform the user that the operation is done
-            system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Mac address has been changed"')
-
-        # Checking if the didn't pressed to bot yes and not buttons 
-        else:
-
-            # Printing "Operation canceled in debug mode"
-            debug("Operation canceled")
-
-    # Sending a notification to inform the user that the operation is starting
-    system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Changing the mac address"')
-    
-    # Waiting for 0.3 seconds
-    sleep(0.3)
-
-    # Creating a question dialog window
-    question_dialog = QMessageBox()
-
-    # Setting the question dialog window's icon
-    question_dialog.setIcon(QMessageBox.Question)
-
-    # Setting the dialog's window title
-    question_dialog.setWindowTitle("Important")
-
-    # Setting the question dialog's text
-    question_dialog.setText("Do you want to connect back to the internet?")
-
-    # Setting standard buttons
-    question_dialog.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
-
-    # Adding functionality to Yes and No buttons
-    question_dialog.buttonClicked.connect(mac_changer_button_question_dialog_processor)
-
-    # Showing the question dialog
-    question_dialog.exec_()
-
-
-def wipe_the_memory():
-    """A function which drops caches, wipes the memory securely and notifies the user"""
-
-    def wipe_button_question_dialog_processor(i):
-        """A function which process the input coming from the dialog box that is opened after the wipe button is pressed to identify what app should do"""
-        
-        # Getting the user's answer from the i's text value to identify if the user pressed to yes or no
-        user_answer = i.text()
-
-        # Waiting for 0.3 seconds
-        sleep(0.3)
-
-        # Checking if the user pressed to the yes button.
-        if user_answer == "&Yes":
-            
-            # Sending a notification to inform the user that the process is starting
-            system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Trying to wipe the memory and drop caches. This might take some time!"')
-
-            # Executing the bomb.sh file to wipe the memory securely
-            run(["sudo", "-S", "bash", "-c", "{}".format(fast_bomb_script_file_path)], input=user_pwd, text=True, capture_output=True)
-
-            # Sending a notification to let the user know what the application just did
-            system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Caches are dropped and memory is wiped"')
-            
-        # Checking if the user pressed to the no button
-        elif user_answer == "&No":
-
-            # Sending a notification to inform the user that the process is starting
-            system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Trying to wipe the memory and drop caches. This might take some time!"')
-
-            # Executing the bomb.sh file to wipe the memory securely
-            run(["sudo", "-S", "bash", "-c", "{}".format(secure_bomb_script_file_path)], input=user_pwd, text=True, capture_output=True)
-
-            # Sending a notification to let the user know what the application just did
-            system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Caches are dropped and memory is wiped"')
-
-        # Checking if the didn't pressed to bot yes and not buttons 
-        else:
-
-            # Printing "Operation canceled in debug mode"
-            debug("Operation canceled")
-
-    # Creating a question dialog window
-    question_dialog = QMessageBox()
-
-    # Setting the question dialog window's icon
-    question_dialog.setIcon(QMessageBox.Question)
-
-    # Setting the dialog's window title
-    question_dialog.setWindowTitle("Important")
-
-    # Setting the question dialog's text
-    question_dialog.setText("Do you want fast and less secure operation?")
-
-    # Setting standard buttons
-    question_dialog.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
-
-    # Adding functionality to Yes and No buttons
-    question_dialog.buttonClicked.connect(wipe_button_question_dialog_processor)
-
-    # Showing the question dialog
-    question_dialog.exec_()
-    
-
-def reset_ghostsurf_settings():
-    """A function which resets the ghostsurf settings"""
-
-    def reset_button_question_dialog_processor(i):
-        """A function which process the input coming from the dialog box that is opened after the reset button is pressed to identify what app should do"""
-        
-        # Getting the user's answer from the i's text value to identify if the user pressed to yes or no
-        user_answer = i.text()
-
-        # Waiting for 0.3 seconds
-        sleep(0.3)
-
-        # Checking if the user pressed to the yes button.
-        if user_answer == "&Yes":
-            
-            # Sending a notification to inform the user that the operation is starting
-            system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Resetting iptables rules only"')
-
-            # Waiting for 0.3 seconds
-            sleep(0.3)
-
-            # Executing the reset.sh script.
-            run(["sudo", "-S", "bash", "-c", "{}".format(reset_iptables_only_script_file_path)], input=user_pwd, text=True, capture_output=True)
-            
-            # Sending a notification to inform the user that the operation is done
-            system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Iptables rules are reset"')
-            
-        # Checking if the user pressed to the no button
-        elif user_answer == "&No":
-
-            # Sending a notification to inform the user that the operation is starting
-            system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Resetting ghostsurf configurations"')
-
-            # Waiting for 0.3 seconds
-            sleep(0.3)
-
-            # Executing the reset.sh script.
-            run(["sudo", "-S", "bash", "-c", "{}".format(reset_script_file_path)], input=user_pwd, text=True, capture_output=True)
-            
-            # Sending a notification to inform the user that the operation is done
-            system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Reseting is done"')
-
-        # Checking if the didn't pressed to bot yes and not buttons 
-        else:
-
-            # Printing "Operation canceled in debug mode"
-            debug("Operation canceled")
-
-    # Creating a question dialog window
-    question_dialog = QMessageBox()
-
-    # Setting the question dialog window's icon
-    question_dialog.setIcon(QMessageBox.Question)
-
-    # Setting the dialog's window title
-    question_dialog.setWindowTitle("Important")
-
-    # Setting the question dialog's text
-    question_dialog.setText("Do you want to reset iptables rules only?")
-
-    # Setting standard buttons
-    question_dialog.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
-
-    # Adding functionality to Yes and No buttons
-    question_dialog.buttonClicked.connect(reset_button_question_dialog_processor)
-
-    # Showing the question dialog
-    question_dialog.exec_()
-
-
-class WorkerSignals(QObject):
+class CheckListWorkerSignals(QObject):
     """A worker signals class which defines the signals available from a running worker thread"""
 
     list_item = Signal(str)
 
 
-class Worker(QRunnable):
+class CheckListWorker(QRunnable):
     """A worker class which inherits from QRunnable to handle worker thread setup, signals and wrap-up"""
 
     def __init__(self):
         super().__init__()
 
-        self.signals = WorkerSignals()
+        self.signals = CheckListWorkerSignals()
 
     # Creating a dictionary to store the checklist's keys and values
     global checklist_items_dict
@@ -633,22 +216,22 @@ class Worker(QRunnable):
     def run(self):
         
         # Calling the check_fake_hostname_usage function.
-        check_fake_hostname_usage()
+        check_fake_hostname_usage(fake_hostnames_list_file_path=fake_hostnames_list_file_path, checklist_items_dict=checklist_items_dict)
 
         # Calling the check_fake_mac_address_usage function.
-        check_fake_mac_address_usage()
+        check_fake_mac_address_usage(user_pwd=user_pwd, checklist_items_dict=checklist_items_dict)
 
         # Calling the check_appropriate_nameserver_usage function.
-        check_appropriate_nameserver_usage()
+        check_appropriate_nameserver_usage(privacy_focused_nameservers_file_path=privacy_focused_nameservers_file_path, original_resolv_configuration_file_path=original_resolv_configuration_file_path, main_window=main_window, checklist_items_dict=checklist_items_dict)
 
         # Calling the check_browser_anonymization function.
-        check_browser_anonymization()
+        check_browser_anonymization(current_username=current_username, checklist_items_dict=checklist_items_dict, custom_firefox_preferences_file_path=custom_firefox_preferences_file_path)
 
         # Calling the check_different_timezone_usage function.
-        check_different_timezone_usage()
+        check_different_timezone_usage(timezone_backup_file_path=timezone_backup_file_path, checklist_items_dict=checklist_items_dict)
 
         # Calling the check_tor_connection_usage function.
-        check_tor_connection_usage()
+        check_tor_connection_usage(checklist_items_dict=checklist_items_dict)
 
         # Iterating over each each key in cheklist dictionary's keys
         for key in checklist_items_dict.keys():
@@ -659,6 +242,13 @@ class Worker(QRunnable):
             # Waiting for 0.02 seconds
             sleep(0.02)
 
+
+
+##############################
+
+# DATA MODELS
+
+##############################
 
 class ChecklistModel(QAbstractListModel):
     """A data class called ChacklistModel to control how data objects will be created"""
@@ -694,8 +284,15 @@ class ChecklistModel(QAbstractListModel):
         return len(self.list_items)
 
 
+
+##############################
+
+# CHECK LIST WINDOW
+
+##############################
+
 class ChecklistWindow(QWidget, Ui_ChecklistWindow):
-    """A window class called ChecklistWindow created with QWidget subclass and Ui_ChecklistWindow user interface"""
+    """A window class representing the checklist interface, built as a QWidget with a user interface from Ui_ChecklistWindow"""
 
     def __init__(self, *args, **kwargs):
         """An init function which makes the window self contained""" 
@@ -716,7 +313,7 @@ class ChecklistWindow(QWidget, Ui_ChecklistWindow):
         self.checklist_list_view.setModel(self.model)
 
         # Creating a worker
-        worker = Worker()
+        worker = CheckListWorker()
         
         # Connecting a function with the worker's signal
         worker.signals.list_item.connect(self.run_all_the_checks)
@@ -734,8 +331,15 @@ class ChecklistWindow(QWidget, Ui_ChecklistWindow):
         self.model.layoutChanged.emit()
 
 
+
+##############################
+
+# PASSWORD WINDOW
+
+##############################
+
 class PasswordWindow(QWidget, Ui_PasswordWindow):
-    """A window class called that is created with QWdiged subclass and Ui_PasswordWindow user interface"""
+    """A window class representing the password window interface, built as a QWidget with a user interface from Ui_PasswordWindow"""
 
     def __init__(self, *args, **kwargs):
         """An init function which makes the window self contained""" 
@@ -832,8 +436,15 @@ class PasswordWindow(QWidget, Ui_PasswordWindow):
             warning_dialog.exec_()
 
 
+
+##############################
+
+# MAIN WINDOW
+
+##############################
+
 class MainWindow(QMainWindow, Ui_MainWindow):
-    """A MainWindow class created with QMainWindow subclass and Ui_MainWindow user interface"""
+    """A window class representing the main window interface, built as a QMainWindow with a user interface from Ui_MainWindow"""
 
     def __init__(self, *args, **kwargs):
         """An init function which makes the window self contained""" 
@@ -845,7 +456,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
 
         # Calling the manage_netfilter_service function.
-        manage_netfilter_service()
+        manage_netfilter_service(user_pwd=user_pwd)
 
         # Checking tor services status
         tor_status = run(["sudo", "-S", "bash", "-c", "systemctl status tor.service"], input=user_pwd, text=True, capture_output=True).stdout.strip()
@@ -1088,7 +699,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # Checking if transparent proxy is on
         if working_status == "Stop":
-            
+
             # Executing the nameservers_changer script
             run(["sudo", "-S", "bash", "-c", f'{nameserver_changer_file_path} {tor_nameservers_file_path}'], input=user_pwd, text=True, capture_output=True)
 
@@ -1110,29 +721,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def reset_settings(self):
         """A function which resets ghostsurf settings"""
 
-        # Creating a thread that resets the ghostsurf settings
-        reset_thread = Thread(target=reset_ghostsurf_settings)
-
-        # Starting the thread
-        reset_thread.start()
+        reset_ghostsurf_settings(user_pwd=user_pwd, ghostsurf_logo_file_path=ghostsurf_logo_file_path, reset_iptables_only_script_file_path=reset_iptables_only_script_file_path, reset_script_file_path=reset_script_file_path)
 
     def shred_log_files(self):
         """A function which shreds the log files"""
 
-        # Creating a thread that kills the log files
-        log_kill_thread = Thread(target=kill_log_files)
-
-        # Starting the thread
-        log_kill_thread.start()
+        kill_log_files(ghostsurf_logo_file_path=ghostsurf_logo_file_path, log_shredder_file_path=log_shredder_file_path, current_username=current_username)
 
     def change_mac_address(self):
         """A function which changes the mac address"""
         
-        # Creating a thread that changes the mac address
-        mac_changer_thread = Thread(target=change_the_mac_address)
-
-        # Starting the thread
-        mac_changer_thread.start()
+        # Calling the change_the_mac_address function.
+        change_the_mac_address(user_pwd=user_pwd, ghostsurf_logo_file_path=ghostsurf_logo_file_path, mac_changer_script_file_path=mac_changer_script_file_path)
 
     def ultra_ghost_mode(self):
         """A function which enables/disables ghostsurf at boot"""
@@ -1239,11 +839,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def wipe_memory_securely(self):
         """A function which wipes the memory securely"""
 
-        # Creating a thread that targerts the wipe_the_memory function
-        wipe_memory_thread = Thread(target=wipe_the_memory)
-
-        # Starting the thread
-        wipe_memory_thread.start()
+        # Calling the wipe_the_memory function.
+        wipe_the_memory(user_pwd=user_pwd, ghostsurf_logo_file_path=ghostsurf_logo_file_path, fast_bomb_script_file_path=fast_bomb_script_file_path, secure_bomb_script_file_path=secure_bomb_script_file_path)
 
     def open_info_page(self):
         """A function which opens the info page in the default browser"""
@@ -1272,6 +869,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 # Executing the start script
                 run(["sudo", "-S", "bash", "-c", "{}".format(start_transparent_proxy_script_file_path)], input=user_pwd, text=True, capture_output=True)
 
+                # Executing the nameservers_changer script
+                run(["sudo", "-S", "bash", "-c", f'{nameserver_changer_file_path} {tor_nameservers_file_path}'], input=user_pwd, text=True, capture_output=True)
+
+                # Copying and pasting custom nameservers for tor on resolv.conf file
+                run(["sudo", "-S", "bash", "-c", f'cp {tor_nameservers_file_path} {original_resolv_configuration_file_path}'], input=user_pwd, text=True, capture_output=True)
+
                 # Changing the start_stop_button's text value to Stop.
                 self.start_stop_button.setText("Stop")
 
@@ -1283,6 +886,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 
                 # Executing the start script
                 run(["sudo", "-S", "bash", "-c", "{}".format(start_transparent_proxy_script_file_path)], input=user_pwd, text=True, capture_output=True)
+
+                # Executing the nameservers_changer script
+                run(["sudo", "-S", "bash", "-c", f'{nameserver_changer_file_path} {tor_nameservers_file_path}'], input=user_pwd, text=True, capture_output=True)
+
+                # Copying and pasting custom nameservers for tor on resolv.conf file
+                run(["sudo", "-S", "bash", "-c", f'cp {tor_nameservers_file_path} {original_resolv_configuration_file_path}'], input=user_pwd, text=True, capture_output=True)
 
                 # Changing the start_stop_button's text value to Stop.
                 self.start_stop_button.setText("Stop")
@@ -1338,6 +947,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 # Setting the style sheet of the ultra_ghost_button 
                 self.ultra_ghost_button.setStyleSheet(u"#ultra_ghost_button {background: red; border-radius: 4px; border: 1px solid black}")
 
+                # Executing the nameservers_changer script
+                run(["sudo", "-S", "bash", "-c", f'{nameserver_changer_file_path} {privacy_focused_nameservers_file_path}'], input=user_pwd, text=True, capture_output=True)
+
+                # Copying and pasting dns_changer nameservers to on resolv.conf file
+                run(["sudo", "-S", "bash", "-c", f'cp {privacy_focused_nameservers_file_path} {original_resolv_configuration_file_path}'], input=user_pwd, text=True, capture_output=True)            
+
             # Checking if the user pressed to the no button
             elif user_answer == "&No":
 
@@ -1373,6 +988,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
                 # Setting the style sheet of the ultra_ghost_button 
                 self.ultra_ghost_button.setStyleSheet(u"#ultra_ghost_button {background: red; border-radius: 4px; border: 1px solid black}")
+
+                # Executing the nameservers_changer script
+                run(["sudo", "-S", "bash", "-c", f'{nameserver_changer_file_path} {privacy_focused_nameservers_file_path}'], input=user_pwd, text=True, capture_output=True)
+
+                # Copying and pasting dns_changer nameservers to on resolv.conf file
+                run(["sudo", "-S", "bash", "-c", f'cp {privacy_focused_nameservers_file_path} {original_resolv_configuration_file_path}'], input=user_pwd, text=True, capture_output=True)            
 
             # Checking if the didn't pressed to bot yes and not buttons 
             else:
@@ -1459,7 +1080,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """A function which shows your public ip address"""
         
         # Creating a thread start uses the get_the_public_ip_address function 
-        public_ip_thread = Thread(target=get_the_public_ip_address)
+        public_ip_thread = Thread(target=get_the_public_ip_address, args=[user_pwd, ghostsurf_logo_file_path])
 
         # Starting the thread
         public_ip_thread.start()
@@ -1493,6 +1114,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # Restarting the tor service to change the ip address.
         run(["sudo", "-S", "bash", "-c", "systemctl restart tor"], input=user_pwd, text=True, capture_output=True)
+
 
 
 # Evaluate if the source is being run on its own or being imported somewhere else. With this conditional in place, your code can not be imported somewhere else.
