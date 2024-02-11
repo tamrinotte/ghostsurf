@@ -3,6 +3,9 @@
 main () {
     # The main function which runs the entire script
 
+    # Calling the declare_variables functions.
+    declare_variables
+
     # Calling the reset_configuration_files function.
     reset_configuration_files
 
@@ -31,6 +34,9 @@ declare_variables() {
 
     # Getting the current hostname using a system command
     current_hostname="$(hostname)"
+
+    # Getting the username
+    username=${SUDO_USER:-${USER}}
 
 }
 
