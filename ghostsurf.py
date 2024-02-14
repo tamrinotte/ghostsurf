@@ -869,12 +869,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 # Executing the start script
                 run(["sudo", "-S", "bash", "-c", "{}".format(start_transparent_proxy_script_file_path)], input=user_pwd, text=True, capture_output=True)
 
-                # Executing the nameservers_changer script
-                run(["sudo", "-S", "bash", "-c", f'{nameserver_changer_file_path} {tor_nameservers_file_path}'], input=user_pwd, text=True, capture_output=True)
-
-                # Copying and pasting custom nameservers for tor on resolv.conf file
-                run(["sudo", "-S", "bash", "-c", f'cp {tor_nameservers_file_path} {original_resolv_configuration_file_path}'], input=user_pwd, text=True, capture_output=True)
-
                 # Changing the start_stop_button's text value to Stop.
                 self.start_stop_button.setText("Stop")
 
@@ -886,12 +880,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 
                 # Executing the start script
                 run(["sudo", "-S", "bash", "-c", "{}".format(start_transparent_proxy_script_file_path)], input=user_pwd, text=True, capture_output=True)
-
-                # Executing the nameservers_changer script
-                run(["sudo", "-S", "bash", "-c", f'{nameserver_changer_file_path} {tor_nameservers_file_path}'], input=user_pwd, text=True, capture_output=True)
-
-                # Copying and pasting custom nameservers for tor on resolv.conf file
-                run(["sudo", "-S", "bash", "-c", f'cp {tor_nameservers_file_path} {original_resolv_configuration_file_path}'], input=user_pwd, text=True, capture_output=True)
 
                 # Changing the start_stop_button's text value to Stop.
                 self.start_stop_button.setText("Stop")
@@ -947,12 +935,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 # Setting the style sheet of the ultra_ghost_button 
                 self.ultra_ghost_button.setStyleSheet(u"#ultra_ghost_button {background: red; border-radius: 4px; border: 1px solid black}")
 
-                # Executing the nameservers_changer script
-                run(["sudo", "-S", "bash", "-c", f'{nameserver_changer_file_path} {privacy_focused_nameservers_file_path}'], input=user_pwd, text=True, capture_output=True)
-
-                # Copying and pasting dns_changer nameservers to on resolv.conf file
-                run(["sudo", "-S", "bash", "-c", f'cp {privacy_focused_nameservers_file_path} {original_resolv_configuration_file_path}'], input=user_pwd, text=True, capture_output=True)            
-
             # Checking if the user pressed to the no button
             elif user_answer == "&No":
 
@@ -988,12 +970,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
                 # Setting the style sheet of the ultra_ghost_button 
                 self.ultra_ghost_button.setStyleSheet(u"#ultra_ghost_button {background: red; border-radius: 4px; border: 1px solid black}")
-
-                # Executing the nameservers_changer script
-                run(["sudo", "-S", "bash", "-c", f'{nameserver_changer_file_path} {privacy_focused_nameservers_file_path}'], input=user_pwd, text=True, capture_output=True)
-
-                # Copying and pasting dns_changer nameservers to on resolv.conf file
-                run(["sudo", "-S", "bash", "-c", f'cp {privacy_focused_nameservers_file_path} {original_resolv_configuration_file_path}'], input=user_pwd, text=True, capture_output=True)            
 
             # Checking if the didn't pressed to bot yes and not buttons 
             else:

@@ -28,6 +28,7 @@ declare_variables() {
 
         # Get the name of the active Ethernet connection
         active_connection_name=$(nmcli --fields NAME connection show --active | awk 'NR==2 {print $1}')
+
     fi
 
     # Creating a string for nameservers
