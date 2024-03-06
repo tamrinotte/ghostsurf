@@ -1,7 +1,7 @@
 # GHOSTSURF 
 ![GhostsurfLogo](https://raw.githubusercontent.com/tamrinotte/ghostsurf/main/logos/ghostsurf_rounded.png)
 
-Ghostsurf is a hacking tool which you can use to hide your identity.
+Ghostsurf is a powerful tool for online privacy and anonymity. With features like anonymous browsing and encrypted communication, it empowers users to navigate the internet securely, leveraging the Tor network for added protection. Ideal for those seeking to reclaim control over their digital footprint.
 
 <br>
 
@@ -83,7 +83,7 @@ Ghostsurf is identifying your ip address by sending a get request to https://ifc
 # GHOSTSURF 
 ![GhostsurfLogo](https://raw.githubusercontent.com/tamrinotte/ghostsurf/main/logos/ghostsurf_rounded.png)
 
-Ghostsurf kullanıcıların kimliklerini gizlemelerini sağlayan bir hackleme aracıdır.
+Ghostsurf çevrimiçi gizlilik ve anonimlik için güçlü bir araçtır. Anonim bilgi arama ve şifreli iletişim gibi özelliklerle, ek koruma için Tor ağından yararlanarak kullanıcıların internette güvenli bir şekilde gezinmesine olanak tanır. Dijital ayak izleri üzerinde kontrolü geri almak isteyenler için idealdir.
 
 <br>
 
