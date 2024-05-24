@@ -3,11 +3,9 @@
 main () {
     # The function which runs the entire script. Hint: This scripts protects the user from cold boot attacks.
 
-    # Calling the drop_caches function.
-    drop_caches
-
-    # Calling the wipe_memory function
+    drop_caches  
     wipe_memory
+
 }
 
 drop_caches() {
@@ -36,5 +34,4 @@ wipe_memory() {
 
 }
 
-# Calling the main function
 main

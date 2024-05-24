@@ -3,10 +3,7 @@
 main () {
     # The main function which runs the entire script
 
-    # Calling enable_ipv6 function
     enable_ipv6
-
-    # Calling iptables_accept_all function
     iptables_accept_all
 
 }
@@ -42,5 +39,4 @@ iptables_accept_all() {
 
 }
 
-# Calling the main function.
 main

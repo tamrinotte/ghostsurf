@@ -3,25 +3,12 @@
 main() {
     # The main function which runs the entire script
 
-    # Calling the declare_variables function.
     declare_variables
-
-    # Starting the tor service
     systemctl start tor
-
-    # Calling the disable_ipv6 function.
     disable_ipv6
-
-    # Calling the set_timezone_change function.
     set_timezone_change
-
-    # Calling the setup_configuration_files function.
     setup_configuration_files
-
-    # Calling set_up_iptables_rules function.
     set_up_iptables_rules
-
-    # Restarting the tor service
     systemctl restart tor
 
 }
@@ -29,31 +16,14 @@ main() {
 declare_variables() {
     # A function which declares variables
    
-    # Tor uid for Debian/Ubuntu
     tor_uid="$(id -u debian-tor)"
-    
-    # LAN destinations that shouldn't be routed through Tor
     non_tor="127.0.0.0/8 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16"
-    
-    # Tor TransPort
     trans_port="9040"
-
-    # Tor DNSPort
     dns_port="5353"
-
-    # Tor VirtualAddrNetworkIPv4
     virtual_address="10.192.0.0/10"
-
-    # Creating a path which leads to the torrc file 
     torrc_file_path="/etc/tor/torrc"
-
-    # Creating a path which leads to resolconf service's nameserver configuration file
     resolvconf_file_path="/etc/resolv.conf"
-
-    # Creating a path which leads to the custom torrc file
     custom_torrc_file="/opt/ghostsurf/configuration_files/torrc.custom"
-
-    # Creating a path which leads to the custom resolv.conf file 
     custom_resolv_conf_file="/opt/ghostsurf/configuration_files/tor_nameservers_resolv.conf"
 
 }
@@ -78,13 +48,9 @@ disable_ipv6() {
 setup_configuration_files() {
     # A function which backs up the resolv.conf file
 
-    # Changing the resolv.cfile
     cp $custom_resolv_conf_file $resolvconf_file_path
-
-    # Changing the torrc file
     cp $custom_torrc_file $torrc_file_path
 
-    # Reloading system daemons
     systemctl --system daemon-reload
 
 }
@@ -116,8 +82,6 @@ set_up_iptables_rules() {
     iptables -P INPUT ACCEPT
     iptables -P FORWARD ACCEPT
     iptables -P OUTPUT ACCEPT
-
-    # Note to my self -> Study the part below. It's taken from kalitorify
     
     ## *nat OUTPUT (For local redirection)
     #
@@ -177,5 +141,4 @@ set_up_iptables_rules() {
  
 }
 
-# Calling the main function.
 main

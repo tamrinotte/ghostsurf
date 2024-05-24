@@ -25,18 +25,14 @@ def manage_netfilter_service(user_pwd):
 
     netfilter_persistent_status = run(["sudo", "-S", "bash", "-c", "systemctl status netfilter-persistent"], input=user_pwd, text=True, capture_output=True).stdout.strip()
 
-    # Checking if the netfilter-persistent service is inactive
     if 'inactive' in netfilter_persistent_status:
 
-        # Starting the netfilter-persistent service
         run(["sudo", "-S", "bash", "-c", "systemctl start netfilter-persistent"], input=user_pwd, text=True, capture_output=True)
 
         debug("Starting netfilter-persistent.service")
 
-    # Checking if the netfilter-persistent service is disabled
     if 'disabled' in netfilter_persistent_status:
 
-        # Enabling the netfilter service
         run(["sudo", "-S", "bash", "-c", "systemctl enable netfilter-persistent"], input=user_pwd, text=True, capture_output=True)
 
         debug("Enabling netfilter-persistent.service")

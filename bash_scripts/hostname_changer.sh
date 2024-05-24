@@ -3,7 +3,6 @@
 main () {
     # The function which runs the entire script
 
-    # Calling the set_random_hostname function.
     set_random_hostname
 }
 
@@ -18,7 +17,6 @@ set_random_hostname(){
     # Read the list_of_fake_hostnames.list file and populate the array
     readarray -t array < "/opt/ghostsurf/configuration_files/list_of_fake_hostnames.list"
 
-    # Creating a variable from the current hostname
     current_hostname="$(hostname)"
 
     # Identifying the size of the array
@@ -33,13 +31,10 @@ set_random_hostname(){
     # Find the current hostname in the /ets/hosts file and replace it with the new name
     sed -i "s/$current_hostname/$new_hostname/g" "/etc/hosts"
 
-    # Updating the hostname of the system
     hostnamectl set-hostname $new_hostname
 
-    # Restarting the network manager
     systemctl restart NetworkManager.service
 
 }
 
-# Calling the main function
 main

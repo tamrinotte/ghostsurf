@@ -3,10 +3,7 @@
 main () {
     # The main function which runs the entire script
     
-    # Calling the declare_variables function.
     declare_variables
-
-    # Calling the change_mac_address function.
     change_mac_address
 
 }
@@ -26,22 +23,12 @@ change_mac_address() {
     # Iterating over each interface in the list_of_network_interfaces
 	for interface in $list_of_network_interfaces; do
 
-        # Checking if the interface is not the loop back interface
         if [[ $interface != "lo" ]]; then
 
-            # Turning the interface down
             ifconfig $interface down
-
-            # Stopping the NetworkManager service
             systemctl stop NetworkManager.service
-
-            # Changing the mac address with random and permanent options
             macchanger -rp $interface
-
-            # Turning the interface up
             ifconfig $interface up
-
-            # Starting the NetworkManager service
             systemctl start NetworkManager.service
 
         fi
@@ -50,5 +37,4 @@ change_mac_address() {
     
 }
 
-# Calling the main function.
 main

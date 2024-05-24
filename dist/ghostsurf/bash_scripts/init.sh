@@ -11,5 +11,4 @@ main () {
 
 }
 
-# Calling the main function.
 main
