@@ -693,12 +693,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def reset_settings(self):
         """A function which resets ghostsurf settings"""
 
-        reset_ghostsurf_settings(username=current_username, user_pwd=user_pwd, ghostsurf_logo_file_path=ghostsurf_logo_file_path, reset_iptables_only_script_file_path=reset_iptables_only_script_file_path, reset_script_file_path=reset_script_file_path)
+        reset_ghostsurf_settings(user_pwd=user_pwd, ghostsurf_logo_file_path=ghostsurf_logo_file_path, reset_iptables_only_script_file_path=reset_iptables_only_script_file_path, reset_script_file_path=reset_script_file_path)
 
     def shred_log_files(self):
         """A function which shreds the log files"""
 
-        kill_log_files(ghostsurf_logo_file_path=ghostsurf_logo_file_path, log_shredder_file_path=log_shredder_file_path, username=current_username)
+        kill_log_files(ghostsurf_logo_file_path=ghostsurf_logo_file_path, log_shredder_file_path=log_shredder_file_path, current_username=current_username)
 
     def change_mac_address(self):
         """A function which changes the mac address"""

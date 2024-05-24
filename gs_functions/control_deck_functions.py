@@ -140,7 +140,7 @@ def get_the_public_ip_address(user_pwd, ghostsurf_logo_file_path):
     # Sending notification
     system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "{message}"')
 
-def kill_log_files(ghostsurf_logo_file_path, log_shredder_file_path, username):
+def kill_log_files(ghostsurf_logo_file_path, log_shredder_file_path, current_username):
     """A function which overrides the log files in the system"""
     
     # Sending a notification to inform the user that the operation is starting
@@ -150,12 +150,12 @@ def kill_log_files(ghostsurf_logo_file_path, log_shredder_file_path, username):
     sleep(0.3)
 
     # Executing the mac_changer script.
-    system(f'bash {log_shredder_file_path} {username}')
+    system(f'bash {log_shredder_file_path} {current_username}')
 
     # Sending a notification to inform the user that the operation is done
     system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Log shredding has been done"')
 
-def reset_ghostsurf_settings(username, user_pwd, ghostsurf_logo_file_path, reset_iptables_only_script_file_path, reset_script_file_path):
+def reset_ghostsurf_settings(user_pwd, ghostsurf_logo_file_path, reset_iptables_only_script_file_path, reset_script_file_path):
     """A function which resets the ghostsurf settings"""
 
     def reset_button_question_dialog_processor(i):
@@ -177,7 +177,7 @@ def reset_ghostsurf_settings(username, user_pwd, ghostsurf_logo_file_path, reset
             sleep(0.3)
 
             # Executing the reset.sh script.
-            run(["sudo", "-S", "bash", "-c", "{} {}".format(reset_iptables_only_script_file_path, username)], input=user_pwd, text=True, capture_output=True)
+            run(["sudo", "-S", "bash", "-c", "{}".format(reset_iptables_only_script_file_path)], input=user_pwd, text=True, capture_output=True)
             
             # Sending a notification to inform the user that the operation is done
             system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Iptables rules are reset"')
