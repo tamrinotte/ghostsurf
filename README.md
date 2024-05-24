@@ -133,7 +133,7 @@ __Enable Ghostsurf at Boot Switch:__ Ghostsurf'ü başlangıçta başlamaya ayar
 ## YÜKLEME
 1) Bağımlılıkları yükle: 	
 
-       sudo apt install firefox-esr tor iw libnotify-bin netfilter-persistent iptables-persistent secure-delete bleachbit macchanger net-tools -y
+       sudo apt install firefox-esr tor iw libnotify-bin iptables netfilter-persistent iptables-persistent secure-delete bleachbit macchanger net-tools -y
 
 2) Yükleyiciyi indir
 
