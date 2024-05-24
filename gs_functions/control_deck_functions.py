@@ -17,7 +17,7 @@ from PySide2.QtWidgets import QMessageBox
 basicConfig(level=DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Disabling the debugging feature. Hint: Comment out this line to enable debugging.
-disable(CRITICAL)
+# disable(CRITICAL)
 
 
 
@@ -63,6 +63,31 @@ def change_the_mac_address_and_connect_back_to_wifi(user_pwd, ghostsurf_logo_fil
 
     # Sending a notification to inform the user that the operation is done
     system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Mac address has been changed"')
+
+def change_ns(user_pwd, ghostsurf_logo_file_path, working_status, nameserver_changer_file_path, tor_nameservers_file_path, original_resolv_configuration_file_path, privacy_focused_nameservers_file_path):
+    """A function which changes the name servers"""
+
+    # Checking if transparent proxy is on
+    if working_status == "Stop":
+
+        # Executing the nameservers_changer script
+        run(["sudo", "-S", "bash", "-c", f'{nameserver_changer_file_path} {tor_nameservers_file_path}'], input=user_pwd, text=True, capture_output=True)
+
+        # Copying and pasting custom nameservers for tor on resolv.conf file
+        run(["sudo", "-S", "bash", "-c", f'cp {tor_nameservers_file_path} {original_resolv_configuration_file_path}'], input=user_pwd, text=True, capture_output=True)
+
+    # Checking if transparent proxy is off
+    else:
+
+        # Executing the nameservers_changer script
+        run(["sudo", "-S", "bash", "-c", f'{nameserver_changer_file_path} {privacy_focused_nameservers_file_path}'], input=user_pwd, text=True, capture_output=True)
+
+        # Copying and pasting dns_changer nameservers to on resolv.conf file
+        run(["sudo", "-S", "bash", "-c", f'cp {privacy_focused_nameservers_file_path} {original_resolv_configuration_file_path}'], input=user_pwd, text=True, capture_output=True)
+
+    # Sending a notification to inform the user that the operation is done
+    system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Nameservers has been changed"')
+
 
 
 ##############################
@@ -319,3 +344,16 @@ def wipe_the_memory(user_pwd, ghostsurf_logo_file_path, fast_bomb_script_file_pa
 
     # Showing the question dialog
     question_dialog.exec_()
+
+def change_the_nameservers(user_pwd, ghostsurf_logo_file_path, working_status, nameserver_changer_file_path, tor_nameservers_file_path, original_resolv_configuration_file_path, privacy_focused_nameservers_file_path):
+    """A function which changes the nameservers to enhance security and privacy"""
+
+    # Sending a notification to inform the user that the operation is starting
+    system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Changing the nameservers"')
+
+    # Waiting for 0.3 seconds
+    sleep(0.3)
+
+    change_the_ns = Thread(target=change_ns, args=[user_pwd, ghostsurf_logo_file_path, working_status, nameserver_changer_file_path, tor_nameservers_file_path, original_resolv_configuration_file_path, privacy_focused_nameservers_file_path])
+
+    change_the_ns.start()

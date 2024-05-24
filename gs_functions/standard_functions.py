@@ -10,7 +10,7 @@ from logging import basicConfig, DEBUG, debug, disable, CRITICAL
 basicConfig(level=DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Disabling the debugging feature. Hint: Comment out this line to enable debugging.
-disable(CRITICAL)
+# disable(CRITICAL)
 
 
 

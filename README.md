@@ -51,7 +51,7 @@ __Enable Ghostsurf at Boot Switch:__ Enables ghostsurf boot
 ## INSTALLATION
 1) Install the dependencies: 	
 
-       sudo apt install firefox-esr tor iw libnotify-bin netfilter-persistent iptables-persistent secure-delete bleachbit macchanger net-tools -y
+       sudo apt install firefox-esr tor iw libnotify-bin iptables netfilter-persistent iptables-persistent secure-delete bleachbit macchanger net-tools -y
 
 2) Download the installer
 

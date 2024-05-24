@@ -13,7 +13,7 @@ from pathlib import Path
 basicConfig(level=DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Disabling the debugging feature. Hint: Comment out this line to enable debugging.
-disable(CRITICAL)
+# disable(CRITICAL)
 
 
 
@@ -40,6 +40,12 @@ def check_fake_hostname_usage(fake_hostnames_list_file_path, checklist_items_dic
 
         # Updating the 'Using fake hostname' key's value pair to True
         checklist_items_dict['Using fake hostname'] = True
+
+    else:
+
+        # Updating the 'Using fake hostname' key's value pair to False
+        checklist_items_dict['Using fake hostname'] = False
+
 
 def check_fake_mac_address_usage(user_pwd, checklist_items_dict):
     """A function which checks wheather or not you are using fake mac address"""
@@ -91,6 +97,7 @@ def check_fake_mac_address_usage(user_pwd, checklist_items_dict):
                 # Setting the 'Using fake mac address' key's value pair to False
                 checklist_items_dict['Using fake mac address'] = False
 
+
 def check_appropriate_nameserver_usage(privacy_focused_nameservers_file_path, original_resolv_configuration_file_path, main_window, checklist_items_dict):
     """A function which checks if you are using privacy focused name servers"""
 
@@ -122,6 +129,11 @@ def check_appropriate_nameserver_usage(privacy_focused_nameservers_file_path, or
             # Setting the 'Using appropriate nameservers' key's value pair to True
             checklist_items_dict['Using appropriate nameservers'] = True
 
+        else:
+            
+            # Setting the 'Using appropriate nameservers' key's value pair to False
+            checklist_items_dict['Using appropriate nameservers'] = False
+
     # Checking if start_stop_button's text in the main window is not equal to Start string.
     else:
 
@@ -129,6 +141,12 @@ def check_appropriate_nameserver_usage(privacy_focused_nameservers_file_path, or
 
             # Setting the 'Using appropriate nameservers' key's value pair to True
             checklist_items_dict['Using appropriate nameservers'] = True
+
+        else:
+            
+            # Setting the 'Using appropriate nameservers' key's value pair to False
+            checklist_items_dict['Using appropriate nameservers'] = False
+
 
 def check_browser_anonymization(current_username, checklist_items_dict, custom_firefox_preferences_file_path):
     """A function which checks if browser anonymization preferences are in use"""
@@ -156,6 +174,7 @@ def check_browser_anonymization(current_username, checklist_items_dict, custom_f
 
         debug('Couldn\'t find a path')
 
+
 def check_different_timezone_usage(timezone_backup_file_path, checklist_items_dict):
     """A function which checks if a different timezone is set in the system"""
 
@@ -176,6 +195,7 @@ def check_different_timezone_usage(timezone_backup_file_path, checklist_items_di
 
     # Setting the 'Using different timezone' key's value pair to True
     checklist_items_dict['Using different timezone'] = is_timezone_different
+
 
 def check_tor_connection_usage(checklist_items_dict):
     """A function which checks if a transparent proxy is working."""

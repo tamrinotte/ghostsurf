@@ -7,7 +7,6 @@ from logging import basicConfig, DEBUG, debug, disable, CRITICAL
 from webbrowser import open as wbopen
 from time import sleep
 from getpass import getuser
-from pathlib import Path
 from sys import exit as sysexit
 from subprocess import run
 from threading import Thread
@@ -41,6 +40,7 @@ from gs_functions.control_deck_functions import (
     reset_ghostsurf_settings,
     change_the_mac_address,
     wipe_the_memory,
+    change_the_nameservers,
 )
 
 from gs_functions.standard_functions import (
@@ -53,7 +53,7 @@ from gs_functions.standard_functions import (
 basicConfig(level=DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Disabling the debugging feature. Hint: Comment out this line to enable debugging.
-disable(CRITICAL)
+# disable(CRITICAL)
 
 
 
@@ -545,8 +545,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Connecting the reset_button with the reset_settings function in a way that the function will going to trigger with a press signal
         self.reset_button.pressed.connect(self.reset_settings)
 
-        # Connecting the dns_changer_button with the change_dns function in a way that the function will going to trigger with a press signal
-        self.dns_changer_button.pressed.connect(self.change_dns)
+        # Connecting the dns_changer_button with the change_nameservers function in a way that the function will going to trigger with a press signal
+        self.dns_changer_button.pressed.connect(self.change_nameservers)
 
         # Connecting the hostname_changer_button with the change_hostname function in a way that the function will going to trigger with a press signal
         self.hostname_changer_button.pressed.connect(self.change_hostname)
@@ -685,38 +685,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # Printing "Operation canceled" in debug mode
             debug("Operation canceled")
 
-    def change_dns(self):
+    def change_nameservers(self):
         """A function which changes the nameservers in the resolv.conf file"""
 
-        # Sending a notification to inform the user that the operation is starting
-        system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Changing the nameservers"')
-
-        # Waiting for 0.3 seconds
-        sleep(0.3)
-
-        # Getting the working status of the application from the start_stop_button's text
-        working_status = self.start_stop_button.text()
-
-        # Checking if transparent proxy is on
-        if working_status == "Stop":
-
-            # Executing the nameservers_changer script
-            run(["sudo", "-S", "bash", "-c", f'{nameserver_changer_file_path} {tor_nameservers_file_path}'], input=user_pwd, text=True, capture_output=True)
-
-            # Copying and pasting custom nameservers for tor on resolv.conf file
-            run(["sudo", "-S", "bash", "-c", f'cp {tor_nameservers_file_path} {original_resolv_configuration_file_path}'], input=user_pwd, text=True, capture_output=True)
-
-        # Checking if transparent proxy is off
-        else:
-
-            # Executing the nameservers_changer script
-            run(["sudo", "-S", "bash", "-c", f'{nameserver_changer_file_path} {privacy_focused_nameservers_file_path}'], input=user_pwd, text=True, capture_output=True)
-
-            # Copying and pasting dns_changer nameservers to on resolv.conf file
-            run(["sudo", "-S", "bash", "-c", f'cp {privacy_focused_nameservers_file_path} {original_resolv_configuration_file_path}'], input=user_pwd, text=True, capture_output=True)            
-
-        # Sending a notification to inform the user that the operation is done
-        system(f'notify-send -i "{ghostsurf_logo_file_path}" -t 150 "Nameservers has been changed"')
+        change_the_nameservers(user_pwd=user_pwd, ghostsurf_logo_file_path=ghostsurf_logo_file_path, working_status=self.start_stop_button.text(), nameserver_changer_file_path=nameserver_changer_file_path, tor_nameservers_file_path=tor_nameservers_file_path, original_resolv_configuration_file_path=original_resolv_configuration_file_path, privacy_focused_nameservers_file_path=privacy_focused_nameservers_file_path)
 
     def reset_settings(self):
         """A function which resets ghostsurf settings"""
