@@ -1,0 +1,574 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>330</width>
+    <height>290</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>330</width>
+    <height>290</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>330</width>
+    <height>290</height>
+   </size>
+  </property>
+  <property name="font">
+   <font>
+    <strikeout>false</strikeout>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>Ghostsurf</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../resources.qrc">
+    <normaloff>:/logos/ghostsurf.png</normaloff>:/logos/ghostsurf.png</iconset>
+  </property>
+  <property name="toolTip">
+   <string/>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>330</width>
+     <height>290</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>330</width>
+     <height>290</height>
+    </size>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">#centralwidget {
+	background: #231f1f;
+}</string>
+   </property>
+   <widget class="QLabel" name="logo_label">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>100</width>
+      <height>100</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="../resources.qrc">:/logos/ghostsurf.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="title_label">
+    <property name="geometry">
+     <rect>
+      <x>99</x>
+      <y>9</y>
+      <width>221</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>URW Bookman</family>
+      <pointsize>30</pointsize>
+      <weight>75</weight>
+      <italic>true</italic>
+      <bold>true</bold>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">#title_label {
+	color: #6bfffb;
+}</string>
+    </property>
+    <property name="text">
+     <string>Ghostsurf</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="start_stop_button">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>240</y>
+      <width>90</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Ubuntu</family>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Start the ghostsurf</string>
+    </property>
+    <property name="text">
+     <string>Start</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="change_ip_button">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>240</y>
+      <width>90</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Change my ip address</string>
+    </property>
+    <property name="text">
+     <string>Change IP</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="my_ip_button">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>240</y>
+      <width>90</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Display my ip address</string>
+    </property>
+    <property name="text">
+     <string>My IP</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="status_header_label">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>100</y>
+      <width>80</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <weight>75</weight>
+      <bold>true</bold>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+      <kerning>true</kerning>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">#status_header_label {
+	color: white;
+}</string>
+    </property>
+    <property name="text">
+     <string>Tor Status:</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="status_label">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>100</y>
+      <width>70</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <weight>75</weight>
+      <bold>true</bold>
+      <underline>true</underline>
+      <strikeout>false</strikeout>
+      <kerning>true</kerning>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">#status_label {
+	color: red;
+}</string>
+    </property>
+    <property name="text">
+     <string>Inactive</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="info_button">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>180</y>
+      <width>30</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Display the help page</string>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">#info_button {
+	background: #231f1f;
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../resources.qrc">
+      <normaloff>:/icons/info.svg</normaloff>:/icons/info.svg</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pandora_bomb_button">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>140</y>
+      <width>30</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Wipe memory</string>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">#pandora_bomb_button {
+	background: #231f1f;
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../resources.qrc">
+      <normaloff>:/icons/bomb.png</normaloff>:/icons/bomb.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="ultra_ghost_button">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>150</y>
+      <width>80</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Enable/Disable ghostsurf at boot</string>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">#ultra_ghost_button {
+	background: red;
+	border-radius: 4px;
+	border: 1px solid black;
+}</string>
+    </property>
+    <property name="text">
+     <string>disabled</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="reset_button">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>180</y>
+      <width>30</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Reset</string>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">#reset_button {
+	background: #231f1f;
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../resources.qrc">
+      <normaloff>:/icons/reset.svg</normaloff>:/icons/reset.svg</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="mac_changer_button">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>140</y>
+      <width>30</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Change mac address</string>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">#mac_changer_button {
+	background: #231f1f;
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../resources.qrc">
+      <normaloff>:/icons/mac_changer.svg</normaloff>:/icons/mac_changer.svg</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="log_shredder_button">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>140</y>
+      <width>30</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Shred log files</string>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">#log_shredder_button {
+	background: #231f1f;
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../resources.qrc">
+      <normaloff>:/icons/log_shredder.svg</normaloff>:/icons/log_shredder.svg</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="hostname_changer_button">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>140</y>
+      <width>30</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Change hostname</string>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">#hostname_changer_button {
+	background: #231f1f;
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../resources.qrc">
+      <normaloff>:/icons/hostname_changer.svg</normaloff>:/icons/hostname_changer.svg</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="dns_changer_button">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>140</y>
+      <width>30</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Change nameservers</string>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">#dns_changer_button {
+	background: #231f1f;
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../resources.qrc">
+      <normaloff>:/icons/dns_changer.svg</normaloff>:/icons/dns_changer.svg</iconset>
+    </property>
+   </widget>
+   <widget class="QLabel" name="control_deck_label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>110</y>
+      <width>90</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Z003</family>
+      <pointsize>13</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">#control_deck_label {
+	color: white;
+}</string>
+    </property>
+    <property name="text">
+     <string>Control Deck</string>
+    </property>
+   </widget>
+   <widget class="Line" name="horizontal_line">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>80</y>
+      <width>220</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="anti_mitm_button">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>190</y>
+      <width>80</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">#anti_mitm_button {
+	background: red;
+	border-radius: 4px;
+	border: 1px solid black;
+}</string>
+    </property>
+    <property name="text">
+     <string>N/A</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="run_fast_check_button">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>180</y>
+      <width>30</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Run checklist</string>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">#run_fast_check_button {
+	background: #000064;
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../resources.qrc">
+      <normaloff>:/icons/run_fast_check.svg</normaloff>:/icons/run_fast_check.svg</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="browser_anonymizer_button">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>180</y>
+      <width>30</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Anonymize browser</string>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">#browser_anonymizer_button {
+	background: #231f1f;
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../resources.qrc">
+      <normaloff>:/icons/browser.svg</normaloff>:/icons/browser.svg</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="status_button">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>180</y>
+      <width>30</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Update tor status</string>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">#status_button {
+	background: #231f1f;
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../resources.qrc">
+      <normaloff>:/icons/status.svg</normaloff>:/icons/status.svg</iconset>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <resources>
+  <include location="../resources.qrc"/>
+ </resources>
+ <connections/>
+</ui>
