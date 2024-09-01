@@ -1,5 +1,5 @@
 # GHOSTSURF 
-![GhostsurfLogo](https://raw.githubusercontent.com/dogaegeozden/ghostsurf/main/logos/ghostsurf_rounded.png)
+![GhostsurfLogo](https://raw.githubusercontent.com/tamrinotte/ghostsurf/main/logos/ghostsurf_rounded.png)
 
 Ghostsurf is a powerful tool for online privacy and anonymity. With features like anonymous browsing and encrypted communication, it empowers users to navigate the internet securely, leveraging the Tor network for added protection. Ideal for those seeking to reclaim control over their digital footprint.
 
@@ -54,7 +54,7 @@ __Enable Ghostsurf at Boot Switch:__ Enables ghostsurf boot
 
 2) Download the installer
 
-       curl -L https://github.com/dogaegeozden/ghostsurf/releases/download/tor/ghostsurf.deb -o ghostsurf.deb
+       curl -L https://github.com/tamrinotte/ghostsurf/releases/download/tor/ghostsurf.deb -o ghostsurf.deb
 
 3) Start the installer 
 
@@ -77,7 +77,7 @@ Ghostsurf is identifying your ip address by sending a get request to https://ifc
 <br>
 
 # GHOSTSURF 
-![GhostsurfLogo](https://raw.githubusercontent.com/dogaegeozden/ghostsurf/main/logos/ghostsurf_rounded.png)
+![GhostsurfLogo](https://raw.githubusercontent.com/tamrinotte/ghostsurf/main/logos/ghostsurf_rounded.png)
 
 Ghostsurf çevrimiçi gizlilik ve anonimlik için güçlü bir araçtır. Anonim bilgi arama ve şifreli iletişim gibi özelliklerle, ek koruma için Tor ağından yararlanarak kullanıcıların internette güvenli bir şekilde gezinmesine olanak tanır. Dijital ayak izleri üzerinde kontrolü geri almak isteyenler için idealdir.
 
@@ -133,7 +133,7 @@ __Enable Ghostsurf at Boot Switch:__ Ghostsurf'ü başlangıçta başlamaya ayar
 
 2) Yükleyiciyi indir
 
-       curl -L https://github.com/dogaegeozden/ghostsurf/releases/download/tor/ghostsurf.deb -o ghostsurf.deb	
+       curl -L https://github.com/tamrinotte/ghostsurf/releases/download/tor/ghostsurf.deb -o ghostsurf.deb	
 
 3) Yükleyiciyi başlat
 
