@@ -15,6 +15,10 @@ Ghostsurf is a powerful tool for online privacy and anonymity. With features lik
 
 <br>
 
+![Screenshot](https://raw.githubusercontent.com/tamrinotte/ghostsurf/main/screenshots/sc_1.png)
+
+<br>
+
 ## CONTROL DECK
 
 __Start/Stop Button:__ Starts/Stops the transparent proxy and changes the system's timezone
@@ -47,22 +51,34 @@ __Enable Ghostsurf at Boot Switch:__ Enables ghostsurf boot
 
 <br>
 
-## INSTALLATION
-1) Install the dependencies: 	
+## CLI
 
-       sudo apt install firefox-esr tor iw libnotify-bin iptables netfilter-persistent iptables-persistent secure-delete bleachbit macchanger net-tools -y
+### Usage
 
-2) Download the installer
+The GhostSurf CLI offers the following commands:
 
-       curl -L https://github.com/tamrinotte/ghostsurf/releases/download/tor/ghostsurf.deb -o ghostsurf.deb
+#### Positional Arguments
 
-3) Start the installer 
+* `start` - Start transparent proxy
+* `stop` - Stop transparent proxy
+* `changeip` - Change my IP
+* `myip` - Show my public IP address
+* `status` - Show if transparent proxy is on/off
+* `changemac` - Change my mac address
+* `changedns` - Change my DNS
+* `changehostname` - Change my hostname
+* `whiterabbit` - Follow the white rabbit
+* `pandorabomb` - Wipe the RAM
+* `anonymizebrowser` - Anonymize firefox
+* `shredlogs` - Shred log files
+* `checklist` - Run anonymity checklist
+* `reset` - Reset changes
+* `enable` - Enable Ghostsurf at boot
+* `disable` - Disable Ghostsurf at boot
 
-       sudo dpkg -i ghostsurf.deb
+#### Options
 
-4) Open a new terminal and type:
-	
-       ghostsurf
+* `-h, --help` - Show this help message and exit
 
 <br>
 
@@ -93,9 +109,13 @@ Ghostsurf çevrimiçi gizlilik ve anonimlik için güçlü bir araçtır. Anonim
 
 <br>
 
+![Screenshot](https://raw.githubusercontent.com/tamrinotte/ghostsurf/main/screenshots/sc_1.png)
+
+<br>
+
 ## KONTROL GÜVERTESİ
 
-__Start/Stop Button:__ Transparent proxy'i durdurur veya başlatır ve sistemin zaman dilimini değiştirir
+__Start/Stop Button:__ Şeffaf proxyi durdurur veya başlatır ve sistemin zaman dilimini değiştirir
 
 __Change IP Button:__ İp addresini değiştirir
 
@@ -123,6 +143,36 @@ __White Rabbit Button:__ Yardım sayfasını açar
 
 __Enable Ghostsurf at Boot Switch:__ Ghostsurf'ü başlangıçta başlamaya ayarlar
 
+<br>
+
+## CLI
+
+### Kullanım
+
+GhostSurf CLI aşağıdaki komutları sunar:
+
+#### Konumsal Argümanlar
+
+* `start` - Şeffaf proxy'yi başlat
+* `stop` - Şeffaf proxy'yi durdur
+* `changeip` - IP adresimi değiştir
+* `myip` - Genel IP adresimi göster
+* `status` - Şeffaf proxy'nin açık/kapalı olup olmadığını göster
+* `changemac` - Mac adresimi değiştir
+* `changedns` - DNS'imi değiştir
+* `changehostname` - Ana bilgisayar adımı değiştir
+* `whiterabbit` - Beyaz tavşanı takip et
+* `pandorabomb` - RAM'i sil
+* `anonymizebrowser` - Firefox'u anonimleştir
+* `shredlogs` - Günlük dosyalarını parçala
+* `checklist` - Anonimlik kontrol listesini çalıştır
+* `reset` - Değişiklikleri sıfırla
+* `enable` - Önyüklemede Ghostsurf'ü etkinleştir
+* `disable` - Ghostsurf'ü devre dışı bırak önyükleme
+
+#### Seçenekler
+
+* `-h, --help` - Bu yardım mesajını göster ve çık
 
 <br>
 

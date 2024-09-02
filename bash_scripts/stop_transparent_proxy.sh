@@ -108,7 +108,7 @@ append_rules_for_essential_security_measures() {
     # A function which appends firewall rules for essential security
 
     # Logging                                                                                                                
-    iptables -A INPUT -j LOG --log-prefix "IPTABLES-DROP: " --log-level 4                                                                                                                     
+    iptables -A INPUT -j LOG --log-prefix "IPTABLES-DROP: " --log-level 4                                               
     iptables -A OUTPUT -j LOG --log-prefix "IPTABLES-DROP: " --log-level 4
                                                                                                                                                                      
     # Drop invalid packets                                                                                                                                   
@@ -119,7 +119,7 @@ append_rules_for_essential_security_measures() {
                                                                                                                                                                
     # Drop incoming NULL packets                                                                                                                                      
     iptables -A INPUT -p tcp --tcp-flags ALL NONE -j DROP
-                                                                                                                                                                        
+                                                                                                                                                                
     # Drop XMAS packets                                                                                                                                       
     iptables -A INPUT -p tcp --tcp-flags ALL ALL -j DROP
                                                                                                                                                                      
@@ -128,10 +128,15 @@ append_rules_for_essential_security_measures() {
                                                                                                                                                                    
     # Drop malformed packets                                                                                                                                   
     iptables -A INPUT -m conntrack --ctstate INVALID -j DROP
+    
+    # Limit the number of simultaneous connections
+    iptables -A INPUT -p tcp --syn -m connlimit --connlimit-above 50 -j REJECT --reject-with tcp-reset
                                                                                                                                          
     # Prevent DoS attacks (Adjust threshold as needed)                                                                                                 
-    iptables -A INPUT -p tcp --dport 80 -m limit --limit 25/minute --limit-burst 100 -j ACCEPT
-                                                                                                                                                           
+    iptables -A INPUT -p tcp --dport 80 -m limit --limit 60/minute --limit-burst 300 -j ACCEPT
+    iptables -A INPUT -p tcp --dport 443 -m limit --limit 60/minute --limit-burst 300 -j ACCEPT
+    iptables -A INPUT -p tcp --dport 53 -m limit --limit 60/minute --limit-burst 300 -j ACCEPT
+                                                             
     # Drop all other incoming traffic
     iptables -A INPUT -j DROP
 
@@ -150,7 +155,6 @@ append_rules_for_essential_security_measures() {
 
     # Drop packets with invalid IP addresses
     iptables -A INPUT -s 0.0.0.0/0 -j DROP
-
     iptables -A INPUT -d 0.0.0.0/0 -j DROP
 }
 
