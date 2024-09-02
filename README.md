@@ -82,6 +82,25 @@ The GhostSurf CLI offers the following commands:
 
 <br>
 
+## INSTALLATION
+1) Install the dependencies: 	
+
+       sudo apt install firefox-esr tor iw libnotify-bin iptables netfilter-persistent iptables-persistent secure-delete bleachbit macchanger net-tools -y
+
+2) Download the installer
+
+       curl -L https://github.com/dogaegeozden/ghostsurf/releases/download/tor/ghostsurf.deb -o ghostsurf.deb
+
+3) Start the installer 
+
+       sudo dpkg -i ghostsurf.deb
+
+4) Open a new terminal and type:
+	
+       ghostsurf
+
+<br>
+
 ## HELP
 
 Ghostsurf is identifying your ip address by sending a get request to https://ifconfig.io. And, if the app sends too many requests in short time that may cause issues and you may not get a proper response.
