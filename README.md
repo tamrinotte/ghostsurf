@@ -168,7 +168,7 @@ GhostSurf CLI aşağıdaki komutları sunar:
 * `checklist` - Anonimlik kontrol listesini çalıştır
 * `reset` - Değişiklikleri sıfırla
 * `enable` - Önyüklemede Ghostsurf'ü etkinleştir
-* `disable` - Ghostsurf'ü devre dışı bırak önyükleme
+* `disable` - Önyüklemede Ghostsurf'ü devre dışı bırak
 
 #### Seçenekler
 
@@ -183,11 +183,11 @@ GhostSurf CLI aşağıdaki komutları sunar:
 
 2) Yükleyiciyi indir
 
-       curl -L https://github.com/tamrinotte/ghostsurf/releases/download/tor/ghostsurf.deb -o ghostsurf.deb	
+       curl -L https://github.com/tamrinotte/ghostsurf/releases/download/tor/ghostsurf.deb -o ghostsurf.deb
 
 3) Yükleyiciyi başlat
 
-       sudo dpkg -i ghostsurf.deb	
+       sudo dpkg -i ghostsurf.deb
 
 4) Terminali aç ve aşağıdaki metni gir: 
 	
