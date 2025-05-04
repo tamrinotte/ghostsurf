@@ -140,6 +140,7 @@ def check_browser_anonymization(
         # Construct the path to user.js
         ghostsurf_firefox_profile_file_path = Path(ghostsurf_firefox_profile_dir, "user.js")
         debug(f"Ghostsurf Firefox profile file path = {ghostsurf_firefox_profile_file_path}")
+
     penetration_testing_firefox_profile_file_path = next(Path(firefox_profiles_dir).glob("*.penetration-testing"))
 
     if (
