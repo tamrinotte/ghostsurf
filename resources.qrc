@@ -1,0 +1,20 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file alias="eye_open.svg">icons/eye_open.svg</file>
+        <file alias="eye_closed.svg">icons/eye_closed.svg</file>
+        <file alias="info.svg">icons/info.svg</file>
+        <file alias="settings.svg">icons/settings.svg</file>
+        <file alias="bomb.png">icons/bomb.png</file>
+        <file alias="reset.svg">icons/reset.svg</file>
+        <file alias="mac_changer.svg">icons/mac_changer.svg</file>
+        <file alias="log_shredder.svg">icons/log_shredder.svg</file>
+        <file alias="hostname_changer.svg">icons/hostname_changer.svg</file>
+        <file alias="dns_changer.svg">icons/dns_changer.svg</file>
+        <file alias="run_fast_check.svg">icons/run_fast_check.svg</file>
+        <file alias="browser.svg">icons/browser.svg</file>
+        <file alias="status.svg">icons/status.svg</file>
+    </qresource>
+    <qresource prefix="/logos">
+        <file alias="ghostsurf.png">logos/ghostsurf.png</file>
+    </qresource>
+</RCC>

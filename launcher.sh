@@ -1,0 +1,1 @@
+/opt/ghostsurf/ghostsurf $1
