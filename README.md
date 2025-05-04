@@ -82,15 +82,19 @@ The GhostSurf CLI offers the following commands:
 
 ## INSTALLATION
 
-1) Download the installer
+1) Install the dependencies: 	
+
+       sudo apt install firefox-esr tor iw libnotify-bin iptables netfilter-persistent iptables-persistent secure-delete bleachbit macchanger net-tools -y
+
+2) Download the installer
 
        curl -L https://github.com/dogaegeozden/ghostsurf/releases/download/tor/ghostsurf.deb -o ghostsurf.deb
 
-2) Start the installer 
+3) Start the installer 
 
        sudo dpkg -i ghostsurf.deb
 
-3) Open a new terminal and type:
+4) Open a new terminal and type:
 	
        ghostsurf
 
@@ -187,16 +191,19 @@ GhostSurf CLI aşağıdaki komutları sunar:
 <br>
 
 ## YÜKLEME
+1) Bağımlılıkları yükle: 	
 
-1) Yükleyiciyi indir
+       sudo apt install firefox-esr tor iw libnotify-bin iptables netfilter-persistent iptables-persistent secure-delete bleachbit macchanger net-tools -y
+
+2) Yükleyiciyi indir
 
        curl -L https://github.com/tamrinotte/ghostsurf/releases/download/tor/ghostsurf.deb -o ghostsurf.deb
 
-2) Yükleyiciyi başlat
+3) Yükleyiciyi başlat
 
        sudo dpkg -i ghostsurf.deb
 
-3) Terminali aç ve aşağıdaki metni gir: 
+4) Terminali aç ve aşağıdaki metni gir: 
 	
        ghostsurf
 
