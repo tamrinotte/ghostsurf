@@ -18,7 +18,8 @@ start_log_killer() {
     # Iterating over each log file in the list of log files
     for file in "${list_of_log_files[@]}"; do
 
-        if [ -f "$file" ]; then
+        if [ -f "$file" ]
+        then
 
             # Shredding the file
             shred -vfzu "$file" && :> "$file"

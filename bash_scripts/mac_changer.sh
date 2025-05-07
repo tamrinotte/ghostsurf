@@ -18,9 +18,11 @@ declare_variables() {
 change_mac_address() {
 
     # Iterating over each interface in the list_of_network_interfaces
-	for interface in $list_of_network_interfaces; do
+	for interface in $list_of_network_interfaces
+    do
 
-        if [[ $interface != "lo" ]]; then
+        if [[ $interface != "lo" ]]
+        then
 
             ifconfig $interface down
             systemctl stop NetworkManager.service

@@ -253,6 +253,57 @@ def main():
 
 ##############################
 
+# PASSWORD WINDOW
+
+##############################
+
+class PasswordWindow(QWidget, Ui_PasswordWindow):
+
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+        self.setupUi(self)
+        self.submit_button.pressed.connect(self.get_user_pwd)
+        self.visibility_button.pressed.connect(self.change_echo_mode)
+
+    def change_echo_mode(self):
+
+        echo_mode = self.password_line_edit.echoMode()
+        debug(f"Echo Mode = {echo_mode}")
+
+        if echo_mode == QLineEdit.EchoMode.Password:
+
+            self.password_line_edit.setEchoMode(QLineEdit.EchoMode.Normal)
+
+        else:
+
+            self.password_line_edit.setEchoMode(QLineEdit.EchoMode.Password)
+
+    def get_user_pwd(self):
+
+        global user_pwd
+        user_pwd = str(self.password_line_edit.text())
+        user_name = run(["sudo", "-S", "whoami"], input=user_pwd, text=True, capture_output=True).stdout.strip()
+
+        if user_name == "root":
+
+            self.close()
+            global main_window
+            main_window = MainWindow()
+            main_window.show()
+
+        else:
+
+            warning_dialog = QMessageBox()
+            warning_dialog.setIcon(QMessageBox.Critical)
+            warning_dialog.setWindowTitle("Warning")
+            warning_dialog.setText("Couldn't get root privileges!")
+            warning_dialog.exec()
+
+
+
+##############################
+
 # WORKERS
 
 ##############################
@@ -372,56 +423,6 @@ class ChecklistWindow(QWidget, Ui_ChecklistWindow):
 
         self.model.list_items.append((checklist_items_dict[key], key))
         self.model.layoutChanged.emit()
-
-
-
-##############################
-
-# PASSWORD WINDOW
-
-##############################
-
-class PasswordWindow(QWidget, Ui_PasswordWindow):
-
-    def __init__(self, *args, **kwargs):
-
-        super().__init__(*args, **kwargs)
-        self.setupUi(self)
-        self.submit_button.pressed.connect(self.get_user_pwd)
-        self.visibility_button.pressed.connect(self.change_echo_mode)
-
-    def change_echo_mode(self):
-
-        echo_mode = self.password_line_edit.echoMode()
-
-        if echo_mode == QLineEdit.EchoMode.Password:
-
-            self.password_line_edit.setEchoMode(QLineEdit.EchoMode.Normal)
-
-        else:
-
-            self.password_line_edit.setEchoMode(QLineEdit.EchoMode.Password)
-
-    def get_user_pwd(self):
-
-        global user_pwd
-        user_pwd = str(self.password_line_edit.text())
-        user_name = run(["sudo", "-S", "whoami"], input=user_pwd, text=True, capture_output=True).stdout.strip()
-
-        if user_name == "root":
-
-            self.close()
-            global main_window
-            main_window = MainWindow()
-            main_window.show()
-
-        else:
-
-            warning_dialog = QMessageBox()
-            warning_dialog.setIcon(QMessageBox.Critical)
-            warning_dialog.setWindowTitle("Warning")
-            warning_dialog.setText("Couldn't get root privileges!")
-            warning_dialog.exec()
 
 
 

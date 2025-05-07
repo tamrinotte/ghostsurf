@@ -84,7 +84,7 @@ The GhostSurf CLI offers the following commands:
 
 1) Install the dependencies: 	
 
-       sudo apt install firefox-esr tor iw libnotify-bin iptables netfilter-persistent iptables-persistent secure-delete bleachbit macchanger net-tools -y
+       sudo apt install firefox-esr tor iw libnotify-bin iptables secure-delete bleachbit macchanger net-tools -y
 
 2) Download the installer
 
