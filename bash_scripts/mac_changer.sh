@@ -4,14 +4,12 @@ main () {
     
     declare_variables
     change_mac_address
-
 }
 
 declare_variables() {
 
     # Creating a list of network interfaces
     list_of_network_interfaces=$(ip -o link show | awk -F': ' '{print $2}')
-
 }
 
 
