@@ -94,7 +94,7 @@ The GhostSurf CLI offers the following commands:
 
 	- Debian
 
-	      curl -L https://github.com/tamrinotte/ghostsurf/releases/download/debain/ghostsurf.deb -o ghostsurf.deb
+	      curl -L https://github.com/tamrinotte/ghostsurf/releases/download/debian/ghostsurf.deb -o ghostsurf.deb
 
 3) Start the installer 
 
@@ -209,7 +209,7 @@ GhostSurf CLI aşağıdaki komutları sunar:
 
 	- Debian
 
-	      curl -L https://github.com/tamrinotte/ghostsurf/releases/download/debain/ghostsurf.deb -o ghostsurf.deb
+	      curl -L https://github.com/tamrinotte/ghostsurf/releases/download/debian/ghostsurf.deb -o ghostsurf.deb
 
 3) Yükleyiciyi başlat
 
