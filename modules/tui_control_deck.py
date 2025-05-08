@@ -152,7 +152,7 @@ def tui_cd_show_status(ghostsurf_settings_file_path):
         "Is Tor Service Active": False,
     }
 
-    tor_service_status = run(["pkexec", "systemctl", "status", "tor"], capture_output=True, text=True).stdout.strip()
+    tor_service_status = run(["systemctl", "status", "tor"], capture_output=True, text=True).stdout.strip()
 
     if "inactive" in tor_service_status:
 

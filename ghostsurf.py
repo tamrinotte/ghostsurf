@@ -6,7 +6,7 @@ from webbrowser import open as wbopen
 from time import sleep
 from getpass import getuser
 from sys import argv, exit as sysexit
-from subprocess import run
+from subprocess import run, check_call, CalledProcessError
 from threading import Thread
 from re import compile
 from json import load, dump
@@ -147,7 +147,10 @@ def main():
 
     if current_username == "root":
 
-        display_notification(icon_file_path=ghostsurf_logo_file_path, message="You can't run this app as the root user.")
+        display_notification(
+            icon_file_path=ghostsurf_logo_file_path,
+            message="You can't run this app as the root user."
+        )
         sysexit()
 
     else:
@@ -155,8 +158,8 @@ def main():
         if len(argv) == 1:
         
             app = QApplication([])
-            password_window = PasswordWindow()
-            password_window.show()
+            main_window = MainWindow()
+            main_window.show()
             sysexit(app.exec())
 
         else:
@@ -248,57 +251,6 @@ def main():
             else:
 
                 parser.print_help()
-
-
-
-##############################
-
-# PASSWORD WINDOW
-
-##############################
-
-class PasswordWindow(QWidget, Ui_PasswordWindow):
-
-    def __init__(self, *args, **kwargs):
-
-        super().__init__(*args, **kwargs)
-        self.setupUi(self)
-        self.submit_button.pressed.connect(self.get_user_pwd)
-        self.visibility_button.pressed.connect(self.change_echo_mode)
-
-    def change_echo_mode(self):
-
-        echo_mode = self.password_line_edit.echoMode()
-        debug(f"Echo Mode = {echo_mode}")
-
-        if echo_mode == QLineEdit.EchoMode.Password:
-
-            self.password_line_edit.setEchoMode(QLineEdit.EchoMode.Normal)
-
-        else:
-
-            self.password_line_edit.setEchoMode(QLineEdit.EchoMode.Password)
-
-    def get_user_pwd(self):
-
-        global user_pwd
-        user_pwd = str(self.password_line_edit.text())
-        user_name = run(["sudo", "-S", "whoami"], input=user_pwd, text=True, capture_output=True).stdout.strip()
-
-        if user_name == "root":
-
-            self.close()
-            global main_window
-            main_window = MainWindow()
-            main_window.show()
-
-        else:
-
-            warning_dialog = QMessageBox()
-            warning_dialog.setIcon(QMessageBox.Critical)
-            warning_dialog.setWindowTitle("Warning")
-            warning_dialog.setText("Couldn't get root privileges!")
-            warning_dialog.exec()
 
 
 
@@ -441,8 +393,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         ghostsurf_config = load_ghostsurf_config(ghostsurf_settings_file_path=ghostsurf_settings_file_path)
         tor_status = run(
-            ["sudo", "-S", "systemctl", "status", "tor"],
-            input=user_pwd,
+            ["systemctl", "status", "tor"],
             text=True,
             capture_output=True
         ).stdout.strip()
@@ -475,13 +426,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         def start_button_question_dialog_processor(i):
 
+            debug("Start transparent proxy button has been pressed.")
             user_answer = i.text()
 
             if user_answer == "&Yes":
 
-                debug("Yes button is clicked")
-                run(["sudo", "-S", init_script_file_path], text=True, input=user_pwd)
-                run(["sudo", "-S", start_transparent_proxy_script_file_path], text=True, input=user_pwd)
+                debug("No button is clicked")
+                try:
+
+                    check_call(["pkexec", "bash", "-c", f"{init_script_file_path} && {start_transparent_proxy_script_file_path}"])
+
+                except CalledProcessError as e:
+
+                    error(f"Error: {e}")
+                    return
+
                 config = load_ghostsurf_config(ghostsurf_settings_file_path=ghostsurf_settings_file_path)
                 config["is_ghostsurf_on"] = "True"
                 save_ghostsurf_config(ghostsurf_settings_file_path=ghostsurf_settings_file_path, config=config)
@@ -490,7 +449,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             elif user_answer == "&No":
 
                 debug("No button is clicked")
-                run(["sudo", "-S", start_transparent_proxy_script_file_path], text=True, input=user_pwd)
+                try:
+                    
+                    check_call(["pkexec", start_transparent_proxy_script_file_path])
+                
+                except CalledProcessError as e:
+                
+                    debug(f"Error: {e}")
+                    return
+
                 config = load_ghostsurf_config(ghostsurf_settings_file_path=ghostsurf_settings_file_path)
                 config["is_ghostsurf_on"] = "True"
                 save_ghostsurf_config(ghostsurf_settings_file_path=ghostsurf_settings_file_path, config=config)
@@ -502,12 +469,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         def stop_button_question_dialog_processor(i):
 
+            debug("Stop transparent proxy button has been pressed.")
             user_answer = i.text()
 
             if user_answer == "&Yes":
 
-                run(["sudo", "-S", init_script_file_path], text=True, input=user_pwd)
-                run(["sudo", "-S", stop_transparent_proxy_script_file_path], text=True, input=user_pwd)
+                try:
+
+                    check_call(["pkexec", "bash", "-c", f"{init_script_file_path} && {stop_transparent_proxy_script_file_path}"])
+
+                except CalledProcessError as e:
+
+                    error(f"Error: {e}")
+                    return
+
                 config = load_ghostsurf_config(ghostsurf_settings_file_path=ghostsurf_settings_file_path)
                 config["is_ghostsurf_on"] = "False"
                 save_ghostsurf_config(ghostsurf_settings_file_path=ghostsurf_settings_file_path, config=config)
@@ -515,7 +490,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             elif user_answer == "&No":
 
-                run(["sudo", "-S", stop_transparent_proxy_script_file_path], text=True, input=user_pwd)
+                try:
+
+                    check_call(["pkexec", stop_transparent_proxy_script_file_path])
+
+                except CalledProcessError as e:
+
+                    error(f"Error: {e}")
+                    return
+
                 config = load_ghostsurf_config(ghostsurf_settings_file_path=ghostsurf_settings_file_path)
                 config["is_ghostsurf_on"] = "False"
                 save_ghostsurf_config(ghostsurf_settings_file_path=ghostsurf_settings_file_path, config=config)
@@ -552,8 +535,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             question_dialog.exec() 
 
         tor_status = run(
-            ["sudo", "-S", "systemctl", "status", "tor"],
-            input=user_pwd,
+            ["systemctl", "status", "tor"],
             text=True,
             capture_output=True
         ).stdout.strip()
@@ -576,8 +558,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def show_status(self):
 
         tor_status = run(
-            ["sudo", "-S", "systemctl", "status", "tor"],
-            input=user_pwd,
+            ["systemctl", "status", "tor"],
             text=True,
             capture_output=True
         ).stdout.strip()
@@ -595,7 +576,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def change_ip(self):
 
         debug("Change IP button has been clicked!")
-        run(["sudo", "-S", "systemctl", "restart", "tor"], text=True, input=user_pwd)
+        run(["pkexec", "systemctl", "restart", "tor"], text=True)
 
     def display_the_help_page(self):
 
@@ -610,7 +591,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def change_nameservers(self):
 
         gui_cd_change_nameservers(
-            user_pwd=user_pwd,
             ghostsurf_logo_file_path=ghostsurf_logo_file_path,
             working_status=self.start_stop_button.text(),
             nameserver_changer_file_path=nameserver_changer_file_path,
@@ -622,7 +602,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def anonymize_browser(self):
         
         gui_cd_anonymize_browser(
-            user_pwd=user_pwd,
             init_script_file_path=init_script_file_path,
             ghostsurf_logo_file_path=ghostsurf_logo_file_path,
             firefox_profiles_dir=firefox_profiles_dir,
@@ -633,14 +612,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def change_hostname(self):
 
         gui_cd_change_hostname(
-            user_pwd=user_pwd,
             hostname_changer_script_file_path=hostname_changer_script_file_path
         )
 
     def change_mac_address(self):
 
         gui_cd_change_mac_address(
-            user_pwd=user_pwd,
             ghostsurf_logo_file_path=ghostsurf_logo_file_path,
             mac_changer_script_file_path=mac_changer_script_file_path
         )
@@ -651,13 +628,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             ghostsurf_logo_file_path=ghostsurf_logo_file_path,
             log_shredder_file_path=log_shredder_file_path,
             current_username=current_username,
-            user_pwd=user_pwd,
         )
 
     def wipe_memory(self):
 
         gui_cd_wipe_memory(
-            user_pwd=user_pwd,
             ghostsurf_logo_file_path=ghostsurf_logo_file_path,
             fast_bomb_script_file_path=fast_bomb_script_file_path,
             secure_bomb_script_file_path=secure_bomb_script_file_path
@@ -666,7 +641,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def reset_settings(self):
 
         gui_cd_reset(
-            user_pwd=user_pwd,
             ghostsurf_logo_file_path=ghostsurf_logo_file_path,
             reset_iptables_only_script_file_path=reset_iptables_only_script_file_path,
             reset_script_file_path=reset_script_file_path

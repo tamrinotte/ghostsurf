@@ -2,7 +2,7 @@
 
 # MODULES AND/OR LIBRARIES
 from time import sleep
-from subprocess import run
+from subprocess import run, check_call, CalledProcessError
 from re import compile
 from threading import Thread
 from pathlib import Path
@@ -28,33 +28,55 @@ from modules.notification_config import display_notification
 ##############################
 
 def less_secure_memory_wipe(
-    user_pwd,
     ghostsurf_logo_file_path,
     fast_bomb_script_file_path
 ):
 
-    run(["sudo", "-S", fast_bomb_script_file_path], text=True, input=user_pwd)
+    try:
+
+        check_call(["pkexec", fast_bomb_script_file_path])
+
+    except CalledProcessError as e:
+
+        error(f"Error: {e}")
+        return
+
     display_notification(icon_file_path=ghostsurf_logo_file_path, message="Caches are dropped and memory is wiped.")
 
-def high_secure_memory_wipe(user_pwd, ghostsurf_logo_file_path, secure_bomb_script_file_path):
+def high_secure_memory_wipe(ghostsurf_logo_file_path, secure_bomb_script_file_path):
 
-    run(["sudo", "-S", secure_bomb_script_file_path], text=True, input=user_pwd)
+    try:
+
+        check_call(["pkexec", secure_bomb_script_file_path])
+
+    except CalledProcessError as e:
+
+        error(f"Error: {e}")
+        return
+
     display_notification(icon_file_path=ghostsurf_logo_file_path, message="Caches are dropped and memory is wiped.")
 
-def change_the_mac_address_and_connect_back_to_wifi(user_pwd, ghostsurf_logo_file_path, mac_changer_script_file_path):
+def change_the_mac_address_and_connect_back_to_wifi(ghostsurf_logo_file_path, mac_changer_script_file_path):
 
     internet_adaptor_name = run(
         ["ip route show default | awk '/default/ {print $5}'"],
         shell=True,
         capture_output=True, text=True
     ).stdout.strip()
-    run(["sudo", "-S", mac_changer_script_file_path], text=True, input=user_pwd)
-    sleep(4)
-    run(["sudo", "-S", "nmcli", "d", "connect", internet_adaptor_name], text=True, input=user_pwd)
+    command_string = f"{mac_changer_script_file_path} && sleep 4 && nmcli d connect {internet_adaptor_name}"
+
+    try:
+
+        check_call(["pkexec", "bash", "-c", command_string])
+
+    except CalledProcessError as e:
+
+        error(f"Error: {e}")
+        return
+
     display_notification(icon_file_path=ghostsurf_logo_file_path, message="Mac address has been changed.")
 
 def change_ns(
-    user_pwd,
     ghostsurf_logo_file_path,
     working_status,
     nameserver_changer_file_path,
@@ -65,25 +87,26 @@ def change_ns(
 
     if working_status == "Stop":
 
-        run(["sudo", "-S", nameserver_changer_file_path, tor_nameservers_file_path], text=True, input=user_pwd)
-        run(
-            ["sudo", "-S", "cp", tor_nameservers_file_path, original_resolv_configuration_file_path],
-            text=True,
-            input=user_pwd
+        command_string = (
+            f"{nameserver_changer_file_path} {tor_nameservers_file_path} && "
+            f"cp {tor_nameservers_file_path} {original_resolv_configuration_file_path}"
         )
 
     else:
 
-        run(
-            ["sudo", "-S", nameserver_changer_file_path, privacy_focused_nameservers_file_path],
-            text=True,
-            input=user_pwd
+        command_string = (
+            f"{nameserver_changer_file_path} {privacy_focused_nameservers_file_path} && "
+            f"cp {privacy_focused_nameservers_file_path} {original_resolv_configuration_file_path}"
         )
-        run(
-            ["sudo", "-S", "cp", privacy_focused_nameservers_file_path, original_resolv_configuration_file_path],
-            text=True,
-            input=user_pwd
-        )
+
+    try:
+
+        check_call(["pkexec", "bash", "-c", command_string])
+
+    except CalledProcessError as e:
+
+        error(f"Error: {e}")
+        return
 
     display_notification(icon_file_path=ghostsurf_logo_file_path, message="Nameservers has been changed.")
 
@@ -124,14 +147,23 @@ def gui_cd_show_ip(ghostsurf_logo_file_path):
 
     display_notification(icon_file_path=ghostsurf_logo_file_path, message=message)
 
-def gui_cd_shred_logs(ghostsurf_logo_file_path, log_shredder_file_path, current_username, user_pwd):
+def gui_cd_shred_logs(ghostsurf_logo_file_path, log_shredder_file_path, current_username):
 
     display_notification(icon_file_path=ghostsurf_logo_file_path, message="Shreading the log files.")
     sleep(0.3)
-    run(["sudo", "-S", log_shredder_file_path, current_username], text=True, input=user_pwd)
+
+    try:
+
+        check_call(["pkexec", log_shredder_file_path])
+
+    except CalledProcessError as e:
+
+        error(f"Error: {e}")
+        return
+
     display_notification(icon_file_path=ghostsurf_logo_file_path, message="Log shredding has been done.")
 
-def gui_cd_reset(user_pwd, ghostsurf_logo_file_path, reset_iptables_only_script_file_path, reset_script_file_path):
+def gui_cd_reset(ghostsurf_logo_file_path, reset_iptables_only_script_file_path, reset_script_file_path):
 
     def reset_button_question_dialog_processor(i):
 
@@ -142,14 +174,35 @@ def gui_cd_reset(user_pwd, ghostsurf_logo_file_path, reset_iptables_only_script_
 
             display_notification(icon_file_path=ghostsurf_logo_file_path, message="Resetting iptables rules only.")
             sleep(0.3)
-            run(["sudo", "-S", reset_iptables_only_script_file_path], text=True, input=user_pwd)
+
+            try:
+
+                check_call(["pkexec", reset_iptables_only_script_file_path])
+
+            except CalledProcessError as e:
+
+                error(f"Error: {e}")
+                return
+
             display_notification(icon_file_path=ghostsurf_logo_file_path, message="Iptables rules are reset.")
  
         elif user_answer == "&No":
 
-            display_notification(icon_file_path=ghostsurf_logo_file_path, message="Resetting ghostsurf configurations.")
+            display_notification(
+                icon_file_path=ghostsurf_logo_file_path,
+                message="Resetting ghostsurf configurations."
+            )
             sleep(0.3)
-            run(["sudo", "-S", reset_script_file_path], text=True, input=user_pwd)
+
+            try:
+
+                check_call(["pkexec", reset_script_file_path])
+
+            except CalledProcessError as e:
+
+                error(f"Error: {e}")
+                return
+
             display_notification(icon_file_path=ghostsurf_logo_file_path, message="Reseting is done.")
 
         else:
@@ -164,7 +217,7 @@ def gui_cd_reset(user_pwd, ghostsurf_logo_file_path, reset_iptables_only_script_
     question_dialog.buttonClicked.connect(reset_button_question_dialog_processor)
     question_dialog.exec_()
 
-def gui_cd_change_mac_address(user_pwd, ghostsurf_logo_file_path, mac_changer_script_file_path):
+def gui_cd_change_mac_address(ghostsurf_logo_file_path, mac_changer_script_file_path):
 
     def mac_changer_button_question_dialog_processor(i):
 
@@ -174,13 +227,21 @@ def gui_cd_change_mac_address(user_pwd, ghostsurf_logo_file_path, mac_changer_sc
 
             mac_changer_thread = Thread(
                 target=change_the_mac_address_and_connect_back_to_wifi,
-                args=[user_pwd, ghostsurf_logo_file_path, mac_changer_script_file_path]
+                args=[ghostsurf_logo_file_path, mac_changer_script_file_path]
             )
             mac_changer_thread.start()
 
         elif user_answer == "&No":
 
-            run(["sudo", "-S", mac_changer_script_file_path], text=True, input=user_pwd)
+            try:
+
+                check_call(["pkexec", mac_changer_script_file_path])
+
+            except CalledProcessError as e:
+
+                error(f"Error: {e}")
+                return
+
             display_notification(icon_file_path=ghostsurf_logo_file_path, message="Mac address has been changed.")
 
         else:
@@ -198,7 +259,7 @@ def gui_cd_change_mac_address(user_pwd, ghostsurf_logo_file_path, mac_changer_sc
     question_dialog.buttonClicked.connect(mac_changer_button_question_dialog_processor)
     question_dialog.exec_()
 
-def gui_cd_wipe_memory(user_pwd, ghostsurf_logo_file_path, fast_bomb_script_file_path, secure_bomb_script_file_path):
+def gui_cd_wipe_memory(ghostsurf_logo_file_path, fast_bomb_script_file_path, secure_bomb_script_file_path):
 
     def wipe_button_question_dialog_processor(i):
         
@@ -213,7 +274,7 @@ def gui_cd_wipe_memory(user_pwd, ghostsurf_logo_file_path, fast_bomb_script_file
             )
             wipe_memory_thread = Thread(
                 target=less_secure_memory_wipe,
-                args=[user_pwd, ghostsurf_logo_file_path, fast_bomb_script_file_path]
+                args=[ghostsurf_logo_file_path, fast_bomb_script_file_path]
             )
             wipe_memory_thread.start()
 
@@ -225,7 +286,7 @@ def gui_cd_wipe_memory(user_pwd, ghostsurf_logo_file_path, fast_bomb_script_file
             )
             wipe_memory_thread = Thread(
                 target=high_secure_memory_wipe,
-                args=[user_pwd, ghostsurf_logo_file_path, secure_bomb_script_file_path]
+                args=[ghostsurf_logo_file_path, secure_bomb_script_file_path]
             )
             wipe_memory_thread.start()
 
@@ -242,7 +303,6 @@ def gui_cd_wipe_memory(user_pwd, ghostsurf_logo_file_path, fast_bomb_script_file
     question_dialog.exec_()
 
 def gui_cd_change_nameservers(
-    user_pwd,
     ghostsurf_logo_file_path,
     working_status,
     nameserver_changer_file_path,
@@ -256,7 +316,6 @@ def gui_cd_change_nameservers(
     thread = Thread(
         target=change_ns,
         args=[
-            user_pwd,
             ghostsurf_logo_file_path,
             working_status,
             nameserver_changer_file_path,
@@ -268,7 +327,6 @@ def gui_cd_change_nameservers(
     thread.start()
 
 def gui_cd_anonymize_browser(
-    user_pwd,
     init_script_file_path,
     ghostsurf_logo_file_path,
     firefox_profiles_dir,
@@ -325,7 +383,14 @@ def gui_cd_anonymize_browser(
         with open(ghostsurf_firefox_profile_file_path, "w") as ghostsurf_firefox_profile_user_pref_file:
             ghostsurf_firefox_profile_user_pref_file.write(custom_prefs)
 
-        run(["sudo", "-S", init_script_file_path], text=True, input=user_pwd)
+        try:
+
+            check_call(["pkexec", init_script_file_path])
+
+        except CalledProcessError as e:
+
+            error(f"Error: {e}")
+            return
 
         with open(firefox_profiles_conf_file_path, "r") as firefox_prof_conf_file:
             firefox_prof_conf_lines = firefox_prof_conf_file.readlines()
@@ -362,7 +427,10 @@ def gui_cd_anonymize_browser(
 
     else:
 
-        display_notification(icon_file_path=ghostsurf_logo_file_path, message="Ghostsurf Firefox profile already exists.")
+        display_notification(
+            icon_file_path=ghostsurf_logo_file_path,
+            message="Ghostsurf Firefox profile already exists."
+        )
 
     if is_penetration_testing_profile_exists == False:
 
@@ -387,7 +455,7 @@ def gui_cd_anonymize_browser(
             message="Penetration-Testing Firefox profile already exists."
         )
 
-def gui_cd_change_hostname(user_pwd, hostname_changer_script_file_path):
+def gui_cd_change_hostname(hostname_changer_script_file_path):
 
     question_dialog = QMessageBox()
     question_dialog.setIcon(QMessageBox.Question)
@@ -399,8 +467,7 @@ def gui_cd_change_hostname(user_pwd, hostname_changer_script_file_path):
     if question_dialog_answer == QMessageBox.Yes:
 
         debug("Rebooting the system")
-        run(["sudo", "-S", hostname_changer_script_file_path], text=True, input=user_pwd)
-        run(["sudo", "-S", "reboot"], text=True, input=user_pwd)
+        run(["pkexec", "bash", "-c", f"{hostname_changer_script_file_path} && reboot"])
 
     else:
 

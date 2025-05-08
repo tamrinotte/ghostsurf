@@ -133,19 +133,27 @@ def check_browser_anonymization(
     custom_firefox_preferences_file_path
 ):
 
-    ghostsurf_firefox_profile_dir = next(Path(firefox_profiles_dir).glob("*.ghostsurf"))
-    debug(f"Ghostsurf Firefox profile dir path = {ghostsurf_firefox_profile_dir}")
+    ghostsurf_firefox_profile_dir_glob = list(Path(firefox_profiles_dir).glob("*.ghostsurf"))
+    debug(f"Ghostsurf Firefox profile dir glob = {ghostsurf_firefox_profile_dir_glob}")
 
-    if ghostsurf_firefox_profile_dir is not None:
+    if ghostsurf_firefox_profile_dir_glob:
+        ghostsurf_firefox_profile_dir = ghostsurf_firefox_profile_dir_glob[0]
+        debug(f"Ghostsurf Firefox profile dir path = {ghostsurf_firefox_profile_dir}")
+
         # Construct the path to user.js
         ghostsurf_firefox_profile_file_path = Path(ghostsurf_firefox_profile_dir, "user.js")
         debug(f"Ghostsurf Firefox profile file path = {ghostsurf_firefox_profile_file_path}")
 
-    penetration_testing_firefox_profile_file_path = next(Path(firefox_profiles_dir).glob("*.penetration-testing"))
+    penetration_testing_firefox_profile_file_path_glob = list(Path(firefox_profiles_dir).glob("*.penetration-testing"))
+
+    if penetration_testing_firefox_profile_file_path_glob:
+        penetration_testing_firefox_profile_file_path = penetration_testing_firefox_profile_file_path_glob[0]
 
     if (
+        'ghostsurf_firefox_profile_file_path' in locals() and 
         ghostsurf_firefox_profile_file_path.exists() and
         custom_firefox_preferences_file_path.exists() and
+        penetration_testing_firefox_profile_file_path_glob and
         penetration_testing_firefox_profile_file_path.exists()
     ):
 
