@@ -1,19 +1,16 @@
 #!/bin/bash
 
 main () {
-
     enable_ipv6
     iptables_accept_all
 }
 
 enable_ipv6() {
-
     sysctl -w net.ipv6.conf.all.disable_ipv6=0 >/dev/null 2>&1
     sysctl -w net.ipv6.conf.default.disable_ipv6=0 >/dev/null 2>&1
 }
 
 iptables_accept_all() {
-
     # Flush and delete all user-defined chains in the mangle and raw tables
     iptables -t mangle -F
     iptables -t mangle -X

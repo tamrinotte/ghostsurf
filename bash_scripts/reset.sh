@@ -1,7 +1,6 @@
 #!/bin/bash
 
 main () {
-
     reset_configuration_files
     enable_ipv6
     reset_mac_address
@@ -11,13 +10,11 @@ main () {
 }
 
 declare_variables() {
-
     original_hostname="$(cat /opt/ghostsurf/backup_files/hostname.backup)"
     current_hostname="$(hostname)"
 }
 
 reset_configuration_files() {
-
     cp /opt/ghostsurf/backup_files/torrc.backup /etc/tor/torrc 
     cp /opt/ghostsurf/backup_files/resolv.conf.backup /etc/resolv.conf 
     timedatectl set-timezone $(cat /opt/ghostsurf/backup_files/timezone.backup)
@@ -26,13 +23,11 @@ reset_configuration_files() {
 }
 
 enable_ipv6() {
-
     sysctl -w net.ipv6.conf.all.disable_ipv6=0 >/dev/null 2>&1
     sysctl -w net.ipv6.conf.default.disable_ipv6=0 >/dev/null 2>&1
 }
 
 reset_mac_address() {
-
     # Creating a list of network interfaces
     list_of_network_interfaces=$(ip -o link show | awk -F': ' '{print $2}')
 
@@ -53,7 +48,6 @@ reset_mac_address() {
 }
 
 delete_ghostsurf_firefox_profile() {
-
     cp "/opt/ghostsurf/backup_files/firefox_profiles.backup" "/home/$username/.mozilla/firefox/profiles.ini"
 
     rm -rf /home/$username/.mozilla/firefox/*.ghostsurf
@@ -61,7 +55,6 @@ delete_ghostsurf_firefox_profile() {
 }
 
 iptables_accept_all() {
-
     # Flush and delete all user-defined chains in the mangle and raw tables
     iptables -t mangle -F
     iptables -t mangle -X
@@ -99,7 +92,6 @@ iptables_accept_all() {
 }
 
 reload_configuration_files() {
-
     systemctl --system daemon-reload
 }
 

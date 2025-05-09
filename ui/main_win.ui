@@ -406,34 +406,6 @@
       <normaloff>:/icons/dns_changer.svg</normaloff>:/icons/dns_changer.svg</iconset>
     </property>
    </widget>
-   <widget class="QLabel" name="control_deck_label">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>100</y>
-      <width>90</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Z003</family>
-      <pointsize>13</pointsize>
-      <weight>50</weight>
-      <italic>false</italic>
-      <bold>false</bold>
-      <strikeout>false</strikeout>
-     </font>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">#control_deck_label {
-	color: white;
-}</string>
-    </property>
-    <property name="text">
-     <string>Control Deck</string>
-    </property>
-   </widget>
    <widget class="Line" name="horizontal_line">
     <property name="geometry">
      <rect>

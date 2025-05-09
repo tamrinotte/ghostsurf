@@ -1,13 +1,11 @@
 #!/bin/bash
 
 main () {
-
     drop_caches  
     wipe_memory
 }
 
 drop_caches() {
-    
 	swapoff -a 
 	swapon -a 
 
@@ -20,7 +18,6 @@ drop_caches() {
 }
 
 wipe_memory() {
-
     # Wiping memory securely
     sdmem -fllv
 }

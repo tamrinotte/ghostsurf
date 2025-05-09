@@ -1,7 +1,6 @@
 #!/bin/bash
 
 main() {
-
     declare_variables
     drop_timezone_change
     enable_ipv6
@@ -13,7 +12,6 @@ main() {
 }
 
 declare_variables() {
-
     original_timezone=$(cat /opt/ghostsurf/backup_files/timezone.backup)
     pref_path="$(find /home -name prefs.js)"
     torrc_file_path="/etc/tor/torrc"
@@ -25,18 +23,15 @@ declare_variables() {
 }
 
 drop_timezone_change() {
-
     timedatectl set-timezone $original_timezone
 }
 
 enable_ipv6() {
-
     sysctl -w net.ipv6.conf.all.disable_ipv6=0 >/dev/null 2>&1
     sysctl -w net.ipv6.conf.default.disable_ipv6=0 >/dev/null 2>&1
 }
 
 delete_all_rules() {
-
     # Flush and delete all user-defined chains in the mangle and raw tables
     iptables -t mangle -F
     iptables -t mangle -X
@@ -65,7 +60,6 @@ delete_all_rules() {
 }
 
 default_accept() {
-
     iptables -P INPUT ACCEPT
     iptables -P FORWARD ACCEPT
     iptables -P OUTPUT ACCEPT
@@ -76,7 +70,6 @@ default_accept() {
 }
 
 restore_default_configuration_files() {
-
     cp $torrc_backup_file_path $torrc_file_path
     cp $privacy_focused_nameservers_file_path $resolvconf_file_path
 }

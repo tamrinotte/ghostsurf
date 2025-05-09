@@ -1,7 +1,6 @@
 #!/bin/bash
 
 main() {
-
     declare_variables
     systemctl start tor
     disable_ipv6
@@ -12,7 +11,6 @@ main() {
 }
 
 declare_variables() {
-   
     tor_uid="$(id -u debian-tor)"
     non_tor="127.0.0.0/8 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16"
     trans_port="9040"
@@ -25,20 +23,17 @@ declare_variables() {
 }
 
 set_timezone_change() {
-
     # Setting a new timezone
     timedatectl set-timezone UTC &> /dev/null
 }
 
 disable_ipv6() {
-    
     # disable IPv6
     sysctl -w net.ipv6.conf.all.disable_ipv6=1 >/dev/null 2>&1
     sysctl -w net.ipv6.conf.default.disable_ipv6=1 >/dev/null 2>&1
 }
 
 setup_configuration_files() {
-
     cp $custom_resolv_conf_file $resolvconf_file_path
     cp $custom_torrc_file $torrc_file_path
 
@@ -46,7 +41,6 @@ setup_configuration_files() {
 }
 
 set_up_iptables_rules() {
-    
     # Flush and delete all user-defined chains in the mangle and raw tables
     iptables -t mangle -F
     iptables -t mangle -X

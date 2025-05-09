@@ -1,12 +1,10 @@
 #!/bin/bash
 
 main () {
-
     set_random_hostname
 }
 
 set_random_hostname(){
-
     ## Benefits of changing hostname:
     ### Reducing Identifiability: The hostname of a device is often used as part of its network identification. By default, devices may have hostnames that include identifiable information, such as the device owner's name or the device model. Changing the hostname to a more generic or random name can help reduce the risk of being easily identified or traced back to a specific individual or device.
     ### Mitigating Network Scanning: In certain scenarios, attackers or malicious actors may conduct network scanning to identify vulnerable devices or targets. By changing the hostname, you make it more challenging for them to discern information about your device and potentially decrease the likelihood of being targeted. Ex: Modems are loogging your hostname.

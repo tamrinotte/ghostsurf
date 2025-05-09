@@ -1,7 +1,6 @@
 #!/bin/bash
 
 main () {
-
     # Killing all dangerous applications which can cause ip leak
     killall -q tor chrome dropbox iceweasel skype icedove thunderbird firefox chromium xchat transmission deluge pidgin pidgin.orig firefox-bin firefox-esr
 
