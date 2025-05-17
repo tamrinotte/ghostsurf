@@ -25,6 +25,7 @@ set_up_file_ownerships() {
 
     chown -R $username:$username "/opt/ghostsurf/"
     chown $username:$username "/usr/bin/ghostsurf"
+    chown root:root -R "/opt/ghostsurf/bash_scripts"
 }
 
 main

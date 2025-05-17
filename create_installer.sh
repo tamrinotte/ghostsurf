@@ -60,6 +60,7 @@ sudo cp launcher.sh package/usr/bin/ghostsurf
 echo 'Setting the file permissions and ownerships'
 sudo chmod 755 -R package/
 sudo chown $username:$username -R package/
+sudo chown root:root -R package/opt/ghostsurf/bash_scripts
 
 # Create the installer
 echo 'Creating the installer...'
