@@ -55,10 +55,10 @@ class Ui_MainWindow(object):
         self.title_label.setObjectName(u"title_label")
         self.title_label.setGeometry(QRect(99, 9, 221, 71))
         font1 = QFont()
-        font1.setFamilies([u"URW Bookman"])
-        font1.setPointSize(30)
+        font1.setFamilies([u"UKIJ Qolyazma Yantu"])
+        font1.setPointSize(38)
         font1.setBold(True)
-        font1.setItalic(True)
+        font1.setItalic(False)
         font1.setStrikeOut(False)
         self.title_label.setFont(font1)
         self.title_label.setStyleSheet(u"#title_label {\n"
@@ -69,24 +69,56 @@ class Ui_MainWindow(object):
         self.start_stop_button.setObjectName(u"start_stop_button")
         self.start_stop_button.setGeometry(QRect(20, 240, 90, 30))
         font2 = QFont()
-        font2.setFamilies([u"Ubuntu"])
+        font2.setFamilies([u"Lato"])
+        font2.setBold(True)
         font2.setStrikeOut(False)
         self.start_stop_button.setFont(font2)
+        self.start_stop_button.setStyleSheet(u"#start_stop_button {\n"
+"	background-color: #F3F4F6;\n"
+"}\n"
+"\n"
+"#start_stop_button:pressed {\n"
+"	background-color: #D1D5DB;\n"
+"}")
         self.change_ip_button = QPushButton(self.centralwidget)
         self.change_ip_button.setObjectName(u"change_ip_button")
         self.change_ip_button.setGeometry(QRect(120, 240, 90, 30))
+        self.change_ip_button.setFont(font2)
+        self.change_ip_button.setStyleSheet(u"#change_ip_button {\n"
+"	background-color: #F3F4F6;\n"
+"}\n"
+"\n"
+"#change_ip_button:pressed {\n"
+"	background-color: #D1D5DB;\n"
+"}")
         self.my_ip_button = QPushButton(self.centralwidget)
         self.my_ip_button.setObjectName(u"my_ip_button")
         self.my_ip_button.setGeometry(QRect(220, 240, 90, 30))
-        self.status_header_label = QLabel(self.centralwidget)
-        self.status_header_label.setObjectName(u"status_header_label")
-        self.status_header_label.setGeometry(QRect(170, 100, 80, 20))
         font3 = QFont()
+        font3.setFamilies([u"Lato"])
         font3.setBold(True)
+        font3.setItalic(False)
         font3.setUnderline(False)
         font3.setStrikeOut(False)
         font3.setKerning(True)
-        self.status_header_label.setFont(font3)
+        self.my_ip_button.setFont(font3)
+        self.my_ip_button.setStyleSheet(u"#my_ip_button {\n"
+"	background-color: #F3F4F6;\n"
+"}\n"
+"\n"
+"#my_ip_button:pressed {\n"
+"	background-color: #D1D5DB;\n"
+"}")
+        self.status_header_label = QLabel(self.centralwidget)
+        self.status_header_label.setObjectName(u"status_header_label")
+        self.status_header_label.setGeometry(QRect(170, 100, 80, 20))
+        font4 = QFont()
+        font4.setFamilies([u"Lato"])
+        font4.setBold(True)
+        font4.setUnderline(False)
+        font4.setStrikeOut(False)
+        font4.setKerning(True)
+        self.status_header_label.setFont(font4)
         self.status_header_label.setStyleSheet(u"#status_header_label {\n"
 "	color: white;\n"
 "}")
@@ -94,12 +126,13 @@ class Ui_MainWindow(object):
         self.status_label = QLabel(self.centralwidget)
         self.status_label.setObjectName(u"status_label")
         self.status_label.setGeometry(QRect(250, 100, 70, 20))
-        font4 = QFont()
-        font4.setBold(True)
-        font4.setUnderline(True)
-        font4.setStrikeOut(False)
-        font4.setKerning(True)
-        self.status_label.setFont(font4)
+        font5 = QFont()
+        font5.setFamilies([u"Lato"])
+        font5.setBold(True)
+        font5.setUnderline(True)
+        font5.setStrikeOut(False)
+        font5.setKerning(True)
+        self.status_label.setFont(font5)
         self.status_label.setStyleSheet(u"#status_label {\n"
 "	color: red;\n"
 "}")

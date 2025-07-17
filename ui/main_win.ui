@@ -97,10 +97,9 @@
     </property>
     <property name="font">
      <font>
-      <family>URW Bookman</family>
-      <pointsize>30</pointsize>
-      <weight>75</weight>
-      <italic>true</italic>
+      <family>UKIJ Qolyazma Yantu</family>
+      <pointsize>38</pointsize>
+      <italic>false</italic>
       <bold>true</bold>
       <strikeout>false</strikeout>
      </font>
@@ -128,12 +127,22 @@
     </property>
     <property name="font">
      <font>
-      <family>Ubuntu</family>
+      <family>Lato</family>
+      <bold>true</bold>
       <strikeout>false</strikeout>
      </font>
     </property>
     <property name="toolTip">
      <string>Start the ghostsurf</string>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">#start_stop_button {
+	background-color: #F3F4F6;
+}
+
+#start_stop_button:pressed {
+	background-color: #D1D5DB;
+}</string>
     </property>
     <property name="text">
      <string>Start</string>
@@ -148,8 +157,24 @@
       <height>30</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Lato</family>
+      <bold>true</bold>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
     <property name="toolTip">
      <string>Change my ip address</string>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">#change_ip_button {
+	background-color: #F3F4F6;
+}
+
+#change_ip_button:pressed {
+	background-color: #D1D5DB;
+}</string>
     </property>
     <property name="text">
      <string>Change IP</string>
@@ -164,8 +189,27 @@
       <height>30</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Lato</family>
+      <italic>false</italic>
+      <bold>true</bold>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+      <kerning>true</kerning>
+     </font>
+    </property>
     <property name="toolTip">
      <string>Display my ip address</string>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">#my_ip_button {
+	background-color: #F3F4F6;
+}
+
+#my_ip_button:pressed {
+	background-color: #D1D5DB;
+}</string>
     </property>
     <property name="text">
      <string>My IP</string>
@@ -182,7 +226,7 @@
     </property>
     <property name="font">
      <font>
-      <weight>75</weight>
+      <family>Lato</family>
       <bold>true</bold>
       <underline>false</underline>
       <strikeout>false</strikeout>
@@ -212,7 +256,7 @@
     </property>
     <property name="font">
      <font>
-      <weight>75</weight>
+      <family>Lato</family>
       <bold>true</bold>
       <underline>true</underline>
       <strikeout>false</strikeout>
