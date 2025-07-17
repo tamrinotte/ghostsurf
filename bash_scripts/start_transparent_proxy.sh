@@ -75,7 +75,12 @@ set_up_iptables_rules() {
     ## *nat OUTPUT (For local redirection)
     #
     # nat .onion addresses
-    iptables -t nat -A OUTPUT -d $virtual_address -p tcp -m tcp --tcp-flags FIN,SYN,RST,ACK SYN -j REDIRECT --to-ports $trans_port
+    iptables -t nat -A OUTPUT \
+        -d "$virtual_address" \
+        -p tcp -m tcp \
+        --tcp-flags FIN,SYN,RST,ACK SYN \
+        -j REDIRECT \
+        --to-ports "$trans_port"
 
     # nat dns requests to Tor
     iptables -t nat -A OUTPUT -d 127.0.0.1/32 -p udp -m udp --dport 53 -j REDIRECT --to-ports $dns_port
@@ -112,7 +117,12 @@ set_up_iptables_rules() {
     iptables -A OUTPUT -m state --state ESTABLISHED -j ACCEPT
 
     # Allowing Tor process output
-    iptables -A OUTPUT -m owner --uid-owner $tor_uid -p tcp -m tcp --tcp-flags FIN,SYN,RST,ACK SYN -m state --state NEW -j ACCEPT
+    iptables -A OUTPUT \
+        -m owner --uid-owner "$tor_uid" \
+        -p tcp -m tcp \
+        --tcp-flags FIN,SYN,RST,ACK SYN \
+        -m state --state NEW \
+        -j ACCEPT
 
     # Allowing loopback output
     iptables -A OUTPUT -d 127.0.0.1/32 -o lo -j ACCEPT

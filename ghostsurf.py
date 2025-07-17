@@ -10,7 +10,7 @@ from subprocess import run, check_call, CalledProcessError
 from threading import Thread
 from re import compile
 from json import load, dump
-import argparse
+from argparse import ArgumentParser
 
 # PySide6
 from PySide6.QtWidgets import (
@@ -49,6 +49,8 @@ from modules.check_list import (
     check_tor_connection_usage,
 )
 from modules.gui_control_deck import (
+    gui_cd_update_tor_status_label,
+    gui_cd_change_ip,
     gui_cd_show_ip,
     gui_cd_shred_logs,
     gui_cd_reset,
@@ -85,8 +87,6 @@ from modules.logging_config import (
     error,
 )
 from modules.notification_config import display_notification
-
-
 
 ##############################
 
@@ -134,8 +134,6 @@ timezone_backup_file_path = Path("/opt/ghostsurf/backup_files/timezone.backup")
 tick = QImage(str(Path(icons_dir_path, "tick.png")))
 cross = QImage(str(Path(icons_dir_path, "cross.png")))
 
-
-
 ##############################
 
 # THE MAIN FUNCTION
@@ -156,7 +154,7 @@ def main():
             main_window.show()
             sysexit(app.exec())
         else:
-            parser = argparse.ArgumentParser(description='GhostSurf CLI')
+            parser = ArgumentParser(description='GhostSurf CLI')
             subparsers = parser.add_subparsers(dest='command')
             start_parser = subparsers.add_parser('start', help='Start transparent proxy')
             start_parser.set_defaults(
@@ -241,8 +239,6 @@ def main():
             else:
                 parser.print_help()
 
-
-
 ##############################
 
 # WORKERS
@@ -296,8 +292,6 @@ class CheckListWorker(QRunnable):
             self.signals.list_item.emit(key)
             sleep(0.02)
 
-
-
 ##############################
 
 # DATA MODELS
@@ -324,8 +318,6 @@ class ChecklistModel(QAbstractListModel):
     def rowCount(self, index):
         return len(self.list_items)
 
-
-
 ##############################
 
 # CHECK LIST WINDOW
@@ -347,8 +339,6 @@ class ChecklistWindow(QWidget, Ui_ChecklistWindow):
         self.model.list_items.append((checklist_items_dict[key], key))
         self.model.layoutChanged.emit()
 
-
-
 ##############################
 
 # MAIN WINDOW
@@ -359,22 +349,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
-
         ghostsurf_config = load_ghostsurf_config(ghostsurf_settings_file_path=ghostsurf_settings_file_path)
-        tor_status = run(
-            ["systemctl", "status", "tor"],
-            text=True,
-            capture_output=True
-        ).stdout.strip()
-
-        if "inactive" in tor_status:
-            self.status_label.setStyleSheet(u"#status_label {color: red;}")
-            self.status_label.setText('Inactive')
-        else:
-
-            self.status_label.setStyleSheet(u"#status_label {color: green;}")
-            self.status_label.setText('Active')
-
+        gui_cd_update_tor_status_label(label_widget=self.status_label)
         self.start_stop_button.pressed.connect(self.start_stop)
         self.my_ip_button.pressed.connect(self.show_ip)
         self.status_button.pressed.connect(self.show_status)
@@ -396,7 +372,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if user_answer == "&Yes":
                 debug("No button is clicked")
                 try:
-                    check_call(["pkexec", "bash", "-c", f"{init_script_file_path} && {start_transparent_proxy_script_file_path}"])
+                    check_call([
+                        "pkexec",
+                        "bash",
+                        "-c",
+                        f"{init_script_file_path} && {start_transparent_proxy_script_file_path}"
+                    ])
                 except CalledProcessError as e:
                     error(f"Error: {e}")
                     return
@@ -423,7 +404,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             user_answer = i.text()
             if user_answer == "&Yes":
                 try:
-                    check_call(["pkexec", "bash", "-c", f"{init_script_file_path} && {stop_transparent_proxy_script_file_path}"])
+                    check_call([
+                        "pkexec",
+                        "bash",
+                        "-c",
+                        f"{init_script_file_path} && {stop_transparent_proxy_script_file_path}"
+                    ])
                 except CalledProcessError as e:
                     error(f"Error: {e}")
                     return
@@ -467,47 +453,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             question_dialog.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
             question_dialog.buttonClicked.connect(stop_button_question_dialog_processor)
             question_dialog.exec() 
-
-        tor_status = run(
-            ["systemctl", "status", "tor"],
-            text=True,
-            capture_output=True
-        ).stdout.strip()
-
-        if "inactive" in tor_status:
-            self.status_label.setStyleSheet(u"#status_label {color: red;}")
-            self.status_label.setText('Inactive')
-        else:
-            self.status_label.setStyleSheet(u"#status_label {color: green;}")
-            self.status_label.setText('Active')
+        
+        gui_cd_update_tor_status_label(label_widget=self.status_label)
 
     def show_ip(self):
         public_ip_thread = Thread(target=gui_cd_show_ip, args=[ghostsurf_logo_file_path])
         public_ip_thread.start()
 
     def show_status(self):
-        tor_status = run(
-            ["systemctl", "status", "tor"],
-            text=True,
-            capture_output=True
-        ).stdout.strip()
-
-        if "inactive" in tor_status:
-            self.status_label.setStyleSheet(u"#status_label {color: red;}")
-            self.status_label.setText('Inactive')
-        else:
-            self.status_label.setStyleSheet(u"#status_label {color: green;}")
-            self.status_label.setText('Active')
+        gui_cd_update_tor_status_label(label_widget=self.status_label)
 
     def change_ip(self):
-        debug("Change IP button has been clicked!")
-        run(["pkexec", "systemctl", "restart", "tor"], text=True)
+        gui_cd_change_ip(ghostsurf_logo_file_path=ghostsurf_logo_file_path)
 
     def display_the_help_page(self):
         wbopen(help_page_url)
 
     def run_checklist(self):
-        debug("Running a fast check")
         self.checklist_window = ChecklistWindow()
         self.checklist_window.show()
     
@@ -562,8 +524,5 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             reset_script_file_path=reset_script_file_path
         )
 
-
-
 if __name__ == "__main__":
-
     main()

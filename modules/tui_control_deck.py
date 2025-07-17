@@ -28,11 +28,9 @@ from modules.logging_config import (
     error,
 )
 
-
-
 ##############################
 
-# TEXT BASED UI FUNCTIONS
+# START TRANSPARENT PROXY
 
 ##############################
 
@@ -74,6 +72,12 @@ def tui_cd_start_transparent_proxy(
         else:
             print("That's not a valid answer.")
 
+##############################
+
+# STOP TRANSPARENT PROXY
+
+##############################
+
 def tui_cd_stop_transparent_proxy(
     init_script_file_path,
     stop_transparent_proxy_script_file_path,
@@ -112,6 +116,12 @@ def tui_cd_stop_transparent_proxy(
         else:
             print("That's not a valid answer.")
 
+##############################
+
+# CHANGING DEVICES IP ADDRESS
+
+##############################
+
 def tui_cd_change_ip():
     debug("Change command has been entered. Restarting the tor service.")
     try:
@@ -120,6 +130,12 @@ def tui_cd_change_ip():
         error(f"Error: {e}")
         return
     print("Your public IP address has been changed, you can type \"myip\" to see your new IP address.")
+
+##############################
+
+# DISPLAYING THE PUBLIC IP ADDRESS
+
+##############################
 
 def tui_cd_show_ip():
     debug("Myip command has been entered. Trying to display device's public ip address.")
@@ -139,6 +155,12 @@ def tui_cd_show_ip():
     except:
         message = "Couldn't connect to the server!"
     print(message)
+
+##############################
+
+# SHOWING CONNECTION STATUS
+
+##############################
 
 def tui_cd_show_status(ghostsurf_settings_file_path):
     debug("Status command has been entered. Trying to display ghostsurf working status.")
@@ -162,6 +184,12 @@ def tui_cd_show_status(ghostsurf_settings_file_path):
 
     for k,v in status_dict.items():
         print(f'{k} = {v}')
+
+##############################
+
+# CHANGING THE MAC ADDRESS
+
+##############################
 
 def tui_cd_change_mac_address(mac_changer_script_file_path):
     debug("Changemac command has been entered. Trying to change the mac address.")
@@ -198,6 +226,12 @@ def tui_cd_change_mac_address(mac_changer_script_file_path):
         else:
             print("That's not a valid answer.")
 
+##############################
+
+# CHANGING THE NAMESERVERS
+
+##############################
+
 def tui_cd_change_dns(
     nameserver_changer_file_path,
     tor_nameservers_file_path,
@@ -231,6 +265,12 @@ def tui_cd_change_dns(
             return
         print("Nameservers has been changed.")
 
+##############################
+
+# CHANGING THE HOSTNAME
+
+##############################
+
 def tui_cd_change_hostname(hostname_changer_script_file_path):
     debug("changehostname command has been entered. Trying to change the hostname.")
 
@@ -254,9 +294,21 @@ def tui_cd_change_hostname(hostname_changer_script_file_path):
         else:
             print("That's not a valid answer.")
 
+##############################
+
+# DISPLAYING THE HELP PAGE
+
+##############################
+
 def tui_cd_display_the_help_page(url):
     wbopen(url)
     print("Help page has been opened in your default browser.")
+
+##############################
+
+# WIPING MEMORY
+
+##############################
 
 def tui_cd_wipe_memory(fast_bomb_script_file_path, secure_bomb_script_file_path):
     while True:
@@ -280,6 +332,12 @@ def tui_cd_wipe_memory(fast_bomb_script_file_path, secure_bomb_script_file_path)
             break
         else:
             print("That's not a valid answer.")
+
+##############################
+
+# ANONYMIZING THE BROWSER
+
+##############################
 
 def tui_cd_anonymize_browser(
     firefox_profiles_dir,
@@ -353,6 +411,12 @@ def tui_cd_anonymize_browser(
     else:
         print(f"Penetration-Testing Firefox profile already exists.")
 
+##############################
+
+# SHREDING LOGS
+
+##############################
+
 def tui_cd_shred_logs(log_shredder_file_path, current_username):
     try:
         check_call(["pkexec", "bash", "-c", f"{log_shredder_file_path} {current_username}"])
@@ -360,6 +424,12 @@ def tui_cd_shred_logs(log_shredder_file_path, current_username):
         error(f"Error: {e}")
         return
     print("Log files has been shredded!")
+
+##############################
+
+# PERFORM CHECKS
+
+##############################
 
 def tui_cd_checklist(
     fake_hostnames_list_file_path,
@@ -404,6 +474,12 @@ def tui_cd_checklist(
     print("Anonymity Checklist")
     for k, v in checklist_items_dict.items():
         print(f"{k} = {v}")
+
+##############################
+
+# RESETING
+
+##############################
 
 def tui_cd_reset(reset_iptables_only_script_file_path, reset_script_file_path):
     while True:

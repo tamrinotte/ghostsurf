@@ -4,6 +4,12 @@
 from subprocess import run
 from os import system
 
+##############################
+
+# DISPLAY NOTIFICATION
+
+##############################
+
 def display_notification(icon_file_path, message, timeout="150"):
     notification = run(
         ["notify-send", "-i", icon_file_path, "-t", timeout, message],

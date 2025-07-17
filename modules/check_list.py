@@ -17,11 +17,9 @@ from modules.logging_config import (
     error,
 )
 
-
-
 ##############################
 
-# CHECK LIST FUNCTIONS
+# FAKE HOSTNAME
 
 ##############################
 
@@ -34,6 +32,12 @@ def check_fake_hostname_usage(fake_hostnames_list_file_path, checklist_items_dic
         checklist_items_dict['Using fake hostname'] = True
     else:
         checklist_items_dict['Using fake hostname'] = False
+
+##############################
+
+# FAKE MAC ADDRESS
+
+##############################
 
 def check_fake_mac_address_usage(checklist_items_dict):
     list_of_network_interfaces = run(
@@ -68,6 +72,12 @@ def check_fake_mac_address_usage(checklist_items_dict):
                 verification_list.append(False)
                 checklist_items_dict['Using fake mac address'] = False
 
+##############################
+
+# NAMESERVERS
+
+##############################
+
 def check_appropriate_nameserver_usage(
     privacy_focused_nameservers_file_path,
     original_resolv_configuration_file_path,
@@ -97,6 +107,12 @@ def check_appropriate_nameserver_usage(
             checklist_items_dict['Using appropriate nameservers'] = True
         else:
             checklist_items_dict['Using appropriate nameservers'] = False
+
+##############################
+
+# BROWSER ANONYMIZATION
+
+##############################
 
 def check_browser_anonymization(
     current_username,
@@ -140,6 +156,12 @@ def check_browser_anonymization(
     else:
         debug('Couldn\'t find a path')
 
+##############################
+
+# TIME ZONE
+
+##############################
+
 def check_different_timezone_usage(timezone_backup_file_path, checklist_items_dict):
     with open(timezone_backup_file_path, "r") as original_timezone_file:
         otf_content = original_timezone_file.read().strip()
@@ -154,6 +176,12 @@ def check_different_timezone_usage(timezone_backup_file_path, checklist_items_di
         Current Timezone = {current_timezone}
         Is Timezone Different = {is_timezone_different}''')
     checklist_items_dict['Using different timezone'] = is_timezone_different
+
+##############################
+
+# TOR CONNECTION
+
+##############################
 
 def check_tor_connection_usage(checklist_items_dict):
     tor_connection_command = (

@@ -12,8 +12,6 @@ from modules.logging_config import (
     error,
 )
 
-
-
 ##############################
 
 # STANDARD FUNCTIONS

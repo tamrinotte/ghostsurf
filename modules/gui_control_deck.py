@@ -14,16 +14,13 @@ from PySide6.QtWidgets import QMessageBox
 from modules.logging_config import (
     debug,
     info,
-    warning,
     error,
 )
 from modules.notification_config import display_notification
 
-
-
 ##############################
 
-# SUB FUNCTIONS
+# HELPER FUNCTIONS
 
 ##############################
 
@@ -88,12 +85,53 @@ def change_ns(
         error(f"Error: {e}")
         return
 
-    display_notification(icon_file_path=ghostsurf_logo_file_path, message="Nameservers has been changed.")
+    display_notification(icon_file_path=ghostsurf_logo_file_path, message="Nameservers have been changed.")
 
+def get_tor_status():
+    try:
+        output = run(
+            ["systemctl", "status", "tor"],
+            text=True,
+            capture_output=True
+        ).stdout.strip()
+
+        return 'inactive' if 'inactive' in output.lower() else 'active'
+    except Exception as e:
+        return 'unknown'
 
 ##############################
 
-# MAIN FUNCTIONS
+# UPDATING TOR STATUS LABEL
+
+##############################
+
+def gui_cd_update_tor_status_label(label_widget):
+    status_styles = {
+        'inactive': ('#status_label { color: red; }', 'Inactive'),
+        'active':   ('#status_label { color: green; }', 'Active')
+    }
+    status=get_tor_status()
+    style, text = status_styles.get(status, ('#status_label { color: gray; }', 'Unknown'))
+    label_widget.setStyleSheet(style)
+    label_widget.setText(text)
+
+##############################
+
+# CHANGING IP ADDRESS
+
+##############################
+
+def gui_cd_change_ip(ghostsurf_logo_file_path):
+    try:
+        check_call(["pkexec", "/bin/systemctl", "restart", "tor"])
+        info("Tor service has been restarted to change the ip address.")
+    except CalledProcessError as e:
+        error(f"Error: {e}")
+        return
+
+##############################
+
+# SHOWING CURRENT PUBLIC IP ADDRESS
 
 ##############################
 
@@ -115,22 +153,36 @@ def gui_cd_show_ip(ghostsurf_logo_file_path):
             message = f'Your public ip address is {public_ip_address}.'
         else:
             message = "Couldn't connect to the server!"
+        info("IP address has been displayed.")
     except:
         message = "Couldn't connect to the server!"
 
     display_notification(icon_file_path=ghostsurf_logo_file_path, message=message)
 
+##############################
+
+# SHREDING LOG FILES
+
+##############################
+
 def gui_cd_shred_logs(ghostsurf_logo_file_path, log_shredder_file_path, current_username):
-    display_notification(icon_file_path=ghostsurf_logo_file_path, message="Shreading the log files.")
+    display_notification(icon_file_path=ghostsurf_logo_file_path, message="Shreding the log files.")
     sleep(0.3)
 
     try:
         check_call(["pkexec", log_shredder_file_path, current_username])
+        info("Log files have been shredded.")
     except CalledProcessError as e:
         error(f"Error: {e}")
         return
 
-    display_notification(icon_file_path=ghostsurf_logo_file_path, message="Log shredding has been done.")
+    display_notification(icon_file_path=ghostsurf_logo_file_path, message="Log files have been shreded.")
+
+##############################
+
+# RESET
+
+##############################
 
 def gui_cd_reset(ghostsurf_logo_file_path, reset_iptables_only_script_file_path, reset_script_file_path):
     def reset_button_question_dialog_processor(i):
@@ -157,6 +209,7 @@ def gui_cd_reset(ghostsurf_logo_file_path, reset_iptables_only_script_file_path,
 
             try:
                 check_call(["pkexec", reset_script_file_path])
+                info("Changes have been reset.")
             except CalledProcessError as e:
                 error(f"Error: {e}")
                 return
@@ -172,6 +225,12 @@ def gui_cd_reset(ghostsurf_logo_file_path, reset_iptables_only_script_file_path,
     question_dialog.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
     question_dialog.buttonClicked.connect(reset_button_question_dialog_processor)
     question_dialog.exec_()
+
+##############################
+
+# CHANGING THE MAC ADDRESS
+
+##############################
 
 def gui_cd_change_mac_address(ghostsurf_logo_file_path, mac_changer_script_file_path):
     def mac_changer_button_question_dialog_processor(i):
@@ -203,6 +262,12 @@ def gui_cd_change_mac_address(ghostsurf_logo_file_path, mac_changer_script_file_
     question_dialog.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
     question_dialog.buttonClicked.connect(mac_changer_button_question_dialog_processor)
     question_dialog.exec_()
+
+##############################
+
+# WIPING THE MEMORY
+
+##############################
 
 def gui_cd_wipe_memory(ghostsurf_logo_file_path, fast_bomb_script_file_path, secure_bomb_script_file_path):
     def wipe_button_question_dialog_processor(i):
@@ -240,6 +305,12 @@ def gui_cd_wipe_memory(ghostsurf_logo_file_path, fast_bomb_script_file_path, sec
     question_dialog.buttonClicked.connect(wipe_button_question_dialog_processor)
     question_dialog.exec_()
 
+##############################
+
+# CHANGING THE NAMESERVERS
+
+##############################
+
 def gui_cd_change_nameservers(
     ghostsurf_logo_file_path,
     working_status,
@@ -263,6 +334,12 @@ def gui_cd_change_nameservers(
         ]
     )
     thread.start()
+
+##############################
+
+# ANONYMIZING THE BROWSER
+
+##############################
 
 def gui_cd_anonymize_browser(
     init_script_file_path,
@@ -367,6 +444,12 @@ def gui_cd_anonymize_browser(
             icon_file_path=ghostsurf_logo_file_path,
             message="Penetration-Testing Firefox profile already exists."
         )
+
+##############################
+
+# CHANGING THE HOSTNAME
+
+##############################
 
 def gui_cd_change_hostname(hostname_changer_script_file_path):
     question_dialog = QMessageBox()
