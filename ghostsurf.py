@@ -128,7 +128,8 @@ log_shredder_file_path = Path(bash_scripts_dir_path, "log_shredder.sh")
 nameserver_changer_file_path = Path(bash_scripts_dir_path, "nameservers_changer.sh")
 
 # BACKUP FILE PATH
-timezone_backup_file_path = Path("/opt/ghostsurf/backup_files/timezone.backup")
+backup_files_dir = Path(base_dir, "backup_files")
+timezone_backup_file_path = Path(backup_files_dir, "timezone.backup")
 
 # ICONS
 tick = QImage(str(Path(icons_dir_path, "tick.png")))

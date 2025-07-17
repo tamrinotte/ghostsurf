@@ -123,7 +123,7 @@ def gui_cd_update_tor_status_label(label_widget):
 
 def gui_cd_change_ip(ghostsurf_logo_file_path):
     try:
-        check_call(["pkexec", "/bin/systemctl", "restart", "tor"])
+        check_call(["pkexec", "systemctl", "restart", "tor"])
         info("Tor service has been restarted to change the ip address.")
     except CalledProcessError as e:
         error(f"Error: {e}")

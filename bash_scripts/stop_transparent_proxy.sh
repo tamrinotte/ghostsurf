@@ -12,12 +12,16 @@ main() {
 }
 
 declare_variables() {
-    original_timezone=$(cat /opt/ghostsurf/backup_files/timezone.backup)
+    base_dir="/opt/ghostsurf/_internal"
+    backup_dir="$base_dir/backup_files"
+    configuration_dir="$base_dir/configuration_files"
+    timezone_backup_file_path="$backup_dir/timezone.backup"
+    torrc_backup_file_path="$backup_dir/torrc.backup"
+    privacy_focused_nameservers_file_path="$configuration_dir/privacy_focused_nameservers_resolv.conf"
+    original_timezone=$(cat $timezone_backup_file_path)
     pref_path="$(find /home -name prefs.js)"
     torrc_file_path="/etc/tor/torrc"
-    torrc_backup_file_path="/opt/ghostsurf/backup_files/torrc.backup"
     resolvconf_file_path="/etc/resolv.conf"
-    privacy_focused_nameservers_file_path="/opt/ghostsurf/configuration_files/privacy_focused_nameservers_resolv.conf"
     rules_v4_file_path="/etc/iptables/rules.v4"
     rules_v6_file_path="/etc/iptables/rules.v6"
 }

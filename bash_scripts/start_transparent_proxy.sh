@@ -11,6 +11,8 @@ main() {
 }
 
 declare_variables() {
+    base_dir="/opt/ghostsurf/_internal"
+    configuration_dir="$base_dir/configuration_files"
     tor_uid="$(id -u debian-tor)"
     non_tor="127.0.0.0/8 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16"
     trans_port="9040"
@@ -18,8 +20,8 @@ declare_variables() {
     virtual_address="10.192.0.0/10"
     torrc_file_path="/etc/tor/torrc"
     resolvconf_file_path="/etc/resolv.conf"
-    custom_torrc_file="/opt/ghostsurf/configuration_files/torrc.custom"
-    custom_resolv_conf_file="/opt/ghostsurf/configuration_files/tor_nameservers_resolv.conf"
+    custom_torrc_file="$configuration_dir/torrc.custom"
+    custom_resolv_conf_file="$configuration_dir/tor_nameservers_resolv.conf"
 }
 
 set_timezone_change() {
