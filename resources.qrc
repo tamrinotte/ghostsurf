@@ -13,5 +13,6 @@
     </qresource>
     <qresource prefix="/logos">
         <file alias="ghostsurf.png">logos/ghostsurf.png</file>
+        <file alias="ghostsurf_text_logo.png">logos/ghostsurf_text_logo.png</file>
     </qresource>
 </RCC>

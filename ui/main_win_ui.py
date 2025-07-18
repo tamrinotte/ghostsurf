@@ -15,8 +15,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QFrame, QLabel, QMainWindow,
-    QPushButton, QSizePolicy, QWidget)
+from PySide6.QtWidgets import (QApplication, QLabel, QMainWindow, QPushButton,
+    QSizePolicy, QWidget)
 import resources_rc
 
 class Ui_MainWindow(object):
@@ -53,7 +53,7 @@ class Ui_MainWindow(object):
         self.logo_label.setScaledContents(True)
         self.title_label = QLabel(self.centralwidget)
         self.title_label.setObjectName(u"title_label")
-        self.title_label.setGeometry(QRect(99, 9, 221, 71))
+        self.title_label.setGeometry(QRect(100, 0, 230, 100))
         font1 = QFont()
         font1.setFamilies([u"UKIJ Qolyazma Yantu"])
         font1.setPointSize(38)
@@ -64,6 +64,7 @@ class Ui_MainWindow(object):
         self.title_label.setStyleSheet(u"#title_label {\n"
 "	color: #6bfffb;\n"
 "}")
+        self.title_label.setPixmap(QPixmap(u":/logos/ghostsurf_text_logo.png"))
         self.title_label.setAlignment(Qt.AlignCenter)
         self.start_stop_button = QPushButton(self.centralwidget)
         self.start_stop_button.setObjectName(u"start_stop_button")
@@ -75,10 +76,12 @@ class Ui_MainWindow(object):
         self.start_stop_button.setFont(font2)
         self.start_stop_button.setStyleSheet(u"#start_stop_button {\n"
 "	background-color: #F3F4F6;\n"
+"	color: black;\n"
 "}\n"
 "\n"
 "#start_stop_button:pressed {\n"
 "	background-color: #D1D5DB;\n"
+"	color: black;\n"
 "}")
         self.change_ip_button = QPushButton(self.centralwidget)
         self.change_ip_button.setObjectName(u"change_ip_button")
@@ -86,10 +89,12 @@ class Ui_MainWindow(object):
         self.change_ip_button.setFont(font2)
         self.change_ip_button.setStyleSheet(u"#change_ip_button {\n"
 "	background-color: #F3F4F6;\n"
+"	color: black;\n"
 "}\n"
 "\n"
 "#change_ip_button:pressed {\n"
 "	background-color: #D1D5DB;\n"
+"	color: black;\n"
 "}")
         self.my_ip_button = QPushButton(self.centralwidget)
         self.my_ip_button.setObjectName(u"my_ip_button")
@@ -104,10 +109,12 @@ class Ui_MainWindow(object):
         self.my_ip_button.setFont(font3)
         self.my_ip_button.setStyleSheet(u"#my_ip_button {\n"
 "	background-color: #F3F4F6;\n"
+"	color: black;\n"
 "}\n"
 "\n"
 "#my_ip_button:pressed {\n"
 "	background-color: #D1D5DB;\n"
+"	color: black;\n"
 "}")
         self.status_header_label = QLabel(self.centralwidget)
         self.status_header_label.setObjectName(u"status_header_label")
@@ -125,7 +132,7 @@ class Ui_MainWindow(object):
         self.status_header_label.setAlignment(Qt.AlignCenter)
         self.status_label = QLabel(self.centralwidget)
         self.status_label.setObjectName(u"status_label")
-        self.status_label.setGeometry(QRect(250, 100, 70, 20))
+        self.status_label.setGeometry(QRect(250, 100, 60, 20))
         font5 = QFont()
         font5.setFamilies([u"Lato"])
         font5.setBold(True)
@@ -200,11 +207,6 @@ class Ui_MainWindow(object):
         icon7 = QIcon()
         icon7.addFile(u":/icons/dns_changer.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.dns_changer_button.setIcon(icon7)
-        self.horizontal_line = QFrame(self.centralwidget)
-        self.horizontal_line.setObjectName(u"horizontal_line")
-        self.horizontal_line.setGeometry(QRect(100, 70, 220, 20))
-        self.horizontal_line.setFrameShape(QFrame.Shape.HLine)
-        self.horizontal_line.setFrameShadow(QFrame.Shadow.Sunken)
         self.run_fast_check_button = QPushButton(self.centralwidget)
         self.run_fast_check_button.setObjectName(u"run_fast_check_button")
         self.run_fast_check_button.setGeometry(QRect(150, 190, 30, 30))
@@ -245,7 +247,7 @@ class Ui_MainWindow(object):
         MainWindow.setToolTip("")
 #endif // QT_CONFIG(tooltip)
         self.logo_label.setText("")
-        self.title_label.setText(QCoreApplication.translate("MainWindow", u"Ghostsurf", None))
+        self.title_label.setText("")
 #if QT_CONFIG(tooltip)
         self.start_stop_button.setToolTip(QCoreApplication.translate("MainWindow", u"Start the ghostsurf", None))
 #endif // QT_CONFIG(tooltip)
