@@ -1,7 +1,7 @@
 #!/bin/bash
 
-main () {
-    local apps_to_kill=(
+main() {
+    apps_to_kill=(
         tor proxychains dropbox
         chrome chromium firefox firefox-esr firefox-bin iceweasel google-chrome
         skype zoom telegram slack discord signal
@@ -15,8 +15,13 @@ main () {
         steam lutris
         thunderbird geary claws-mail
     )
-    killall -q "${apps_to_kill[@]}"
-    local bleachbit_items=(
+
+    # Safely attempt to kill each app
+    for app in "${apps_to_kill[@]}"; do
+        killall -q "$app" 2>/dev/null || true
+    done
+
+    bleachbit_items=(
         adobe_reader.cache
         bash.history
         chromium.cache chromium.cookies chromium.current_session chromium.history chromium.dom
@@ -41,7 +46,9 @@ main () {
         wget.history
         x11.history
     )
-    bleachbit -c "${bleachbit_items[@]}" &> /dev/null
+
+    # Run bleachbit, ignore failure
+    bleachbit -c "${bleachbit_items[@]}" &>/dev/null || true
 }
 
 main

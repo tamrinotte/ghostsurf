@@ -67,31 +67,12 @@
 	background: #231f1f;
 }</string>
    </property>
-   <widget class="QLabel" name="logo_label">
+   <widget class="QLabel" name="title_label">
     <property name="geometry">
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>100</width>
-      <height>100</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="pixmap">
-     <pixmap resource="../resources.qrc">:/logos/ghostsurf.png</pixmap>
-    </property>
-    <property name="scaledContents">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QLabel" name="title_label">
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>0</y>
-      <width>230</width>
+      <width>330</width>
       <height>100</height>
      </rect>
     </property>
@@ -151,40 +132,6 @@
     </property>
     <property name="text">
      <string>Start</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="change_ip_button">
-    <property name="geometry">
-     <rect>
-      <x>120</x>
-      <y>240</y>
-      <width>90</width>
-      <height>30</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Lato</family>
-      <bold>true</bold>
-      <strikeout>false</strikeout>
-     </font>
-    </property>
-    <property name="toolTip">
-     <string>Change my ip address</string>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">#change_ip_button {
-	background-color: #F3F4F6;
-	color: black;
-}
-
-#change_ip_button:pressed {
-	background-color: #D1D5DB;
-	color: black;
-}</string>
-    </property>
-    <property name="text">
-     <string>Change IP</string>
     </property>
    </widget>
    <widget class="QPushButton" name="my_ip_button">
@@ -532,6 +479,40 @@
     <property name="icon">
      <iconset resource="../resources.qrc">
       <normaloff>:/icons/status.svg</normaloff>:/icons/status.svg</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="change_ip_button">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>240</y>
+      <width>90</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Lato</family>
+      <bold>true</bold>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Restart the tor service</string>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">#change_ip_button {
+	background-color: #F3F4F6;
+	color: black;
+}
+
+#change_ip_button:pressed {
+	background-color: #D1D5DB;
+	color: black;
+}</string>
+    </property>
+    <property name="text">
+     <string>Change IP</string>
     </property>
    </widget>
   </widget>

@@ -1,15 +1,34 @@
-# This Python file uses the following encoding: utf-8
+# -*- coding: utf-8 -*-
 
 # MODULES AND/OR LIBRARIES
-from re import compile
-from time import sleep
-from pathlib import Path
 from webbrowser import open as wbopen
-from subprocess import run, check_call, CalledProcessError
-from getpass import getpass
 
 # Ghostsurf Modules
-from modules.check_list import (
+from modules.conf_ghostsurf import (
+    load_ghostsurf_config,
+)
+from modules.conf_notification import display_notification
+from modules.conf_dialog import ask_confirmation
+from modules.ops_network import (
+    get_public_ip_address,
+    change_public_ip_address,
+    change_mac_address,
+    change_nameservers,
+    get_tor_status,
+    get_proxy_status,
+)
+from modules.ops_system import (
+    wipe_memory,
+    shred_log_files,
+    change_hostname,
+    anonymize_browser,
+)
+from modules.ops_main import (
+    reset_changes,
+    start_proxy,
+    stop_proxy,
+)
+from modules.ops_checklist import (
     check_fake_hostname_usage, 
     check_fake_mac_address_usage, 
     check_appropriate_nameserver_usage, 
@@ -17,16 +36,14 @@ from modules.check_list import (
     check_different_timezone_usage,
     check_tor_connection_usage,
 )
-from modules.json_config_loading import (
-    load_ghostsurf_config,
-    save_ghostsurf_config,
-)
-from modules.logging_config import (
-    debug,
-    info,
-    warning,
-    error,
-)
+
+##############################
+
+# GLOBAL VARIABLES
+
+##############################
+
+is_using_gui = False
 
 ##############################
 
@@ -39,38 +56,16 @@ def tui_cd_start_transparent_proxy(
     start_transparent_proxy_script_file_path,
     ghostsurf_settings_file_path
 ):
-    debug("Start command has been entered. Starting transparent proxy.")
-
-    while True:
-        question = str(
-            input("Are you allowing to killing of dangerous applications and cleaning of dangerous caches? (y/n) ")
-        ).strip().lower()
-
-        if question == "y" or question == "yes":
-            script = f"bash {init_script_file_path} && bash {start_transparent_proxy_script_file_path}"
-            try:
-                check_call(["pkexec", "bash", "-c", script])
-            except CalledProcessError as e:
-                error(f"Error: {e}")
-                break
-            config = load_ghostsurf_config(ghostsurf_settings_file_path=ghostsurf_settings_file_path)
-            config["is_ghostsurf_on"] = "True"
-            save_ghostsurf_config(ghostsurf_settings_file_path=ghostsurf_settings_file_path, config=config)
-            print("Ghostsurf has been turned on.")
-            break
-        elif question == "n" or question == "no":
-            try:
-                check_call(["pkexec", start_transparent_proxy_script_file_path])
-            except CalledProcessError as e:
-                error(f"Error: {e}")
-                break
-            config = load_ghostsurf_config(ghostsurf_settings_file_path=ghostsurf_settings_file_path)
-            config["is_ghostsurf_on"] = "True"
-            save_ghostsurf_config(ghostsurf_settings_file_path=ghostsurf_settings_file_path, config=config)
-            print("Ghostsurf has been turned on.")
-            break
-        else:
-            print("That's not a valid answer.")
+    allow_cleanup = ask_confirmation(
+        "Do you allow the termination of dangerous applications and cleaning of dangerous caches? (y/n): "
+    )
+    start_proxy(
+        init_script_file_path=init_script_file_path,
+        start_transparent_proxy_script_file_path=start_transparent_proxy_script_file_path,
+        is_positive=allow_cleanup,
+        ghostsurf_settings_file_path=ghostsurf_settings_file_path,
+        is_using_gui=is_using_gui,
+    )
 
 ##############################
 
@@ -83,38 +78,16 @@ def tui_cd_stop_transparent_proxy(
     stop_transparent_proxy_script_file_path,
     ghostsurf_settings_file_path
 ):
-    debug("Stop command has been entered. Stopping transparent proxy.")
-
-    while True:
-        question = str(
-            input("Are you allowing to killing of dangerous applications and cleaning of dangerous caches? (y/n) ")
-        ).strip().lower()
-
-        if question == "y" or question == "yes":
-            script = f"bash {init_script_file_path} && bash {stop_transparent_proxy_script_file_path}"
-            try:
-                check_call(["pkexec", "bash", "-c", script])
-            except CalledProcessError as e:
-                error(f"Error: {e}")
-                break
-            config = load_ghostsurf_config(ghostsurf_settings_file_path=ghostsurf_settings_file_path)
-            config["is_ghostsurf_on"] = "False"
-            save_ghostsurf_config(ghostsurf_settings_file_path=ghostsurf_settings_file_path, config=config)
-            print("Ghostsurf has been turned off.")
-            break
-        elif question == "n" or question == "no":
-            try:
-                check_call(["pkexec", stop_transparent_proxy_script_file_path])
-            except CalledProcessError as e:
-                error(f"Error: {e}")
-                break
-            config = load_ghostsurf_config(ghostsurf_settings_file_path=ghostsurf_settings_file_path)
-            config["is_ghostsurf_on"] = "False"
-            save_ghostsurf_config(ghostsurf_settings_file_path=ghostsurf_settings_file_path, config=config)
-            print("Ghostsurf has been turned off.")
-            break
-        else:
-            print("That's not a valid answer.")
+    allow_cleanup = ask_confirmation(
+        "Do you allow the termination of dangerous applications and cleaning of dangerous caches? (y/n): "
+    )
+    stop_proxy(
+        init_script_file_path=init_script_file_path,
+        stop_transparent_proxy_script_file_path=stop_transparent_proxy_script_file_path,
+        is_positive=allow_cleanup,
+        ghostsurf_settings_file_path=ghostsurf_settings_file_path,
+        is_using_gui=is_using_gui,
+    )
 
 ##############################
 
@@ -123,13 +96,7 @@ def tui_cd_stop_transparent_proxy(
 ##############################
 
 def tui_cd_change_ip():
-    debug("Change command has been entered. Restarting the tor service.")
-    try:
-        check_call(["pkexec", "systemctl", "restart", "tor"])
-    except CalledProcessError as e:
-        error(f"Error: {e}")
-        return
-    print("Your public IP address has been changed, you can type \"myip\" to see your new IP address.")
+    change_public_ip_address(is_using_gui=is_using_gui)
 
 ##############################
 
@@ -138,23 +105,7 @@ def tui_cd_change_ip():
 ##############################
 
 def tui_cd_show_ip():
-    debug("Myip command has been entered. Trying to display device's public ip address.")
-    try:
-        public_ip_address = run(
-            ["curl", "--connect-timeout", "7.5", "https://ifconfig.io"],
-            capture_output=True,
-            text=True
-        ).stdout.strip()
-        ip_addr_regex = compile(r'\d{1,3}\.\d{1,3}\.\d{1,3}.\d{1,3}')
-        result = ip_addr_regex.search(public_ip_address).group()
-
-        if result == public_ip_address:
-            message = f'Your public ip address is {public_ip_address}.'
-        else:
-            message = "Couldn't connect to the server!"
-    except:
-        message = "Couldn't connect to the server!"
-    print(message)
+    get_public_ip_address(is_using_gui=is_using_gui)
 
 ##############################
 
@@ -163,27 +114,13 @@ def tui_cd_show_ip():
 ##############################
 
 def tui_cd_show_status(ghostsurf_settings_file_path):
-    debug("Status command has been entered. Trying to display ghostsurf working status.")
-    status_dict = {
-        "Is Ghostsurf ON": False,
-        "Is Tor Service Active": False,
-    }
-    tor_service_status = run(["systemctl", "status", "tor"], capture_output=True, text=True).stdout.strip()
-
-    if "inactive" in tor_service_status:
-        status_dict["Is Tor Service Active"] = True
-    else:
-        status_dict["Is Tor Service Active"] = False
-
-    config = load_ghostsurf_config(ghostsurf_settings_file_path=ghostsurf_settings_file_path)
-
-    if config["is_ghostsurf_on"] == "True":
-        status_dict["Is Ghostsurf ON"] = True
-    else:
-        status_dict["Is Ghostsurf ON"] = False
-
-    for k,v in status_dict.items():
-        print(f'{k} = {v}')
+    get_tor_status(
+        is_using_gui=is_using_gui
+    )
+    get_proxy_status(
+        ghostsurf_settings_file_path=ghostsurf_settings_file_path,
+        is_using_gui=is_using_gui
+    )
 
 ##############################
 
@@ -192,39 +129,14 @@ def tui_cd_show_status(ghostsurf_settings_file_path):
 ##############################
 
 def tui_cd_change_mac_address(mac_changer_script_file_path):
-    debug("Changemac command has been entered. Trying to change the mac address.")
-
-    while True:
-        question = str(input("Do you want to connect back to the internet? (y/n) ")).strip().lower()
-
-        if question == "y" or question == "yes":
-            debug("Trying to change the mac address and trying to connect back to the internet.")
-            internet_adaptor_name = run(
-                ["ip route show default | awk '/default/ {print $5}'"],
-                shell=True,
-                capture_output=True,
-                text=True
-            ).stdout.strip()
-
-            command_string = f"{mac_changer_script_file_path} && sleep 4 && nmcli d connect {internet_adaptor_name}"
-            try:
-                check_call(["pkexec", "bash", "-c", command_string])
-            except CalledProcessError as e:
-                error(f"Error: {e}")
-                break
-            print("MAC address has been changed.")
-            break
-        elif question == "n" or question == "no":
-            debug("Trying to change the mac address.")
-            try:
-                check_call(["pkexec", mac_changer_script_file_path])
-            except CalledProcessError as e:
-                error(f"Error: {e}")
-                break
-            print("MAC address has been changed.")
-            break
-        else:
-            print("That's not a valid answer.")
+    allow_connecting_back_to_wifi = ask_confirmation(
+        "Do you want to connect back to the internet? (y/n): "
+    )
+    change_mac_address(
+        mac_changer_script_file_path=mac_changer_script_file_path,
+        is_positive=allow_connecting_back_to_wifi,
+        is_using_gui=is_using_gui
+    )
 
 ##############################
 
@@ -239,31 +151,19 @@ def tui_cd_change_dns(
     privacy_focused_nameservers_file_path,
     ghostsurf_settings_file_path
 ):
-    debug("Changedns command has been entered. Trying to change the DNS.")
     config = load_ghostsurf_config(ghostsurf_settings_file_path=ghostsurf_settings_file_path)
-
     if config["is_ghostsurf_on"] == "True":
-        command_string = (
-            f"bash {nameserver_changer_file_path} {tor_nameservers_file_path} && "
-            f"cp {tor_nameservers_file_path} {original_resolv_configuration_file_path}"
-        )
-        try:
-            check_call(["pkexec", "bash", "-c", command_string])
-        except CalledProcessError as e:
-            error(f"Error: {e}")
-            return
-        print("Nameservers has been changed.")
+        is_working = True
     else:
-        command_string = (
-            f"bash {nameserver_changer_file_path} {privacy_focused_nameservers_file_path} && "
-            f"cp {privacy_focused_nameservers_file_path} {original_resolv_configuration_file_path}"
-        )
-        try:
-            check_call(["pkexec", "bash", "-c", command_string])
-        except CalledProcessError as e:
-            error(f"Error: {e}")
-            return
-        print("Nameservers has been changed.")
+        is_working = False
+    change_nameservers(
+        is_working=is_working,
+        nameserver_changer_file_path=nameserver_changer_file_path,
+        tor_nameservers_file_path=tor_nameservers_file_path,
+        original_resolv_configuration_file_path=original_resolv_configuration_file_path,
+        privacy_focused_nameservers_file_path=privacy_focused_nameservers_file_path,
+        is_using_gui=is_using_gui,
+    )
 
 ##############################
 
@@ -272,27 +172,20 @@ def tui_cd_change_dns(
 ##############################
 
 def tui_cd_change_hostname(hostname_changer_script_file_path):
-    debug("changehostname command has been entered. Trying to change the hostname.")
-
-    while True:
-        question = str(
-            input("This operation requires system reboot. Are you allowing to a system reboot? (y/n) ")
-        ).strip().lower()
-
-        if (question == "y" or question == "yes"):
-            debug("Rebooting the system")
-            command_string = f"bash {hostname_changer_script_file_path} && reboot"
-            try:
-                check_call(["pkexec", "bash", "-c", command_string])
-            except CalledProcessError as e:
-                error(f"Error: {e}")
-                break
-            break
-        elif (question == "n" or question == "no"):
-            print("Canceling the operation.")
-            break
-        else:
-            print("That's not a valid answer.")
+    allow_reboot = ask_confirmation(
+        "This operation requires reboot. Do you allow to reboot this system? (y/n): "
+    )
+    if allow_reboot:
+        change_hostname(
+            hostname_changer_script_file_path=hostname_changer_script_file_path,
+            is_using_gui=is_using_gui,
+        )
+    else:
+        message = "Operationg cancelled."
+        display_notification(
+            is_using_gui=is_using_gui,
+            message=message,
+        )
 
 ##############################
 
@@ -311,27 +204,33 @@ def tui_cd_display_the_help_page(url):
 ##############################
 
 def tui_cd_wipe_memory(fast_bomb_script_file_path, secure_bomb_script_file_path):
-    while True:
-        question = str(input("Do you want fast and less secure operation? (y/n)")).lower().strip()
+    allow_less_secure_memory_wipe = ask_confirmation(
+        "Do you want fast and less secure operation? (y/n): "
+    )
 
-        if question == "y" or question == "yes":
-            try:
-                check_call(["pkexec", fast_bomb_script_file_path])
-            except CalledProcessError as e:
-                error(f"Error: {e}")
-                break
-            print("Memory has been wiped.")
-            break
-        elif question == "n" or question == "no":
-            try:
-                check_call(["pkexec", secure_bomb_script_file_path])
-            except CalledProcessError as e:
-                error(f"Error: {e}")
-                break
-            print("Memory has been wiped.")
-            break
-        else:
-            print("That's not a valid answer.")
+    if allow_less_secure_memory_wipe:
+        wipe_memory_less_securely(
+            fast_bomb_script_file_path=fast_bomb_script_file_path,
+            is_using_gui=is_using_gui,
+        )
+    else:
+        wipe_memory_high_securely(
+            secure_bomb_script_file_path=secure_bomb_script_file_path,
+            is_using_gui=is_using_gui,
+        )
+
+##############################
+
+# SHREDING LOGS
+
+##############################
+
+def tui_cd_shred_logs(log_shredder_file_path, current_username):
+    shred_log_files(
+        log_shredder_file_path=log_shredder_file_path,
+        current_username=current_username,
+        is_using_gui=is_using_gui,
+    )
 
 ##############################
 
@@ -345,85 +244,29 @@ def tui_cd_anonymize_browser(
     init_script_file_path,
     firefox_profiles_conf_file_path
 ):
-    ghostsurf_profile_pattern = compile(r".*ghostsurf$")
-    penetration_testing_pattern = compile(r".*penetration-testing$")
-
-    is_ghostsurf_profile_exists = False
-    is_penetration_testing_profile_exists = False
-
-    for profile_path in firefox_profiles_dir.iterdir():
-        if profile_path.is_dir() and ghostsurf_profile_pattern.match(profile_path.name):
-            debug(f"Found ghostsurf profile: {profile_path}")
-            is_ghostsurf_profile_exists = True
-                    
-    for profile_path in firefox_profiles_dir.iterdir():
-        if profile_path.is_dir() and penetration_testing_pattern.match(profile_path.name):
-            debug(f"Found penetration-testing profile: {profile_path}")
-            is_penetration_testing_profile_exists = True
-
-    if is_ghostsurf_profile_exists == False:
-        run(["firefox-esr", "-CreateProfile", "ghostsurf"], text=True)
-
-        if Path(custom_firefox_preferences_file_path).exists() == True:
-            with open(custom_firefox_preferences_file_path, "r") as the_custom_prefs_file:
-                custom_prefs = the_custom_prefs_file.read()
-        else:
-            print("Custom preferences file not found. Try to reinstall ghostsurf!")
-
-        ghostsurf_firefox_profile_file_path = str(next(Path(firefox_profiles_dir).glob("*.ghostsurf/user.js")))
-
-        with open(ghostsurf_firefox_profile_file_path, "w") as ghostsurf_firefox_profile_user_pref_file:
-            ghostsurf_firefox_profile_user_pref_file.write(custom_prefs)
-
-        try:
-            check_call(["pkexec", init_script_file_path])
-        except CalledProcessError as e:
-            error(f"Error: {e}")
-            return
-
-        with open(firefox_profiles_conf_file_path, "r") as firefox_prof_conf_file:
-            firefox_prof_conf_lines = firefox_prof_conf_file.readlines()
-
-        for line in firefox_prof_conf_lines:
-            if "Path" in line:
-                path = line.split("=")[1][:-1]
-                if "ghostsurf" in path:
-                    ghostsurf_profile_path_spec = path
-                elif "default" in path:
-                    default_profile_path_spec = path
-            elif "Default" in line and "." in line:
-                path = line.split("=")[1][:-1]
-                default_profile_setting_raw = line
-
-        new_default = f"Default={ghostsurf_profile_path_spec}\n"
-        firefox_prof_conf_lines[firefox_prof_conf_lines.index(default_profile_setting_raw)] = new_default
-
-        with open(firefox_profiles_conf_file_path, "w") as f:
-            f.write("".join(firefox_prof_conf_lines))
-
-        print("Ghostsurf Firefox profile has been created. And, preferences has been set.")
-    else:
-        print(f"Ghostsurf Firefox profile already exists.")
-
-    if is_penetration_testing_profile_exists == False:
-        run(["firefox-esr", "-CreateProfile", "penetration-testing"], text=True)
-        print("Penetration-Testing Firefox profile has been created.")
-    else:
-        print(f"Penetration-Testing Firefox profile already exists.")
+    anonymize_browser(
+        init_script_file_path=init_script_file_path,
+        firefox_profiles_dir=firefox_profiles_dir,
+        custom_firefox_preferences_file_path=custom_firefox_preferences_file_path,
+        firefox_profiles_conf_file_path=firefox_profiles_conf_file_path,
+        is_using_gui=is_using_gui,
+    )
 
 ##############################
 
-# SHREDING LOGS
+# RESETING
 
 ##############################
 
-def tui_cd_shred_logs(log_shredder_file_path, current_username):
-    try:
-        check_call(["pkexec", "bash", "-c", f"{log_shredder_file_path} {current_username}"])
-    except CalledProcessError as e:
-        error(f"Error: {e}")
-        return
-    print("Log files has been shredded!")
+def tui_cd_reset(reset_script_file_path):
+    allow_resetting_iptables_rules_only = ask_confirmation(
+        "Are you sure you want to revert all changes and restore the defaults? (y/n): "
+    )
+    if allow_resetting_iptables_rules_only:
+        reset_changes(
+            reset_script_file_path=reset_script_file_path,
+            is_using_gui=is_using_gui,
+        )
 
 ##############################
 
@@ -474,32 +317,3 @@ def tui_cd_checklist(
     print("Anonymity Checklist")
     for k, v in checklist_items_dict.items():
         print(f"{k} = {v}")
-
-##############################
-
-# RESETING
-
-##############################
-
-def tui_cd_reset(reset_iptables_only_script_file_path, reset_script_file_path):
-    while True:
-        question = str(input("Do you want to reset iptables rules only? (y/n) ")).lower().strip()
-
-        if question == "y" or question == "yes":
-            try:
-                check_call(["pkexec", reset_iptables_only_script_file_path])
-            except CalledProcessError as e:
-                error(f"Error: {e}")
-                break
-            print("Iptables rules has been resetted.")
-            break
-        elif question =="n" or question == "no":
-            try:
-                check_call(["pkexec", reset_script_file_path])
-            except CalledProcessError as e:
-                error(f"Error: {e}")
-                break
-            print("Ghostsurf changes has been reset.")
-            break
-        else:
-            print("That's not a valid answer.")

@@ -1,4 +1,4 @@
-# This Python file uses the following encoding: utf-8
+# -*- coding: utf-8 -*-
 
 # MODULES AND LIBRARIES
 from logging import (
@@ -15,6 +15,5 @@ from logging import (
 
 # Doing the basic configuration for the debugging feature
 basicConfig(level=DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
-
 # Disabling the debugging feature. Hint: Comment out this line to enable debugging.
 disable(CRITICAL)

@@ -8,11 +8,19 @@ main() {
     package_the_tool
     create_installer
     start_the_installer
+    print_info_message "Installation complete."
+}
+
+print_info_message() {
+    echo -e "\e[1;34m[INFO]\e[0m $1"
 }
 
 declare_variables() {
     app_name="ghostsurf"
+    version="0.1.1"
     username=$USER
+    installer="${app_name}.deb"
+    build_dirs=("dist" "build" "package")
     package_base_dir="package"
     package_opt_dir="$package_base_dir/opt"
     package_bash_scripts_dir="$package_opt_dir/$app_name/_internal/bash_scripts"
@@ -22,14 +30,15 @@ declare_variables() {
     package_launcher_file_path="$package_usr_bin_dir/$app_name"
     package_desktop_file_dir="$package_usr_share_applications_dir/main"
     package_desktop_file_path="$package_desktop_file_dir/$app_name.desktop"
-    build_dirs=("dist" "build" "package")
 }
 
 purge_the_app() {
-    echo "Purging ghostsurf..."
-    sudo apt purge --autoremove $app_name -y
-    echo "Deleting what is left..."
-    sudo rm -rf $package_base_dir
+    print_info_message "Purging existing installation of ${app_name} (if installed)..."
+    if dpkg -l | grep -q "^ii  ${app_name} "; then
+        sudo apt purge --autoremove -y "${app_name}"
+    else
+        print_info_message "No existing installation found."
+    fi
 }
 
 delete_the_old_files() {
@@ -37,26 +46,25 @@ delete_the_old_files() {
     do
         if [[ -d "$dir" ]]
         then
-            info "Removing existing directory: $dir"
+            print_info_message "Removing existing directory: $dir"
             sudo rm -rf "$dir"
         fi
     done
    
-    echo "Deleting the installer..."
     if [[ -f ghostsurf.deb ]]; then
-        sudo rm $app_name.deb
+        print_info_message "Removing existing installer: $installer"
+        sudo rm -f "$installer"
     fi
 }
 
 create_a_new_executable_file() {
-    # Create the executable file
-    echo 'Creating the executable file...'
+    print_info_message 'Creating the executable file...'
     pyinstaller $app_name.spec
 }
 
 package_the_tool() {
     # Create a directory hierarchy to package your application
-    echo 'Creating the directory hierarchy...'
+    print_info_message 'Creating the directory hierarchy...'
     mkdir -p $package_bash_scripts_dir
     mkdir -p $package_usr_bin_dir
     mkdir -p $package_usr_share_applications_dir
@@ -64,29 +72,29 @@ package_the_tool() {
     mkdir -p $package_desktop_file_dir
 
     # Copy required files and folders into the package
-    echo "Copying the executable application into $package_opt_dir"
+    print_info_message "Copying the executable application into $package_opt_dir"
     sudo cp -r dist/ghostsurf $package_opt_dir
-    echo "Copying the desktop file into $package_usr_share_applications_dir"
+    print_info_message "Copying the desktop file into $package_usr_share_applications_dir"
     sudo cp ghostsurf.desktop "$package_desktop_file_path"
-    echo "Copying the logo into $package_usr_share_icons_hicolor_scalable_apps_dir"
+    print_info_message "Copying the logo into $package_usr_share_icons_hicolor_scalable_apps_dir"
     sudo cp logos/ghostsurf_rounded.png "$package_usr_share_icons_hicolor_scalable_apps_dir"
-    echo "Copying the launcher file into $package_usr_bin_dir"
+    print_info_message "Copying the launcher file into $package_usr_bin_dir"
     sudo cp launcher.sh "$package_launcher_file_path"
 
     # Set the permissions and file ownerships
-    echo 'Setting the file permissions and ownerships'
+    print_info_message 'Setting the file permissions and ownerships'
     sudo chmod 755 -R $package_base_dir
     sudo chown $username:$username -R $package_base_dir
     sudo chown root:root -R $package_bash_scripts_dir
 }
 
 create_installer() {
-    # Create the installer
-    echo 'Creating the installer...'
-    fpm -C package -s dir -t deb -n "$app_name" -v 0.1.0 -p $app_name.deb --after-install post_install_script.sh
+    print_info_message 'Creating the installer...'
+    fpm -C package -s dir -t deb -n "$app_name" -v $version -p $app_name.deb --after-install post_install_script.sh
 }
 
 start_the_installer() {
+    print_info_message "Installing the new ${app_name} app."
     sudo dpkg -i $app_name.deb
 }
 

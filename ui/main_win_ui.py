@@ -46,14 +46,9 @@ class Ui_MainWindow(object):
         self.centralwidget.setStyleSheet(u"#centralwidget {\n"
 "	background: #231f1f;\n"
 "}")
-        self.logo_label = QLabel(self.centralwidget)
-        self.logo_label.setObjectName(u"logo_label")
-        self.logo_label.setGeometry(QRect(0, 0, 100, 100))
-        self.logo_label.setPixmap(QPixmap(u":/logos/ghostsurf.png"))
-        self.logo_label.setScaledContents(True)
         self.title_label = QLabel(self.centralwidget)
         self.title_label.setObjectName(u"title_label")
-        self.title_label.setGeometry(QRect(100, 0, 230, 100))
+        self.title_label.setGeometry(QRect(0, 0, 330, 100))
         font1 = QFont()
         font1.setFamilies([u"UKIJ Qolyazma Yantu"])
         font1.setPointSize(38)
@@ -80,19 +75,6 @@ class Ui_MainWindow(object):
 "}\n"
 "\n"
 "#start_stop_button:pressed {\n"
-"	background-color: #D1D5DB;\n"
-"	color: black;\n"
-"}")
-        self.change_ip_button = QPushButton(self.centralwidget)
-        self.change_ip_button.setObjectName(u"change_ip_button")
-        self.change_ip_button.setGeometry(QRect(120, 240, 90, 30))
-        self.change_ip_button.setFont(font2)
-        self.change_ip_button.setStyleSheet(u"#change_ip_button {\n"
-"	background-color: #F3F4F6;\n"
-"	color: black;\n"
-"}\n"
-"\n"
-"#change_ip_button:pressed {\n"
 "	background-color: #D1D5DB;\n"
 "	color: black;\n"
 "}")
@@ -234,6 +216,19 @@ class Ui_MainWindow(object):
         icon10 = QIcon()
         icon10.addFile(u":/icons/status.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.status_button.setIcon(icon10)
+        self.change_ip_button = QPushButton(self.centralwidget)
+        self.change_ip_button.setObjectName(u"change_ip_button")
+        self.change_ip_button.setGeometry(QRect(120, 240, 90, 30))
+        self.change_ip_button.setFont(font2)
+        self.change_ip_button.setStyleSheet(u"#change_ip_button {\n"
+"	background-color: #F3F4F6;\n"
+"	color: black;\n"
+"}\n"
+"\n"
+"#change_ip_button:pressed {\n"
+"	background-color: #D1D5DB;\n"
+"	color: black;\n"
+"}")
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
@@ -246,16 +241,11 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(tooltip)
         MainWindow.setToolTip("")
 #endif // QT_CONFIG(tooltip)
-        self.logo_label.setText("")
         self.title_label.setText("")
 #if QT_CONFIG(tooltip)
         self.start_stop_button.setToolTip(QCoreApplication.translate("MainWindow", u"Start the ghostsurf", None))
 #endif // QT_CONFIG(tooltip)
         self.start_stop_button.setText(QCoreApplication.translate("MainWindow", u"Start", None))
-#if QT_CONFIG(tooltip)
-        self.change_ip_button.setToolTip(QCoreApplication.translate("MainWindow", u"Change my ip address", None))
-#endif // QT_CONFIG(tooltip)
-        self.change_ip_button.setText(QCoreApplication.translate("MainWindow", u"Change IP", None))
 #if QT_CONFIG(tooltip)
         self.my_ip_button.setToolTip(QCoreApplication.translate("MainWindow", u"Display my ip address", None))
 #endif // QT_CONFIG(tooltip)
@@ -302,5 +292,9 @@ class Ui_MainWindow(object):
         self.status_button.setToolTip(QCoreApplication.translate("MainWindow", u"Update tor status", None))
 #endif // QT_CONFIG(tooltip)
         self.status_button.setText("")
+#if QT_CONFIG(tooltip)
+        self.change_ip_button.setToolTip(QCoreApplication.translate("MainWindow", u"Restart the tor service", None))
+#endif // QT_CONFIG(tooltip)
+        self.change_ip_button.setText(QCoreApplication.translate("MainWindow", u"Change IP", None))
     # retranslateUi
 

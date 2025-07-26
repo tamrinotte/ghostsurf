@@ -1,119 +1,140 @@
-# This Python file uses the following encoding: utf-8
+# -*- coding: utf-8 -*-
 
 # MODULES AND/OR LIBRARIES
-from time import sleep
-from subprocess import run, check_call, CalledProcessError
-from re import compile
 from threading import Thread
-from pathlib import Path
-
-# PySide6
-from PySide6.QtWidgets import QMessageBox
 
 # Ghostsurf Modules
-from modules.logging_config import (
+from modules.conf_logging import (
     debug,
     info,
     error,
 )
-from modules.notification_config import display_notification
+from modules.conf_notification import display_notification
+from modules.conf_dialog import show_question_dialog
+from modules.conf_ghostsurf import load_ghostsurf_config
+from modules.ops_network import (
+    get_public_ip_address,
+    change_public_ip_address,
+    change_mac_address,
+    change_nameservers,
+    update_tor_status_label,
+)
+from modules.ops_system import (
+    wipe_memory,
+    shred_log_files,
+    change_hostname,
+    anonymize_browser,
+)
+from modules.ops_main import (
+    reset_changes,
+    start_proxy,
+    stop_proxy,
+    update_start_stop_button_text,
+)
 
 ##############################
 
-# HELPER FUNCTIONS
+# GLOBAL VARIABLES
 
 ##############################
 
-def less_secure_memory_wipe(
-    ghostsurf_logo_file_path,
-    fast_bomb_script_file_path
+is_using_gui = True
+
+##############################
+
+# START/STOP TRANSPARENT PROXY
+
+##############################
+
+def gui_cd_start_stop_transparent_proxy(
+    init_script_file_path,
+    start_transparent_proxy_script_file_path,
+    stop_transparent_proxy_script_file_path,
+    button_label_widget,
+    status_label_widget,
+    ghostsurf_settings_file_path,
+    ghostsurf_logo_file_path
 ):
-    try:
-        check_call(["pkexec", fast_bomb_script_file_path])
-    except CalledProcessError as e:
-        error(f"Error: {e}")
-        return
+    config = load_ghostsurf_config(ghostsurf_settings_file_path)
+    is_ghostsurf_on = config["is_ghostsurf_on"] == "True"
 
-    display_notification(icon_file_path=ghostsurf_logo_file_path, message="Caches are dropped and memory is wiped.")
+    def start_stop_button_question_dialog_processor(i):
+        user_answer = i.text()
 
-def high_secure_memory_wipe(ghostsurf_logo_file_path, secure_bomb_script_file_path):
-    try:
-        check_call(["pkexec", secure_bomb_script_file_path])
-    except CalledProcessError as e:
-        error(f"Error: {e}")
-        return
+        if user_answer == "&Yes":
+            is_positive = True
+        elif user_answer == "&No":
+            is_positive = False
+        else:
+            error("Operation cancelled.")
+            return
 
-    display_notification(icon_file_path=ghostsurf_logo_file_path, message="Caches are dropped and memory is wiped.")
+        def proxy_runner():
+            if is_ghostsurf_on:
+                stop_proxy(
+                    init_script_file_path=init_script_file_path,
+                    stop_transparent_proxy_script_file_path=stop_transparent_proxy_script_file_path,
+                    is_positive=is_positive,
+                    button_label_widget=button_label_widget,
+                    ghostsurf_settings_file_path=ghostsurf_settings_file_path,
+                    is_using_gui=is_using_gui,
+                    ghostsurf_logo_file_path=ghostsurf_logo_file_path,
+                )
+            else:
+                start_proxy(
+                    init_script_file_path=init_script_file_path,
+                    start_transparent_proxy_script_file_path=start_transparent_proxy_script_file_path,
+                    is_positive=is_positive,
+                    button_label_widget=button_label_widget,
+                    ghostsurf_settings_file_path=ghostsurf_settings_file_path,
+                    is_using_gui=is_using_gui,
+                    ghostsurf_logo_file_path=ghostsurf_logo_file_path,
+                )
+            update_tor_status_label(
+                label_widget=status_label_widget,
+                is_using_gui=is_using_gui,
+                ghostsurf_logo_file_path=ghostsurf_logo_file_path,
+            )
 
-def change_the_mac_address_and_connect_back_to_wifi(ghostsurf_logo_file_path, mac_changer_script_file_path):
-    internet_adaptor_name = run(
-        ["ip route show default | awk '/default/ {print $5}'"],
-        shell=True,
-        capture_output=True, text=True
-    ).stdout.strip()
-    command_string = f"{mac_changer_script_file_path} && sleep 4 && nmcli d connect {internet_adaptor_name}"
-    try:
-        check_call(["pkexec", "bash", "-c", command_string])
-    except CalledProcessError as e:
-        error(f"Error: {e}")
-        return
-
-    display_notification(icon_file_path=ghostsurf_logo_file_path, message="Mac address has been changed.")
-
-def change_ns(
-    ghostsurf_logo_file_path,
-    working_status,
-    nameserver_changer_file_path,
-    tor_nameservers_file_path,
-    original_resolv_configuration_file_path,
-    privacy_focused_nameservers_file_path
-):
-    if working_status == "Stop":
-        command_string = (
-            f"{nameserver_changer_file_path} {tor_nameservers_file_path} && "
-            f"cp {tor_nameservers_file_path} {original_resolv_configuration_file_path}"
+        proxy_thread = Thread(
+            target=proxy_runner,
+            daemon=True,
         )
-    else:
-        command_string = (
-            f"{nameserver_changer_file_path} {privacy_focused_nameservers_file_path} && "
-            f"cp {privacy_focused_nameservers_file_path} {original_resolv_configuration_file_path}"
+        proxy_thread.start()
+
+    show_question_dialog(
+        title="Important",
+        text="Do you want to kill dangerous applications and clear dangerous caches?",
+        on_click_handler=start_stop_button_question_dialog_processor,
+    )
+
+##############################
+
+# UPDATE TOR STATUS LABEL
+
+##############################
+
+def gui_cd_update_tor_status_label(label_widget, ghostsurf_logo_file_path):
+    try:
+        display_notification(
+            is_using_gui=is_using_gui,
+            icon_file_path=ghostsurf_logo_file_path,
+            message="Trying to update tor status label...",
         )
-
-    try:
-        check_call(["pkexec", "bash", "-c", command_string])
-    except CalledProcessError as e:
-        error(f"Error: {e}")
-        return
-
-    display_notification(icon_file_path=ghostsurf_logo_file_path, message="Nameservers have been changed.")
-
-def get_tor_status():
-    try:
-        output = run(
-            ["systemctl", "status", "tor"],
-            text=True,
-            capture_output=True
-        ).stdout.strip()
-
-        return 'inactive' if 'inactive' in output.lower() else 'active'
+        tor_status_thread = Thread(
+            target=update_tor_status_label,
+            args=[
+                label_widget,
+                is_using_gui,
+                ghostsurf_logo_file_path,
+            ],
+            daemon=True,
+        )
+        tor_status_thread.start()
     except Exception as e:
-        return 'unknown'
+        message = "Failed to start update tor status thread."
+        error(f"{message} - {e}")
 
-##############################
-
-# UPDATING TOR STATUS LABEL
-
-##############################
-
-def gui_cd_update_tor_status_label(label_widget):
-    status_styles = {
-        'inactive': ('#status_label { color: red; }', 'Inactive'),
-        'active':   ('#status_label { color: green; }', 'Active')
-    }
-    status=get_tor_status()
-    style, text = status_styles.get(status, ('#status_label { color: gray; }', 'Unknown'))
-    label_widget.setStyleSheet(style)
-    label_widget.setText(text)
 
 ##############################
 
@@ -123,191 +144,168 @@ def gui_cd_update_tor_status_label(label_widget):
 
 def gui_cd_change_ip(ghostsurf_logo_file_path):
     try:
-        check_call(["pkexec", "systemctl", "restart", "tor"])
-        info("Tor service has been restarted to change the ip address.")
-    except CalledProcessError as e:
-        error(f"Error: {e}")
-        return
+        display_notification(
+            is_using_gui=is_using_gui,
+            icon_file_path=ghostsurf_logo_file_path,
+            message="Trying to restart tor service...",
+        )
+        ip_thread = Thread(
+            target=change_public_ip_address,
+            args=(is_using_gui, ghostsurf_logo_file_path),
+            daemon=True,
+        )
+        ip_thread.start()
+        info("IP change thread started successfully.")
+    except Exception as e:
+        message = "Failed to start change ip thread."
+        error(f"{message} - {e}")
 
 ##############################
 
-# SHOWING CURRENT PUBLIC IP ADDRESS
+# SHOW PUBLIC IP ADDRESS
 
 ##############################
 
 def gui_cd_show_ip(ghostsurf_logo_file_path):
-    sleep(1.5)
-    display_notification(icon_file_path=ghostsurf_logo_file_path, message="Trying to connect to the server.")
-    sleep(1.5)
-
     try:
-        public_ip_address = run(
-            ["curl", "--connect-timeout", "7.5", "https://ifconfig.io"],
-            capture_output=True,
-            text=True
-        ).stdout.strip()
-        ip_addr_regex = compile(r'\d{1,3}\.\d{1,3}\.\d{1,3}.\d{1,3}')
-        result = ip_addr_regex.search(public_ip_address).group()
-
-        if result == public_ip_address:
-            message = f'Your public ip address is {public_ip_address}.'
-        else:
-            message = "Couldn't connect to the server!"
-        info("IP address has been displayed.")
-    except:
-        message = "Couldn't connect to the server!"
-
-    display_notification(icon_file_path=ghostsurf_logo_file_path, message=message)
+        display_notification(
+            is_using_gui=is_using_gui,
+            icon_file_path=ghostsurf_logo_file_path,
+            message="Trying to connect to the server..."
+        )
+        ip_thread = Thread(
+            target=get_public_ip_address,
+            args=(is_using_gui, ghostsurf_logo_file_path,),
+            daemon=True
+        )
+        ip_thread.start()
+        info("IP retrieval thread started successfully.")
+    except Exception as e:
+        message = "Failed to start show ip thread."
+        error(f"{message} - {e}")
 
 ##############################
 
-# SHREDING LOG FILES
+# SHRED LOG FILES
 
 ##############################
 
 def gui_cd_shred_logs(ghostsurf_logo_file_path, log_shredder_file_path, current_username):
-    display_notification(icon_file_path=ghostsurf_logo_file_path, message="Shreding the log files.")
-    sleep(0.3)
-
     try:
-        check_call(["pkexec", log_shredder_file_path, current_username])
-        info("Log files have been shredded.")
-    except CalledProcessError as e:
-        error(f"Error: {e}")
-        return
-
-    display_notification(icon_file_path=ghostsurf_logo_file_path, message="Log files have been shreded.")
-
-##############################
-
-# RESET
-
-##############################
-
-def gui_cd_reset(ghostsurf_logo_file_path, reset_iptables_only_script_file_path, reset_script_file_path):
-    def reset_button_question_dialog_processor(i):
-        user_answer = i.text()
-        sleep(0.3)
-
-        if user_answer == "&Yes":
-            display_notification(icon_file_path=ghostsurf_logo_file_path, message="Resetting iptables rules only.")
-            sleep(0.3)
-
-            try:
-                check_call(["pkexec", reset_iptables_only_script_file_path])
-            except CalledProcessError as e:
-                error(f"Error: {e}")
-                return
-
-            display_notification(icon_file_path=ghostsurf_logo_file_path, message="Iptables rules are reset.")
-        elif user_answer == "&No":
-            display_notification(
-                icon_file_path=ghostsurf_logo_file_path,
-                message="Resetting ghostsurf configurations."
-            )
-            sleep(0.3)
-
-            try:
-                check_call(["pkexec", reset_script_file_path])
-                info("Changes have been reset.")
-            except CalledProcessError as e:
-                error(f"Error: {e}")
-                return
-
-            display_notification(icon_file_path=ghostsurf_logo_file_path, message="Reseting is done.")
-        else:
-            debug("Operation canceled")
-    
-    question_dialog = QMessageBox()
-    question_dialog.setIcon(QMessageBox.Question)
-    question_dialog.setWindowTitle("Important")
-    question_dialog.setText("Do you want to reset iptables rules only?")
-    question_dialog.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
-    question_dialog.buttonClicked.connect(reset_button_question_dialog_processor)
-    question_dialog.exec_()
+        display_notification(
+            is_using_gui=is_using_gui,
+            icon_file_path=ghostsurf_logo_file_path,
+            message="Trying to shred log files..."
+        )
+        shred_thread = Thread(
+            target=shred_log_files,
+            args=(
+                log_shredder_file_path,
+                current_username,
+                is_using_gui,
+                ghostsurf_logo_file_path,
+            ),
+            daemon=True
+        )
+        shred_thread.start()
+        info("Shred thread started successfully.")
+    except Exception as e:
+        message = "Failed to start log shreder thread."
+        error(f"{message} - {e}")
 
 ##############################
 
-# CHANGING THE MAC ADDRESS
+# CHANGE MAC ADDRESS
 
 ##############################
 
 def gui_cd_change_mac_address(ghostsurf_logo_file_path, mac_changer_script_file_path):
     def mac_changer_button_question_dialog_processor(i):
-        user_answer = i.text()
-        if user_answer == "&Yes":
-            mac_changer_thread = Thread(
-                target=change_the_mac_address_and_connect_back_to_wifi,
-                args=[ghostsurf_logo_file_path, mac_changer_script_file_path]
-            )
-            mac_changer_thread.start()
-        elif user_answer == "&No":
-            try:
-                check_call(["pkexec", mac_changer_script_file_path])
-            except CalledProcessError as e:
-                error(f"Error: {e}")
-                return
+        try:
+            user_answer = i.text()
+            debug(f"Answer to question dialog: {user_answer}")
+            if user_answer == "&Yes" or user_answer == "&No":
+                display_notification(
+                    is_using_gui=is_using_gui,
+                    icon_file_path=ghostsurf_logo_file_path,
+                    message="Trying to change MAC address..."
+                )
+            if user_answer == "&Yes":
+                is_positive = True
+                thread = Thread(
+                    target=change_mac_address,
+                    args=(mac_changer_script_file_path, is_positive, is_using_gui, ghostsurf_logo_file_path),
+                    daemon=True,
+                )
+            elif user_answer == "&No":
+                is_positive = False
+                thread = Thread(
+                    target=change_mac_address,
+                    args=(mac_changer_script_file_path, is_positive, is_using_gui, ghostsurf_logo_file_path),
+                    daemon=True,
+                )
+            else:
+                debug("MAC address change operation canceled by user.")
 
-            display_notification(icon_file_path=ghostsurf_logo_file_path, message="Mac address has been changed.")
-        else:
-            debug("Operation canceled")
-
-    display_notification(icon_file_path=ghostsurf_logo_file_path, message="Changing the mac address.")
-
-    sleep(0.3)
-    question_dialog = QMessageBox()
-    question_dialog.setIcon(QMessageBox.Question)
-    question_dialog.setWindowTitle("Important")
-    question_dialog.setText("Do you want to connect back to the internet?")
-    question_dialog.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
-    question_dialog.buttonClicked.connect(mac_changer_button_question_dialog_processor)
-    question_dialog.exec_()
+            thread.start()
+            info("MAC changer thread started successfully.")
+        except Exception as e:
+            message = "Failed to start MAC changer thread"
+            error(f"{message} - {e}")
+    show_question_dialog(
+        title="Important",
+        text="Do you want to connect back to the internet after changing the MAC address?",
+        on_click_handler=mac_changer_button_question_dialog_processor
+    )
 
 ##############################
 
-# WIPING THE MEMORY
+# WIPE MEMORY
 
 ##############################
 
 def gui_cd_wipe_memory(ghostsurf_logo_file_path, fast_bomb_script_file_path, secure_bomb_script_file_path):
     def wipe_button_question_dialog_processor(i):
         user_answer = i.text()
-        sleep(0.3)
-
-        if user_answer == "&Yes":
+        if user_answer == "&Yes" or user_answer == "&No":
+            message = "Trying to wipe the memory..."
             display_notification(
+                is_using_gui=is_using_gui,
                 icon_file_path=ghostsurf_logo_file_path,
-                message="Wiping the memory and droping caches. This might take some time!"
+                message=message,
             )
+        try:
+            if user_answer == "&Yes":
+                is_positive = True
+            elif user_answer == "&No":
+                is_positive = False
+            else:
+                debug("Operation canceled")
+                return
             wipe_memory_thread = Thread(
-                target=less_secure_memory_wipe,
-                args=[ghostsurf_logo_file_path, fast_bomb_script_file_path]
+                target=wipe_memory,
+                args=[
+                    is_positive,
+                    fast_bomb_script_file_path,
+                    secure_bomb_script_file_path,
+                    is_using_gui,
+                    ghostsurf_logo_file_path,
+                ],
+                daemon=True,
             )
             wipe_memory_thread.start()
-        elif user_answer == "&No":
-            display_notification(
-                icon_file_path=ghostsurf_logo_file_path,
-                message="Wiping the memory and droping caches. This might take some time!"
-            )
-            wipe_memory_thread = Thread(
-                target=high_secure_memory_wipe,
-                args=[ghostsurf_logo_file_path, secure_bomb_script_file_path]
-            )
-            wipe_memory_thread.start()
-        else:
-            debug("Operation canceled")
-
-    question_dialog = QMessageBox()
-    question_dialog.setIcon(QMessageBox.Question)
-    question_dialog.setWindowTitle("Important")
-    question_dialog.setText("Do you want fast and less secure operation?")
-    question_dialog.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
-    question_dialog.buttonClicked.connect(wipe_button_question_dialog_processor)
-    question_dialog.exec_()
+        except Exception as e:
+            message = "Failed to start memory wiper thread."
+            error(f"{message} - {e}")
+    show_question_dialog(
+        title="Important",
+        text="Do you want fast and less secure operation?",
+        on_click_handler=wipe_button_question_dialog_processor
+    )
 
 ##############################
 
-# CHANGING THE NAMESERVERS
+# CHANGE DNS NAMESERVERS
 
 ##############################
 
@@ -319,25 +317,70 @@ def gui_cd_change_nameservers(
     original_resolv_configuration_file_path,
     privacy_focused_nameservers_file_path
 ):
-
-    display_notification(icon_file_path=ghostsurf_logo_file_path, message="Changing the nameservers.")
-    sleep(0.3)
-    thread = Thread(
-        target=change_ns,
-        args=[
-            ghostsurf_logo_file_path,
-            working_status,
-            nameserver_changer_file_path,
-            tor_nameservers_file_path,
-            original_resolv_configuration_file_path,
-            privacy_focused_nameservers_file_path
-        ]
-    )
-    thread.start()
+    try:
+        if working_status == "Stop":
+            is_working=True
+        else:
+            is_working=False
+        display_notification(
+            is_using_gui=is_using_gui,
+            icon_file_path=ghostsurf_logo_file_path,
+            message="Trying to change nameservers...",
+        )
+        thread = Thread(
+            target=change_nameservers,
+            args=[
+                is_working,
+                nameserver_changer_file_path,
+                tor_nameservers_file_path,
+                original_resolv_configuration_file_path,
+                privacy_focused_nameservers_file_path,
+                is_using_gui,
+                ghostsurf_logo_file_path,
+            ],
+            daemon=True
+        )
+        thread.start()
+    except Exception as e:
+        message = "Failed to start nameserver changer thread."
+        error(f"{message} - {e}")
 
 ##############################
 
-# ANONYMIZING THE BROWSER
+# CHANGE HOSTNAME
+
+##############################
+
+def gui_cd_change_hostname(hostname_changer_script_file_path, ghostsurf_logo_file_path):
+    def change_hostname_button_question_dialog_processor(i):
+        user_answer = i.text()
+        if user_answer == "&Yes":
+            display_notification(
+                is_using_gui=is_using_gui,
+                icon_file_path=ghostsurf_logo_file_path,
+                message="Trying to change system's hostname...",
+            )
+            hostname_thread = Thread(
+                target=change_hostname,
+                args=[
+                    hostname_changer_script_file_path,
+                    is_using_gui,
+                    ghostsurf_logo_file_path,
+                ],
+                daemon=True,
+            )
+            hostname_thread.start()
+        else:
+            debug("Operation canceled.")
+    show_question_dialog(
+        title="Important",
+        text="This operation requires reboot. Do you allow to reboot this system?",
+        on_click_handler=change_hostname_button_question_dialog_processor,
+    )
+
+##############################
+
+# ANONYMIZE BROWSER
 
 ##############################
 
@@ -346,121 +389,93 @@ def gui_cd_anonymize_browser(
     ghostsurf_logo_file_path,
     firefox_profiles_dir,
     custom_firefox_preferences_file_path,
-    firefox_profiles_conf_file_path
+    firefox_profiles_conf_file_path,
 ):
-    ghostsurf_profile_pattern = compile(r".*ghostsurf$")
-    penetration_testing_pattern = compile(r".*penetration-testing$")
+    try:
+        display_notification(
+            is_using_gui=is_using_gui,
+            icon_file_path=ghostsurf_logo_file_path,
+            message="Trying to create and anonymize Firefox profiles...",
+        )
+        browser_thread = Thread(
+            target=anonymize_browser,
+            args=[
+                init_script_file_path,
+                firefox_profiles_dir,
+                custom_firefox_preferences_file_path,
+                firefox_profiles_conf_file_path,
+                is_using_gui,
+                ghostsurf_logo_file_path,
+            ],
+            daemon=True,
+        )
+        browser_thread.start()
+    except Exception as e:
+        message = "Failed to start browser anonymizer thread."
+        error(f"{message} - {e}")
 
-    is_ghostsurf_profile_exists = False
-    is_penetration_testing_profile_exists = False
+##############################
 
-    for profile_path in firefox_profiles_dir.iterdir():
-        if profile_path.is_dir() and ghostsurf_profile_pattern.match(profile_path.name):
-            debug(f"Found ghostsurf profile: {profile_path}")
-            is_ghostsurf_profile_exists = True
-                    
-    for profile_path in firefox_profiles_dir.iterdir():
-        if profile_path.is_dir() and penetration_testing_pattern.match(profile_path.name):
-            debug(f"Found penetration-testing profile: {profile_path}")
-            is_penetration_testing_profile_exists = True
+# RESET
 
-    if is_ghostsurf_profile_exists == False:
-        display_notification(icon_file_path=ghostsurf_logo_file_path, message="Creating Ghostsurf Firefox profile.")
-        sleep(2)
-        run(["firefox-esr", "-CreateProfile", "ghostsurf"], text=True)
-        
-        if custom_firefox_preferences_file_path.exists() == True:
-            with open(custom_firefox_preferences_file_path, "r") as the_custom_prefs_file:
-                custom_prefs = the_custom_prefs_file.read()
+##############################
+
+def gui_cd_reset(ghostsurf_logo_file_path, reset_script_file_path):
+    def reset_button_question_dialog_processor(i):
+        user_answer = i.text()
+        if user_answer == "&Yes":
+            try:
+                display_notification(
+                    is_using_gui=is_using_gui,
+                    icon_file_path=ghostsurf_logo_file_path,
+                    message="Trying to reset...",
+                )
+                reset_thread = Thread(
+                    target=reset_changes,
+                    args=(
+                        reset_script_file_path,
+                        is_using_gui,
+                        ghostsurf_logo_file_path,
+                    ),
+                    daemon=True,
+                )
+                reset_thread.start()
+            except Exception as e:
+                message = "Failed to start reset thread."
+                error(f"{message} - {e}")
         else:
-            display_notification(
-                icon_file_path=ghostsurf_logo_file_path,
-                message="Custom preferences file not found. Try to reinstall ghostsurf!"
-            )
-
-        ghostsurf_firefox_profile_dir = next(Path(firefox_profiles_dir).glob("*.ghostsurf"))
-        debug(f"Ghostsurf Firefox profile dir path = {ghostsurf_firefox_profile_dir}")
-
-        if ghostsurf_firefox_profile_dir is not None:
-            # Construct the path to user.js
-            ghostsurf_firefox_profile_file_path = Path(ghostsurf_firefox_profile_dir, "user.js")
-            debug(f"Ghostsurf Firefox profile file path = {ghostsurf_firefox_profile_file_path}")
-
-        with open(ghostsurf_firefox_profile_file_path, "w") as ghostsurf_firefox_profile_user_pref_file:
-            ghostsurf_firefox_profile_user_pref_file.write(custom_prefs)
-
-        try:
-            check_call(["pkexec", init_script_file_path])
-        except CalledProcessError as e:
-            error(f"Error: {e}")
+            debug("Operation canceled.")
             return
-
-        with open(firefox_profiles_conf_file_path, "r") as firefox_prof_conf_file:
-            firefox_prof_conf_lines = firefox_prof_conf_file.readlines()
-
-        for line in firefox_prof_conf_lines:
-            if "Path" in line:
-                path = line.split("=")[1][:-1]
-                if "ghostsurf" in path:
-                    ghostsurf_profile_path_spec = path
-                elif "default" in path:
-                    default_profile_path_spec = path
-            elif "Default" in line and "." in line:
-                path = line.split("=")[1][:-1]
-                default_profile_setting_raw = line
-
-        new_default = f"Default={ghostsurf_profile_path_spec}\n"
-        firefox_prof_conf_lines[firefox_prof_conf_lines.index(default_profile_setting_raw)] = new_default
-
-        with open(firefox_profiles_conf_file_path, "w") as f:
-            f.write("".join(firefox_prof_conf_lines))
-
-        display_notification(
-            icon_file_path=ghostsurf_logo_file_path,
-            message="Ghostsurf Firefox profile has been created. And, preferences has been set."
-        )
-    else:
-        display_notification(
-            icon_file_path=ghostsurf_logo_file_path,
-            message="Ghostsurf Firefox profile already exists."
-        )
-
-    if is_penetration_testing_profile_exists == False:
-        sleep(2)
-        display_notification(
-            icon_file_path=ghostsurf_logo_file_path,
-            message="Creating Penetration-Testing Firefox profile."
-        )
-        sleep(2)
-        run(["firefox-esr", "-CreateProfile", "penetration-testing"], text=True)
-        sleep(2)
-        display_notification(
-            icon_file_path=ghostsurf_logo_file_path,
-            message="Penetration-Testing Firefox profile has been created."
-        )
-    else:
-        sleep(2)
-        display_notification(
-            icon_file_path=ghostsurf_logo_file_path,
-            message="Penetration-Testing Firefox profile already exists."
-        )
+    show_question_dialog(
+        title="Important",
+        text="Are you sure you want to revert all changes and restore the defaults?",
+        on_click_handler=reset_button_question_dialog_processor,
+    )
 
 ##############################
 
-# CHANGING THE HOSTNAME
+# UPDATE START/STOP BUTTON TEXT
 
 ##############################
 
-def gui_cd_change_hostname(hostname_changer_script_file_path):
-    question_dialog = QMessageBox()
-    question_dialog.setIcon(QMessageBox.Question)
-    question_dialog.setWindowTitle("Important")
-    question_dialog.setText("This operation requires reboot. Do you allow to reboot this system?")
-    question_dialog.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
-    question_dialog_answer = question_dialog.exec()
-
-    if question_dialog_answer == QMessageBox.Yes:
-        debug("Rebooting the system")
-        run(["pkexec", "bash", "-c", f"{hostname_changer_script_file_path} && reboot"])
-    else:
-        debug("Operation canceled")
+def gui_update_start_stop_button_text(button_widget, ghostsurf_settings_file_path, ghostsurf_logo_file_path):
+    try:
+        display_notification(
+            is_using_gui=is_using_gui,
+            icon_file_path=ghostsurf_logo_file_path,
+            message="Trying to update start/stop button's text...",
+        )
+        update_button_text_thread = Thread(
+            target=update_start_stop_button_text,
+            args=[
+                button_widget,
+                ghostsurf_settings_file_path,
+                is_using_gui,
+                ghostsurf_logo_file_path,
+            ],
+            daemon=True,
+        )
+        update_button_text_thread.start()
+    except Exception as e:
+        message = "Failed to start start stop button text updater thread."
+        error(f"{message} - {e}")

@@ -84,11 +84,11 @@ The GhostSurf CLI offers the following commands:
 
 1) Install the dependencies: 	
 
-       sudo apt install firefox-esr tor iw libnotify-bin iptables secure-delete bleachbit macchanger net-tools -y
+       sudo apt install firefox-esr tor iw libnotify-bin iptables netfilter-persistent iptables-persistent secure-delete bleachbit macchanger net-tools -y
 
 2) Download the installer
 
-	- Kali
+	- Kali (Recommended)
 
 	      curl -L https://github.com/tamrinotte/ghostsurf/releases/download/kali_v0.1.1/ghostsurf.deb -o ghostsurf.deb
 
@@ -203,7 +203,7 @@ GhostSurf CLI aşağıdaki komutları sunar:
 
 2) Yükleyiciyi indir
 
-	- Kali
+	- Kali (Önerilen)
 
 	      curl -L https://github.com/tamrinotte/ghostsurf/releases/download/kali_v0.1.1/ghostsurf.deb -o ghostsurf.deb
 

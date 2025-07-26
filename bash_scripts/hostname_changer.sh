@@ -1,6 +1,7 @@
 #!/bin/bash
 
 main () {
+    declare_variables
     set_random_hostname
 }
 
@@ -17,11 +18,8 @@ set_random_hostname(){
     index=$(($RANDOM % $array_size))
     new_hostname="${array[$index]}"
     sed -i "s/$current_hostname/$new_hostname/g" "/etc/hosts"
-    if [[ "$new_hostname" != "$current_hostname" ]]
-    then
-        hostnamectl set-hostname $new_hostname
-        systemctl restart NetworkManager.service
-    fi
+    hostnamectl set-hostname $new_hostname
+    systemctl restart NetworkManager.service
 }
 
 main
