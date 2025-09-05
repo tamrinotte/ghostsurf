@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # MODULES AND/OR LIBRARIES
-from subprocess import check_call, CalledProcessError
+import subprocess
 
 # Ghostsurf Modules
 from modules.conf_logging import error
@@ -15,10 +15,10 @@ from modules.conf_logging import error
 def display_notification(is_using_gui=False, icon_file_path="", message="", timeout="150"):
     if is_using_gui:
         try:
-            notification = check_call(
+            notification = subprocess.check_call(
                 ["notify-send", "-i", icon_file_path, "-t", timeout, message],
             )
-        except CalledProcessError as e:
+        except subprocess.CalledProcessError as e:
             message = "Notification sending subprocess failed."
             error(f"{message} - {e}")
             return

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # MODULES AND/OR LIBRARIES
-from json import load, dump
+import json
 
 # Ghostsurf Modules
 from modules.conf_logging import error
@@ -14,7 +14,7 @@ from modules.conf_logging import error
 
 def load_ghostsurf_config(ghostsurf_settings_file_path):
     with open(ghostsurf_settings_file_path, 'r') as file:
-        return load(file)
+        return json.load(file)
 
 ##############################
 
@@ -24,7 +24,7 @@ def load_ghostsurf_config(ghostsurf_settings_file_path):
 
 def save_ghostsurf_config(ghostsurf_settings_file_path, config):
     with open(ghostsurf_settings_file_path, 'w') as file:
-        dump(config, file, indent=4)
+        json.dump(config, file, indent=4)
 
 ##############################
 

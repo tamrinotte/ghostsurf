@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 main() {
     declare_variables
     backup_configuration_files

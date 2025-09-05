@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # MODULES AND/OR LIBRARIES
-from webbrowser import open as wbopen
+import webbrowser
 
 # Ghostsurf Modules
 from modules.conf_ghostsurf import (
@@ -194,7 +194,7 @@ def tui_cd_change_hostname(hostname_changer_script_file_path):
 ##############################
 
 def tui_cd_display_the_help_page(url):
-    wbopen(url)
+    webbrowser.open(url)
     print("Help page has been opened in your default browser.")
 
 ##############################

@@ -90,11 +90,7 @@ The GhostSurf CLI offers the following commands:
 
 	- Kali (Recommended)
 
-	      curl -L https://github.com/tamrinotte/ghostsurf/releases/download/kali_v0.1.1/ghostsurf.deb -o ghostsurf.deb
-
-	- Debian
-
-	      curl -L https://github.com/tamrinotte/ghostsurf/releases/download/debian_v0.1.1/ghostsurf.deb -o ghostsurf.deb
+	      curl -L https://github.com/tamrinotte/ghostsurf/releases/download/kali_v0.1.2/ghostsurf.deb -o ghostsurf.deb
 
 3) Start the installer 
 
@@ -205,11 +201,7 @@ GhostSurf CLI aşağıdaki komutları sunar:
 
 	- Kali (Önerilen)
 
-	      curl -L https://github.com/tamrinotte/ghostsurf/releases/download/kali_v0.1.1/ghostsurf.deb -o ghostsurf.deb
-
-	- Debian
-
-	      curl -L https://github.com/tamrinotte/ghostsurf/releases/download/debian_v0.1.1/ghostsurf.deb -o ghostsurf.deb
+	      curl -L https://github.com/tamrinotte/ghostsurf/releases/download/kali_v0.1.2/ghostsurf.deb -o ghostsurf.deb
 
 3) Yükleyiciyi başlat
 

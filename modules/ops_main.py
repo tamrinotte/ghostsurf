@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 # MODULES AND/OR LIBRARIES
-from subprocess import check_call, CalledProcessError
+import subprocess
+import getpass
 
 # Ghostsurf Modules
 from modules.conf_logging import info, error
@@ -28,8 +29,8 @@ def start_proxy(
 ):
     try:
         if is_positive:
-            check_call(["pkexec", "bash", init_script_file_path])
-        check_call(["pkexec", "bash", start_transparent_proxy_script_file_path])
+            subprocess.check_call(["pkexec", "bash", init_script_file_path])
+        subprocess.check_call(["pkexec", "bash", start_transparent_proxy_script_file_path])
 
         config = load_ghostsurf_config(ghostsurf_settings_file_path)
         config["is_ghostsurf_on"] = "True"
@@ -44,7 +45,7 @@ def start_proxy(
             icon_file_path=ghostsurf_logo_file_path,
             message=message,
         )
-    except CalledProcessError as e:
+    except subprocess.CalledProcessError as e:
         message = "Starting transparent proxy subprocess failed."
         error(f"{message} - {e}")
         display_notification(
@@ -78,8 +79,8 @@ def stop_proxy(
 ):
     try:
         if is_positive:
-            check_call(["pkexec", "bash", init_script_file_path])
-        check_call(["pkexec", "bash", stop_transparent_proxy_script_file_path])
+            subprocess.check_call(["pkexec", "bash", init_script_file_path])
+        subprocess.check_call(["pkexec", "bash", stop_transparent_proxy_script_file_path])
 
         config = load_ghostsurf_config(ghostsurf_settings_file_path)
         config["is_ghostsurf_on"] = "False"
@@ -94,7 +95,7 @@ def stop_proxy(
             icon_file_path=ghostsurf_logo_file_path,
             message=message,
         )
-    except CalledProcessError as e:
+    except subprocess.CalledProcessError as e:
         message = "Stopping transparent proxy subprocess failed."
         error(f"{message} - {e}")
         display_notification(
@@ -123,7 +124,8 @@ def reset_changes(
     ghostsurf_logo_file_path=None,
 ):
     try:
-        check_call(["pkexec", "bash", reset_script_file_path])
+        current_username = getpass.getuser()
+        subprocess.check_call(["pkexec", "bash", reset_script_file_path, current_username])
         message = "All changes have been reverted."
         display_notification(
             is_using_gui=is_using_gui,
@@ -131,7 +133,7 @@ def reset_changes(
             message=message,
         )
         info("Changes have been resetted.")
-    except CalledProcessError as e:
+    except subprocess.CalledProcessError as e:
         message = "Reset subprocess failed."
         error(f"{message} - {e}")
         display_notification(

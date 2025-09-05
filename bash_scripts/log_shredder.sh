@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail # Add -x option to enable execution tracking (good for debugging).
+
 main () {
     local username="$1"
     declare_variables "$username"

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 # MODULES AND/OR LIBRARIES
-from sys import exit as sysexit
-from os import geteuid
-from pathlib import Path
+import sys
+import os
+import pathlib
 
 # Ghostsurf Modules
 from modules.conf_logging import debug, error
@@ -16,17 +16,17 @@ from modules.conf_logging import debug, error
 
 def check_root_privileges():
     try:
-        effective_user_id = geteuid()
+        effective_user_id = os.geteuid()
         debug(f"Effective User ID: {effective_user_id}")
 
         if effective_user_id == 0:
             message = "Running as root is not allowed."
             print(message)
-            sysexit()
+            sys.exit()
 
     except Exception as e:
         error(f"Failed to check root privileges: {e}")
-        sysexit()
+        sys.exit()
 
 ##############################
 
@@ -40,7 +40,7 @@ def validate_ghostsurf_paths(paths_dict):
 
         for label, path in paths_dict.items():
             if isinstance(path, str):
-                resolved_path = Path(path)
+                resolved_path = pathlib.Path(path)
             else:
                 resolved_path = path
 
@@ -51,8 +51,8 @@ def validate_ghostsurf_paths(paths_dict):
         if missing_paths:
             message = "Missing required files:\n" + "\n".join(missing_paths)
             print(message)
-            sysexit()
+            sys.exit()
 
     except Exception as e:
         error(f"Failed to validate files.")
-        sysexit()
+        sys.exit()

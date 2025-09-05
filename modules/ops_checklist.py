@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
 # MODULES AND/OR LIBRARIES
-from socket import gethostname
-from subprocess import run
-from pathlib import Path
-from requests import get as requestsget
-from requests.exceptions import Timeout, RequestException
+import socket
+import subprocess
+import pathlib
+import requests
+import requests.exceptions
 
 # Ghostsurf Modules
 from modules.conf_logging import (
@@ -35,7 +35,7 @@ def check_fake_hostname_usage(fake_hostnames_list_file_path, checklist_items_dic
         with open(fake_hostnames_list_file_path, "r", encoding="utf-8") as file:
             fake_hostnames = {line.strip() for line in file if line.strip()}
 
-        current_hostname = gethostname().strip()
+        current_hostname = socket.gethostname().strip()
         is_using_fake = current_hostname in fake_hostnames
         checklist_items_dict['Using fake hostname'] = is_using_fake
         debug(f"Current hostname: {current_hostname}")
@@ -55,7 +55,7 @@ def check_fake_mac_address_usage(checklist_items_dict):
     try:
         is_fake_mac_used = False
         verification_list = []
-        raw_list_of_network_interfaces = run(
+        raw_list_of_network_interfaces = subprocess.run(
             ["ip -o link show | awk -F': ' '{print $2}'"],
             shell=True,
             text=True,
@@ -66,7 +66,7 @@ def check_fake_mac_address_usage(checklist_items_dict):
             interface = interface.strip("\n\r")
             if interface != "lo":
                 debug(f"Network Interface Name = {interface}")
-                mac_address_info = run(
+                mac_address_info = subprocess.run(
                     ["macchanger", "-s", interface],
                     capture_output=True,
                     text=True
@@ -102,12 +102,12 @@ def check_appropriate_nameserver_usage(
 ):
     try:
         # Check if the required files exist
-        if not Path(privacy_focused_nameservers_file_path).is_file():
+        if not pathlib.Path(privacy_focused_nameservers_file_path).is_file():
             warning(f"Privacy nameserver list file not found: {privacy_focused_nameservers_file_path}")
             checklist_items_dict['Using appropriate nameservers'] = False
             return
 
-        if not Path(original_resolv_configuration_file_path).is_file():
+        if not pathlib.Path(original_resolv_configuration_file_path).is_file():
             warning(f"Resolv.conf file not found: {original_resolv_configuration_file_path}")
             checklist_items_dict['Using appropriate nameservers'] = False
             return
@@ -166,8 +166,8 @@ def check_browser_anonymization(
 
     try:
         # Look for Ghostsurf and Penetration Testing Firefox profiles
-        ghostsurf_profile_dirs = list(Path(firefox_profiles_dir).glob("*.ghostsurf"))
-        pentest_profile_dirs = list(Path(firefox_profiles_dir).glob("*.penetration-testing"))
+        ghostsurf_profile_dirs = list(pathlib.Path(firefox_profiles_dir).glob("*.ghostsurf"))
+        pentest_profile_dirs = list(pathlib.Path(firefox_profiles_dir).glob("*.penetration-testing"))
 
         debug(f"Ghostsurf Firefox profile dirs found: {ghostsurf_profile_dirs}")
         debug(f"Penetration Testing Firefox profile dirs found: {pentest_profile_dirs}")
@@ -226,7 +226,7 @@ def check_different_timezone_usage(timezone_backup_file_path, checklist_items_di
             return
 
         original_timezone = timezone_backup_file_path.read_text(encoding="utf-8").strip()
-        current_timezone = run(
+        current_timezone = subprocess.run(
             ["timedatectl", "show", "-p", "Timezone", "--value"],
             capture_output=True,
             text=True,
@@ -259,7 +259,7 @@ def check_different_timezone_usage(timezone_backup_file_path, checklist_items_di
 def check_tor_connection_usage(checklist_items_dict):
     url = "https://check.torproject.org/"
     try:
-        response = requestsget(url, timeout=10, headers={"User-Agent": "curl"})
+        response = requests.get(url, timeout=10, headers={"User-Agent": "curl"})
         response.raise_for_status()
         content = response.text
 
@@ -272,10 +272,10 @@ def check_tor_connection_usage(checklist_items_dict):
 
         checklist_items_dict['Using a tor connection'] = is_connected
 
-    except Timeout:
+    except requests.exceptions.Timeout:
         error("Timeout occurred while trying to connect to Tor check site.")
         checklist_items_dict['Using a tor connection'] = False
-    except RequestException as e:
+    except requests.exceptions.RequestException as e:
         error(f"Network error while checking Tor connection: {e}")
         checklist_items_dict['Using a tor connection'] = False
     except Exception as e:

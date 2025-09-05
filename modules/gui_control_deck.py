@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # MODULES AND/OR LIBRARIES
-from threading import Thread
+import threading
 
 # Ghostsurf Modules
 from modules.conf_logging import (
@@ -96,7 +96,7 @@ def gui_cd_start_stop_transparent_proxy(
                 ghostsurf_logo_file_path=ghostsurf_logo_file_path,
             )
 
-        proxy_thread = Thread(
+        proxy_thread = threading.Thread(
             target=proxy_runner,
             daemon=True,
         )
@@ -121,7 +121,7 @@ def gui_cd_update_tor_status_label(label_widget, ghostsurf_logo_file_path):
             icon_file_path=ghostsurf_logo_file_path,
             message="Trying to update tor status label...",
         )
-        tor_status_thread = Thread(
+        tor_status_thread = threading.Thread(
             target=update_tor_status_label,
             args=[
                 label_widget,
@@ -149,7 +149,7 @@ def gui_cd_change_ip(ghostsurf_logo_file_path):
             icon_file_path=ghostsurf_logo_file_path,
             message="Trying to restart tor service...",
         )
-        ip_thread = Thread(
+        ip_thread = threading.Thread(
             target=change_public_ip_address,
             args=(is_using_gui, ghostsurf_logo_file_path),
             daemon=True,
@@ -173,7 +173,7 @@ def gui_cd_show_ip(ghostsurf_logo_file_path):
             icon_file_path=ghostsurf_logo_file_path,
             message="Trying to connect to the server..."
         )
-        ip_thread = Thread(
+        ip_thread = threading.Thread(
             target=get_public_ip_address,
             args=(is_using_gui, ghostsurf_logo_file_path,),
             daemon=True
@@ -197,7 +197,7 @@ def gui_cd_shred_logs(ghostsurf_logo_file_path, log_shredder_file_path, current_
             icon_file_path=ghostsurf_logo_file_path,
             message="Trying to shred log files..."
         )
-        shred_thread = Thread(
+        shred_thread = threading.Thread(
             target=shred_log_files,
             args=(
                 log_shredder_file_path,
@@ -232,14 +232,14 @@ def gui_cd_change_mac_address(ghostsurf_logo_file_path, mac_changer_script_file_
                 )
             if user_answer == "&Yes":
                 is_positive = True
-                thread = Thread(
+                thread = threading.Thread(
                     target=change_mac_address,
                     args=(mac_changer_script_file_path, is_positive, is_using_gui, ghostsurf_logo_file_path),
                     daemon=True,
                 )
             elif user_answer == "&No":
                 is_positive = False
-                thread = Thread(
+                thread = threading.Thread(
                     target=change_mac_address,
                     args=(mac_changer_script_file_path, is_positive, is_using_gui, ghostsurf_logo_file_path),
                     daemon=True,
@@ -282,7 +282,7 @@ def gui_cd_wipe_memory(ghostsurf_logo_file_path, fast_bomb_script_file_path, sec
             else:
                 debug("Operation canceled")
                 return
-            wipe_memory_thread = Thread(
+            wipe_memory_thread = threading.Thread(
                 target=wipe_memory,
                 args=[
                     is_positive,
@@ -327,7 +327,7 @@ def gui_cd_change_nameservers(
             icon_file_path=ghostsurf_logo_file_path,
             message="Trying to change nameservers...",
         )
-        thread = Thread(
+        thread = threading.Thread(
             target=change_nameservers,
             args=[
                 is_working,
@@ -360,7 +360,7 @@ def gui_cd_change_hostname(hostname_changer_script_file_path, ghostsurf_logo_fil
                 icon_file_path=ghostsurf_logo_file_path,
                 message="Trying to change system's hostname...",
             )
-            hostname_thread = Thread(
+            hostname_thread = threading.Thread(
                 target=change_hostname,
                 args=[
                     hostname_changer_script_file_path,
@@ -397,7 +397,7 @@ def gui_cd_anonymize_browser(
             icon_file_path=ghostsurf_logo_file_path,
             message="Trying to create and anonymize Firefox profiles...",
         )
-        browser_thread = Thread(
+        browser_thread = threading.Thread(
             target=anonymize_browser,
             args=[
                 init_script_file_path,
@@ -430,7 +430,7 @@ def gui_cd_reset(ghostsurf_logo_file_path, reset_script_file_path):
                     icon_file_path=ghostsurf_logo_file_path,
                     message="Trying to reset...",
                 )
-                reset_thread = Thread(
+                reset_thread = threading.Thread(
                     target=reset_changes,
                     args=(
                         reset_script_file_path,
@@ -465,7 +465,7 @@ def gui_update_start_stop_button_text(button_widget, ghostsurf_settings_file_pat
             icon_file_path=ghostsurf_logo_file_path,
             message="Trying to update start/stop button's text...",
         )
-        update_button_text_thread = Thread(
+        update_button_text_thread = threading.Thread(
             target=update_start_stop_button_text,
             args=[
                 button_widget,

@@ -1,15 +1,16 @@
 #!/bin/bash
 
+set -euo pipefail # Add -x option to enable execution tracking (good for debugging).
+
 main () {
-    local nameservers_file_path="$1"
+    nameservers_file_path="$1"
     
     declare_variables "$nameservers_file_path"
     change_nameservers
 }
 
 declare_variables() {
-    local nameservers_file_path="$1"
-    active_connection_name=$(iwgetid --raw)
+    active_connection_name=$(iwgetid --raw || true)
 
     if [ -z "$active_connection_name" ]; then
         active_connection_name=$(nmcli --fields NAME connection show --active | awk 'NR==2 {print $1}')

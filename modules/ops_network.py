@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 # MODULES AND/OR LIBRARIES
-from requests import get as requestsget
-from requests.exceptions import RequestException, Timeout
-from re import compile as recompile
-from subprocess import run, check_call, CalledProcessError, TimeoutExpired
+import requests
+import requests.exceptions
+import re
+import subprocess
 
 # Ghostsurf Modules
 from modules.conf_logging import debug, info, error
@@ -20,13 +20,13 @@ from modules.conf_ghostsurf import load_ghostsurf_config
 def get_public_ip_address(is_using_gui=False, ghostsurf_logo_file_path=None, timeout_seconds=7.5):
     url = "https://ifconfig.io"
     try:
-        response = requestsget(url, timeout=timeout_seconds, headers={"User-Agent": "curl"})
+        response = requests.get(url, timeout=timeout_seconds, headers={"User-Agent": "curl"})
         response.raise_for_status()
 
         ip = response.text.strip()
 
-        ipv4_pattern = recompile(r'^\d{1,3}(\.\d{1,3}){3}$')
-        ipv6_pattern = recompile(r'^([a-fA-F0-9:]+:+)+[a-fA-F0-9]+$')
+        ipv4_pattern = re.compile(r'^\d{1,3}(\.\d{1,3}){3}$')
+        ipv6_pattern = re.compile(r'^([a-fA-F0-9:]+:+)+[a-fA-F0-9]+$')
 
         if ipv4_pattern.fullmatch(ip) or ipv6_pattern.fullmatch(ip):
             message = f'Your public IP address is {ip}.'
@@ -42,7 +42,7 @@ def get_public_ip_address(is_using_gui=False, ghostsurf_logo_file_path=None, tim
         )
         info("Public IP address retrieved successfully.")
 
-    except Timeout:
+    except requests.exceptions.Timeout:
         message = "Timeout while retrieving public IP address."
         error(f"{message} - {e}")
         display_notification(
@@ -50,7 +50,7 @@ def get_public_ip_address(is_using_gui=False, ghostsurf_logo_file_path=None, tim
             icon_file_path=ghostsurf_logo_file_path,
             message=message,
         )
-    except RequestException as e:
+    except requests.exceptions.RequestException as e:
         message = "Network error occurred while retrieving public IP."
         error(f"{message} - {e}")
         display_notification(
@@ -76,9 +76,9 @@ def get_public_ip_address(is_using_gui=False, ghostsurf_logo_file_path=None, tim
 def change_public_ip_address(is_using_gui=False, ghostsurf_logo_file_path=None):
     try:
         if is_using_gui:
-            check_call(["pkexec", "systemctl", "restart", "tor"])
+            subprocess.check_call(["pkexec", "systemctl", "restart", "tor"])
         else:
-            check_call(["sudo", "systemctl", "restart", "tor"])
+            subprocess.check_call(["sudo", "systemctl", "restart", "tor"])
         message = "Tor service has been restarted to change your public IP address."
         display_notification(
             is_using_gui=is_using_gui,
@@ -86,7 +86,7 @@ def change_public_ip_address(is_using_gui=False, ghostsurf_logo_file_path=None):
             message=message
         )
         info("Tor service has been restarted.")
-    except CalledProcessError as e:
+    except subprocess.CalledProcessError as e:
         message = "Failed to restart Tor service. Is pkexec working correctly?"
         error(f"{message} - {e}")
         display_notification(
@@ -118,7 +118,7 @@ def change_mac_address(
     if is_positive:
         try:
             # Identify the active internet interface (e.g., wlan0)
-            result = run(
+            result = subprocess.run(
                 "ip route show default | awk '/default/ {print $5}'",
                 shell=True, capture_output=True, text=True, check=True
             )
@@ -130,7 +130,7 @@ def change_mac_address(
             debug(f"Detected interface for reconnection: {interface_name}")
             # Construct and execute the combined command securely
             command = f"bash {mac_changer_script_file_path} && sleep 4 && nmcli d connect {interface_name}"
-            check_call(["pkexec", "bash", "-c", command])
+            subprocess.check_call(["pkexec", "bash", "-c", command])
             message = "MAC address has been changed and the device has reconnected to the internet."
             display_notification(
                 is_using_gui=is_using_gui,
@@ -138,7 +138,7 @@ def change_mac_address(
                 message=message,
             )
             info("MAC address has been changed.")
-        except CalledProcessError as e:
+        except subprocess.CalledProcessError as e:
             message = "MAC changer subprocess failed."
             error(f"{message} - {e}")
             display_notification(
@@ -156,7 +156,7 @@ def change_mac_address(
             )
     else:
         try:
-            check_call(["pkexec", "bash", mac_changer_script_file_path])
+            subprocess.check_call(["pkexec", "bash", mac_changer_script_file_path])
             message = "MAC address has been changed."
             display_notification(
                 is_using_gui=is_using_gui,
@@ -164,7 +164,7 @@ def change_mac_address(
                 message=message,
             )
             info("MAC address has been changed.")
-        except CalledProcessError as e:
+        except subprocess.CalledProcessError as e:
             message = "MAC changer subprocess failed."
             error(f"{message} - {e}")
             display_notification(
@@ -199,19 +199,19 @@ def change_nameservers(
     try:
         if is_working == True:
             command_string = (
-                f"{nameserver_changer_file_path} {tor_nameservers_file_path} && "
+                f"{nameserver_changer_file_path} {tor_nameservers_file_path}; "
                 f"cp {tor_nameservers_file_path} {original_resolv_configuration_file_path}"
             )
         else:
             command_string = (
-                f"{nameserver_changer_file_path} {privacy_focused_nameservers_file_path} && "
+                f"{nameserver_changer_file_path} {privacy_focused_nameservers_file_path}; "
                 f"cp {privacy_focused_nameservers_file_path} {original_resolv_configuration_file_path}"
             )
-        check_call(["pkexec", "bash", "-c", command_string])
+        subprocess.check_call(["pkexec", "bash", "-c", command_string])
         message = "Nameservers have been changed."
         display_notification(is_using_gui=is_using_gui, icon_file_path=ghostsurf_logo_file_path, message=message)
         info("Nameservers have been changed.")
-    except CalledProcessError as e:
+    except subprocess.CalledProcessError as e:
         message = "Nameserver changer subprocess failed."
         error(f"{message} - {e}")
         display_notification(is_using_gui=is_using_gui, icon_file_path=ghostsurf_logo_file_path, message=message)
@@ -232,7 +232,7 @@ def get_tor_status(
 ):
     is_tor_service_active = False
     try:
-        output = run(
+        output = subprocess.run(
             ["systemctl", "is-active", "tor"],
             text=True,
             capture_output=True,
@@ -255,7 +255,7 @@ def get_tor_status(
             else:
                 return 'unknown'
         info("Tor status has been retreived.")
-    except TimeoutExpired:
+    except subprocess.TimeoutExpired:
         message = "Timed out while checking Tor service status."
         error(f"{message} - {e}")
         display_notification(is_using_gui=is_using_gui, icon_file_path=ghostsurf_logo_file_path, message=message)

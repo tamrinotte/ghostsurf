@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
 # MODULES AND/OR LIBRARIES
-from subprocess import run, check_call, CalledProcessError
-from re import compile as recompile
-from pathlib import Path
+import subprocess
+import pathlib
+import re
 
 # Ghostsurf Modules
-from modules.conf_logging import debug, info, error
+from modules.conf_logging import debug, info, error, warning
 from modules.conf_notification import display_notification
 
 ##############################
@@ -21,8 +21,8 @@ def change_hostname(
     ghostsurf_logo_file_path=None,
 ):
     try:
-        check_call(["pkexec", "bash", "-c", f"bash '{hostname_changer_script_file_path}' && reboot"])
-    except CalledProcessError as e:
+        subprocess.check_call(["pkexec", "bash", "-c", f"bash '{hostname_changer_script_file_path}' && reboot"])
+    except subprocess.CalledProcessError as e:
         message = "Hostname changer subprocess failed."
         error(f"{message} - {e}")
         display_notification(
@@ -56,7 +56,7 @@ def wipe_memory(
     message = "Memory wipe completed successfully."
     
     try:
-        result = run(["pkexec", "bash", script])
+        result = subprocess.run(["pkexec", "bash", script])
         if result.returncode == 0:
             display_notification(
                 is_using_gui=is_using_gui,
@@ -94,11 +94,11 @@ def shred_log_files(
     ghostsurf_logo_file_path=None,
 ):
     try:
-        check_call(["pkexec", "bash", log_shredder_file_path, current_username])
+        subprocess.check_call(["pkexec", "bash", log_shredder_file_path, current_username])
         message = "Log files have been shredded."
         display_notification(is_using_gui=is_using_gui, icon_file_path=ghostsurf_logo_file_path, message=message)
         info("Log files have been shredded.")
-    except CalledProcessError as e:
+    except subprocess.CalledProcessError as e:
         message = "Log shredder subprocess failed."
         error(f"{message} - {e}")
         display_notification(
@@ -130,9 +130,9 @@ def anonymize_browser(
     ghostsurf_logo_file_path=None,
 ):
     try:
-        check_call(["pkexec", "bash", init_script_file_path])
-        ghostsurf_pattern = recompile(r".*ghostsurf$")
-        pentest_pattern = recompile(r".*penetration-testing$")
+        subprocess.check_call(["pkexec", "bash", init_script_file_path])
+        ghostsurf_pattern = re.compile(r".*ghostsurf$")
+        pentest_pattern = re.compile(r".*penetration-testing$")
         ghostsurf_dir = None
         pentest_dir = None
 
@@ -147,7 +147,7 @@ def anonymize_browser(
 
         # --- Handle Ghostsurf profile creation ---
         if not ghostsurf_dir:
-            check_call(["firefox-esr", "-CreateProfile", "ghostsurf"])
+            subprocess.check_call(["firefox-esr", "-CreateProfile", "ghostsurf"])
 
             # Find new profile directory
             ghostsurf_dirs = list(firefox_profiles_dir.glob("*.ghostsurf"))
@@ -162,7 +162,7 @@ def anonymize_browser(
             with open(custom_firefox_preferences_file_path, "r") as f:
                 custom_prefs = f.read().strip()
 
-            user_js_path = Path(ghostsurf_dir, "user.js")
+            user_js_path = pathlib.Path(ghostsurf_dir, "user.js")
             debug(f"Writing preferences to {user_js_path}")
             with open(user_js_path, "w") as f:
                 f.write(custom_prefs)
@@ -194,17 +194,29 @@ def anonymize_browser(
                 icon_file_path=ghostsurf_logo_file_path,
                 message="Ghostsurf Firefox profile has been created and configured."
             )
+        else:
+            display_notification(
+                is_using_gui=is_using_gui,
+                icon_file_path=ghostsurf_logo_file_path,
+                message="The Ghostsurf Firefox profile is already available."
+            )
 
         # --- Handle Penetration-Testing profile creation ---
         if not pentest_dir:
-            check_call(["firefox-esr", "-CreateProfile", "penetration-testing"])
+            subprocess.check_call(["firefox-esr", "-CreateProfile", "penetration-testing"])
             display_notification(
                 is_using_gui=is_using_gui,
                 icon_file_path=ghostsurf_logo_file_path,
                 message="Penetration-Testing Firefox profile has been created."
             )
+        else:
+            display_notification(
+                is_using_gui=is_using_gui,
+                icon_file_path=ghostsurf_logo_file_path,
+                message="The Penetration-Testing Firefox profile is already available."
+            )
 
-    except CalledProcessError as e:
+    except subprocess.CalledProcessError as e:
         message = "Browser anonymizer subprocess failed."
         error(f"{message} - {e}")
         display_notification(

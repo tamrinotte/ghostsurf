@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
 # MODULES AND/OR LIBRARIES
-from pathlib import Path
-from webbrowser import open as wbopen
-from time import sleep
-from getpass import getuser
-from sys import argv, exit as sysexit
-from subprocess import run
-from argparse import ArgumentParser
+import pathlib
+import webbrowser
+import time
+import getpass
+import sys
+import subprocess
+import argparse
 
 # PySide6
 from PySide6.QtWidgets import (
@@ -88,43 +88,43 @@ from modules.ops_checklist import (
 
 ##############################
 
-current_username = getuser()
+current_username = getpass.getuser()
 help_page_url = "https://www.github.com/tamrinotte/ghostsurf#readme"
-base_dir = Path(__file__).parent
+base_dir = pathlib.Path(__file__).parent
 
 # CONFIGURATION FILE PATHS
-configuration_files_dir_path = Path(base_dir, "configuration_files")
-ghostsurf_settings_file_path = Path(configuration_files_dir_path, "ghostsurf_settings.json")
-privacy_focused_nameservers_file_path = Path(configuration_files_dir_path, "privacy_focused_nameservers_resolv.conf")
-tor_nameservers_file_path = Path(configuration_files_dir_path, "tor_nameservers_resolv.conf")
-original_resolv_configuration_file_path = Path("/etc/resolv.conf")
-fake_hostnames_list_file_path = Path(configuration_files_dir_path, "list_of_fake_hostnames.list")
-firefox_profiles_dir = Path(f"/home/{current_username}/.mozilla/firefox/")
-firefox_profiles_conf_file_path = Path(firefox_profiles_dir, "profiles.ini")
-custom_firefox_preferences_file_path = Path(configuration_files_dir_path, "firefox_prefs.js.custom")
+configuration_files_dir_path = pathlib.Path(base_dir, "configuration_files")
+ghostsurf_settings_file_path = pathlib.Path(configuration_files_dir_path, "ghostsurf_settings.json")
+privacy_focused_nameservers_file_path = pathlib.Path(configuration_files_dir_path, "privacy_focused_nameservers_resolv.conf")
+tor_nameservers_file_path = pathlib.Path(configuration_files_dir_path, "tor_nameservers_resolv.conf")
+original_resolv_configuration_file_path = pathlib.Path("/etc/resolv.conf")
+fake_hostnames_list_file_path = pathlib.Path(configuration_files_dir_path, "list_of_fake_hostnames.list")
+firefox_profiles_dir = pathlib.Path(f"/home/{current_username}/.mozilla/firefox/")
+firefox_profiles_conf_file_path = pathlib.Path(firefox_profiles_dir, "profiles.ini")
+custom_firefox_preferences_file_path = pathlib.Path(configuration_files_dir_path, "firefox_prefs.js.custom")
 
 # BASH SCRIPT FILE PATHS
-bash_scripts_dir_path = Path(base_dir, "bash_scripts")
-mac_changer_script_file_path = Path(bash_scripts_dir_path, "mac_changer.sh")
-fast_bomb_script_file_path = Path(bash_scripts_dir_path, "fast_bomb.sh")
-secure_bomb_script_file_path = Path(bash_scripts_dir_path, "secure_bomb.sh")
-reset_script_file_path = Path(bash_scripts_dir_path, "reset.sh")
-start_transparent_proxy_script_file_path = Path(bash_scripts_dir_path, "start_transparent_proxy.sh")
-stop_transparent_proxy_script_file_path = Path(bash_scripts_dir_path, "stop_transparent_proxy.sh")
-hostname_changer_script_file_path = Path(bash_scripts_dir_path, "hostname_changer.sh")
-init_script_file_path = Path(bash_scripts_dir_path, "init.sh")
-log_shredder_file_path = Path(bash_scripts_dir_path, "log_shredder.sh")
-nameserver_changer_file_path = Path(bash_scripts_dir_path, "nameservers_changer.sh")
+bash_scripts_dir_path = pathlib.Path(base_dir, "bash_scripts")
+mac_changer_script_file_path = pathlib.Path(bash_scripts_dir_path, "mac_changer.sh")
+fast_bomb_script_file_path = pathlib.Path(bash_scripts_dir_path, "fast_bomb.sh")
+secure_bomb_script_file_path = pathlib.Path(bash_scripts_dir_path, "secure_bomb.sh")
+reset_script_file_path = pathlib.Path(bash_scripts_dir_path, "reset.sh")
+start_transparent_proxy_script_file_path = pathlib.Path(bash_scripts_dir_path, "start_transparent_proxy.sh")
+stop_transparent_proxy_script_file_path = pathlib.Path(bash_scripts_dir_path, "stop_transparent_proxy.sh")
+hostname_changer_script_file_path = pathlib.Path(bash_scripts_dir_path, "hostname_changer.sh")
+init_script_file_path = pathlib.Path(bash_scripts_dir_path, "init.sh")
+log_shredder_file_path = pathlib.Path(bash_scripts_dir_path, "log_shredder.sh")
+nameserver_changer_file_path = pathlib.Path(bash_scripts_dir_path, "nameservers_changer.sh")
 
 # BACKUP FILE PATHS
-backup_files_dir = Path(base_dir, "backup_files")
-timezone_backup_file_path = Path(backup_files_dir, "timezone.backup")
+backup_files_dir = pathlib.Path(base_dir, "backup_files")
+timezone_backup_file_path = pathlib.Path(backup_files_dir, "timezone.backup")
 
 # ICON FILE PATHS
-icons_dir_path = Path(base_dir, "icons")
-ghostsurf_logo_file_path = str(Path(icons_dir_path, "ghostsurf.png"))
-tick = QImage(str(Path(icons_dir_path, "tick.png")))
-cross = QImage(str(Path(icons_dir_path, "cross.png")))
+icons_dir_path = pathlib.Path(base_dir, "icons")
+ghostsurf_logo_file_path = str(pathlib.Path(icons_dir_path, "ghostsurf.png"))
+tick = QImage(str(pathlib.Path(icons_dir_path, "tick.png")))
+cross = QImage(str(pathlib.Path(icons_dir_path, "cross.png")))
 
 # PATHS TO VALIDATE
 paths_to_check = {
@@ -155,7 +155,7 @@ paths_to_check = {
 ##############################
 
 def main():
-    is_using_gui = len(argv) == 1
+    is_using_gui = len(sys.argv) == 1
     check_root_privileges()
     validate_ghostsurf_paths(paths_dict=paths_to_check)
 
@@ -163,9 +163,9 @@ def main():
         app = QApplication([])
         main_window = MainWindow()
         main_window.show()
-        sysexit(app.exec())
+        sys.exit(app.exec())
     else:
-        parser = ArgumentParser(description='GhostSurf CLI')
+        parser = argparse.ArgumentParser(description='GhostSurf CLI')
         subparsers = parser.add_subparsers(dest='command')
         start_parser = subparsers.add_parser('start', help='Start the transparent proxy')
         start_parser.set_defaults(
@@ -212,7 +212,10 @@ def main():
                 secure_bomb_script_file_path
             )
         )
-        browser_anonymization_parser = subparsers.add_parser('anonymizebrowser', help="Create and anonymize Firefox profiles")
+        browser_anonymization_parser = subparsers.add_parser(
+            'anonymizebrowser',
+            help="Create and anonymize Firefox profiles"
+        )
         browser_anonymization_parser.set_defaults(
             func=lambda: tui_cd_anonymize_browser(
                 firefox_profiles_dir,
@@ -296,7 +299,7 @@ class CheckListWorker(QRunnable):
 
         for key in checklist_items_dict.keys():
             self.signals.list_item.emit(key)
-            sleep(0.02)
+            time.sleep(0.02)
 
 ##############################
 
@@ -403,7 +406,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         gui_cd_change_ip(ghostsurf_logo_file_path=ghostsurf_logo_file_path)
 
     def display_the_help_page(self):
-        wbopen(help_page_url)
+        webbrowser.open(help_page_url)
 
     def run_checklist(self):
         self.checklist_window = ChecklistWindow()

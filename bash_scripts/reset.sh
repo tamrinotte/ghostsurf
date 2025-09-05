@@ -1,6 +1,9 @@
 #!/bin/bash
 
+set -euo pipefail # Add -x option to enable execution tracking (good for debugging).
+
 main() {
+    username="$1"
     declare_variables
     reset_configuration_files
     enable_ipv6
@@ -11,9 +14,8 @@ main() {
 }
 
 declare_variables() {
-    base_dir=/opt/ghostsurf/_internal
+    base_dir="/opt/ghostsurf/_internal"
     backup_dir="$base_dir/backup_files"
-    username=${SUDO_USER:-${USER}}
     firefox_dir="/home/$username/.mozilla/firefox"
     cache_dir="/home/$username/.cache/mozilla/firefox"
     hosts_file="/etc/hosts"
@@ -41,11 +43,16 @@ reset_mac_address() {
         [[ "$iface" == "lo" ]] && continue
         ifconfig "$iface" down
         systemctl stop "$network_manager"
-        macchanger -p "$iface"
+        perm_mac=$(macchanger -s "$iface" | grep "Permanent MAC" | awk '{print $3}')
+        curr_mac=$(cat /sys/class/net/"$iface"/address | tr '[:lower:]' '[:upper:]')
+        if [[ "$curr_mac" == "$perm_mac" ]]; then
+            macchanger -r "$iface"
+        fi
         systemctl start "$network_manager"
         ifconfig "$iface" up
     done
 }
+
 
 restore_firefox_profile() {
     cp "$backup_dir/firefox_profiles.backup" "$firefox_dir/profiles.ini"
@@ -70,7 +77,7 @@ iptables_accept_all() {
     iptables -t filter -X
     iptables -t nat -F
     iptables -t nat -X
-    
+
     ip6tables -t filter -F
     ip6tables -t filter -X
     ip6tables -t nat -F
@@ -95,4 +102,4 @@ reload_system_daemons() {
     systemctl daemon-reload
 }
 
-main
+main "$1"

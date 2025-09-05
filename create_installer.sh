@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 main() {
     declare_variables
@@ -17,7 +17,7 @@ print_info_message() {
 
 declare_variables() {
     app_name="ghostsurf"
-    version="0.1.1"
+    version="0.1.2"
     username=$USER
     installer="${app_name}.deb"
     build_dirs=("dist" "build" "package")
