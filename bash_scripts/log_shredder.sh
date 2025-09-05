@@ -3,13 +3,12 @@
 set -euo pipefail # Add -x option to enable execution tracking (good for debugging).
 
 main () {
-    local username="$1"
+    username="$1"
     declare_variables "$username"
     start_log_killer
 }
 
 declare_variables() {
-    local username="$1"
     list_of_log_files=(
         "/var/log/auth.log"
         "/var/log/kern.log"
