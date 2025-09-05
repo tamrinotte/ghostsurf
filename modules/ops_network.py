@@ -245,7 +245,7 @@ def get_tor_status(
                 is_tor_service_active = True
             else:
                 is_tor_service_active = False
-            message = f"Is Tor service active: {is_tor_service_active}."
+            message = f"Is Tor service active: {is_tor_service_active}"
             display_notification(is_using_gui=is_using_gui, icon_file_path=ghostsurf_logo_file_path, message=message)
         else:
             if output == "active":

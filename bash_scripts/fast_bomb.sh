@@ -20,7 +20,6 @@ drop_caches() {
 }
 
 wipe_memory() {
-    # Wiping memory securely
     sdmem -fllv
 }
 
